@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="spriter_data" type="SpriterData" />
@@ -11,6 +12,8 @@
 	<xs:element name="key" type="Key" />
 	<xs:element name="object_ref" type="AnimationObjectRef" />
 	<xs:element name="object" type="AnimationObject" />
+	<xs:element name="bone" type="Bone" />
+	<xs:element name="bone_ref" type="BoneRef" />
 	
 	<xs:complexType name="SpriterData">
 		<xs:sequence>
@@ -73,6 +76,8 @@
 		<xs:sequence>
 			<xs:element name="object" type="AnimationObject" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="object_ref" type="AnimationObjectRef" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="bone_ref" type="BoneRef" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="bone" type="Bone" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" />
 		<xs:attribute name="time" type="xs:long" default="0"/>
@@ -96,6 +101,18 @@
 		<xs:attribute name="angle" type="xs:decimal" default="0"/>
 	</xs:complexType>
 	
+	<xs:complexType name="BoneRef">
+		<xs:attribute name="id" type="xs:long"/>
+		<xs:attribute name="timeline" type="xs:int" />
+		<xs:attribute name="key" type="xs:int" />
+	</xs:complexType>
 	
+	<xs:complexType name="Bone">
+		<xs:attribute name="x" type="xs:decimal" default="0"/>
+		<xs:attribute name="y" type="xs:decimal" default="0"/>
+		<xs:attribute name="angle" type="xs:decimal" default="0"/>
+		<xs:attribute name="scale_x" type="xs:decimal" default="0"/>
+		<xs:attribute name="scale_y" type="xs:decimal" default="0"/>
+	</xs:complexType>
 
 </xs:schema>

@@ -25,7 +25,7 @@ public class SpriterTest {
 		if(i>120){
 			i=0;
 			
-			currentAnimation = currentAnimation==1?0:1;
+			currentAnimation = currentAnimation==2?0:2;
 			spriter.playAnimation(currentAnimation);
 		}
 		

@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.discobeard.game</groupId>
+	<artifactId>spriter-test</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>spriter-test</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<lwjgl.version>2.8.1</lwjgl.version>
+		<slick.version>274</slick.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>java.net</id>
+			<name>java.net Maven Repository</name>
+			<url>https://maven-repository.dev.java.net/nonav/repository</url>
+			<layout>legacy</layout>
+		</repository>
+
+		<repository>
+				<id>Slick Repo</id>
+		      	<name>Slick Repo</name>
+		      	<url>http://slick.cokeandcode.com/mavenrepo</url>
+		</repository>
+
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+			        <groupId>com.googlecode.mavennatives</groupId>
+			        <artifactId>maven-nativedependencies-plugin</artifactId>
+			        <version>0.0.5</version>
+			        <configuration>
+					    <nativesTargetDir>target/natives</nativesTargetDir>
+					    <separateDirs>true</separateDirs>	               
+					</configuration>
+			        <executions>
+			                <execution>
+			                        <id>unpacknatives</id>
+			                        <phase>generate-resources</phase>
+			                        <goals>
+			                                <goal>copy</goal>
+			                        </goals>
+			                </execution>
+			        </executions>
+			</plugin>
+		</plugins>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+	</build>
+
+	<dependencies>
+		<dependency>
+		    <groupId>com.discobeard.spirter</groupId>
+		    <artifactId>spriter_plugin</artifactId>
+		    <version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.lwjgl.lwjgl</groupId>
+		    <artifactId>lwjgl_util</artifactId>
+		    <version>${lwjgl.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>slick</groupId>
+		    <artifactId>slick</artifactId>
+		    <version>${slick.version}</version>
+			<exclusions>
+	            <exclusion>
+	               <artifactId>lwjgl</artifactId>
+	               <groupId>org.lwjgl</groupId>
+	            </exclusion>
+	            <exclusion>
+	               <artifactId>lwjgl-jinput</artifactId>
+	               <groupId>org.lwjgl</groupId>
+	            </exclusion>
+	            <exclusion>
+	               <artifactId>lwjgl-native</artifactId>
+	               <groupId>org.lwjgl</groupId>
+	            </exclusion>
+         </exclusions>
+		</dependency>
+	</dependencies>
+
+</project>

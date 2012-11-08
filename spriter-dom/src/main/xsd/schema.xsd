@@ -29,12 +29,12 @@
 		<xs:sequence>
 			<xs:element name="file" type="File" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string" />
+		<xs:attribute name="id" type="xs:int" />
 		<xs:attribute name="name" type="xs:string" />
     </xs:complexType>
 	
 	<xs:complexType name="File">
-            <xs:attribute name="id" type="xs:long"/>
+            <xs:attribute name="id" type="xs:int"/>
             <xs:attribute name="name" type="xs:string"/>
             <xs:attribute name="width" type="xs:long"/>
 			<xs:attribute name="height" type="xs:long"/>
@@ -44,13 +44,13 @@
 		<xs:sequence>
 			<xs:element name="animation" type="Animation" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:long"/>
+		<xs:attribute name="id" type="xs:int"/>
 		<xs:attribute name="name" type="xs:string" />
     </xs:complexType>
 	
 	<xs:complexType name="MainLine">
 		<xs:sequence>
-			<xs:element name="key" type="Key" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="key" type="Key"  minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
     </xs:complexType>
 	
@@ -58,15 +58,15 @@
 		<xs:sequence>
 			<xs:element name="key" type="Key" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string" />
+		<xs:attribute name="id" type="xs:int" />
     </xs:complexType>
 	
 	<xs:complexType name="Animation">
 		<xs:sequence>
-			<xs:element name="mainline" type="MainLine" minOccurs="1" maxOccurs="unbounded" />
+			<xs:element name="mainline" type="MainLine" minOccurs="1" maxOccurs="1" />
 			<xs:element name="timeline" type="TimeLine" minOccurs="1" maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:long"/>
+		<xs:attribute name="id" type="xs:int"/>
 		<xs:attribute name="name" type="xs:string" />
 		<xs:attribute name="length" type="xs:long" />
 		<xs:attribute name="looping" type="xs:boolean" />
@@ -74,21 +74,22 @@
 	
 	<xs:complexType name="Key">
 		<xs:sequence>
-			<xs:element name="object" type="AnimationObject" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="object" type="AnimationObject" minOccurs="0" maxOccurs="1" />
 			<xs:element name="object_ref" type="AnimationObjectRef" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="bone_ref" type="BoneRef" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="bone" type="Bone" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="bone" type="Bone" minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string" />
+		<xs:attribute name="id" type="xs:int" />
 		<xs:attribute name="time" type="xs:long" default="0"/>
 		<xs:attribute name="spin" type="xs:int" default="1"/>
     </xs:complexType>
 	
 	<xs:complexType name="AnimationObjectRef">
-		<xs:attribute name="id" type="xs:long"/>
+		<xs:attribute name="id" type="xs:int"/>
 		<xs:attribute name="timeline" type="xs:int" />
 		<xs:attribute name="key" type="xs:int" />
 		<xs:attribute name="z_index" type="xs:int" />
+		<xs:attribute name="parent" type="xs:int" />
 	</xs:complexType>
 	
 	<xs:complexType name="AnimationObject">
@@ -102,17 +103,18 @@
 	</xs:complexType>
 	
 	<xs:complexType name="BoneRef">
-		<xs:attribute name="id" type="xs:long"/>
+		<xs:attribute name="id" type="xs:int"/>
 		<xs:attribute name="timeline" type="xs:int" />
 		<xs:attribute name="key" type="xs:int" />
+		<xs:attribute name="parent" type="xs:int" />
 	</xs:complexType>
 	
 	<xs:complexType name="Bone">
 		<xs:attribute name="x" type="xs:decimal" default="0"/>
 		<xs:attribute name="y" type="xs:decimal" default="0"/>
 		<xs:attribute name="angle" type="xs:decimal" default="0"/>
-		<xs:attribute name="scale_x" type="xs:decimal" default="0"/>
-		<xs:attribute name="scale_y" type="xs:decimal" default="0"/>
+		<xs:attribute name="scale_x" type="xs:decimal" default="1.0"/>
+		<xs:attribute name="scale_y" type="xs:decimal" default="1.0"/>
 	</xs:complexType>
 
 </xs:schema>

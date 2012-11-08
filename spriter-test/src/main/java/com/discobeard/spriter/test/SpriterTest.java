@@ -9,25 +9,15 @@ public class SpriterTest {
 	private Spriter spriter;
 	private FileLoader<Texture> loader;
 	private int i=0;
-	private int currentAnimation=0;
+	private int currentAnimation=3;
 	
 	public SpriterTest(){
 		loader = new TextureLoader();
 		spriter = Spriter.getSpriter("monster",new TextureDrawer(loader),loader);
-		spriter.playAnimation(currentAnimation);
+		spriter.playAnimation(currentAnimation,true);
 	}
 	
 	public void draw(){
-		spriter.draw(200,20);
-		
-		i++;
-		
-		if(i>120){
-			i=0;
-			
-			currentAnimation = currentAnimation==2?0:2;
-			spriter.playAnimation(currentAnimation);
-		}
-		
+		spriter.draw(400,20);
 	}
 }

@@ -13,6 +13,8 @@ public class SpriterAnimation {
 	final private long lenght;
 	final private boolean shouldLoop;
 	
+	private HashMap<Integer,SpriterBone> tempBones = new HashMap<Integer,SpriterBone>();
+	
 	public static SpriterAnimation createAnimation(Animation from) {
 		return new SpriterAnimation(new SpriterKeyFrameBuilder().buildKeyFrameArray(from),from.getLength(),Boolean.getBoolean("false"));
 	}
@@ -47,7 +49,7 @@ public class SpriterAnimation {
 		
 		DrawInstruction[] drawInstructions = new DrawInstruction[key1.getObjects().length];
 		
-		HashMap<Integer,SpriterBone> tempBones = new HashMap<Integer,SpriterBone>();
+		tempBones.clear();
 		
 		for(int b=0;b<key1.getBones().length;b++){
 			
@@ -120,7 +122,7 @@ public class SpriterAnimation {
 			}
 			
 			
-			System.out.println("rotation"+rotation);
+			//System.out.println("rotation"+rotation);
 			drawInstructions[o] = new DrawInstruction(new Reference(obj1.getFolder(),obj1.getFile()),x,y,obj1.getPivotX(),obj1.getPivotY(),rotation);
 		}
 		
@@ -142,6 +144,13 @@ public class SpriterAnimation {
 		  childx =xnew;
 		  childy =ynew;
 		  
+		  
+		  if(parent.getParent()!=null){
+			  System.out.println("recurse");
+			  return rotatePoint(tempBones.get(parent.getParent()),childx,childy,rotation*parent.getSpin());
+			  
+		  }
+		  System.out.println("release");
 		  return new float[]{childx,childy,rotation};
 	}
 	

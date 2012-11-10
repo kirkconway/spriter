@@ -9,11 +9,12 @@ public class SpriterTest {
 	private Spriter spriter;
 	private FileLoader<Texture> loader;
 	private int i=0;
-	private int currentAnimation=3;
+	private int currentAnimation=0;
 	
 	public SpriterTest(){
 		loader = new TextureLoader();
 		spriter = Spriter.getSpriter("monster",new TextureDrawer(loader),loader);
+		//spriter = Spriter.getSpriter("bonetest",new TextureDrawer(loader),loader);
 		spriter.playAnimation(currentAnimation,true);
 	}
 	

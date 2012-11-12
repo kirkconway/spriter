@@ -1,7 +1,5 @@
 package com.discobeard.spriter.objects;
 
-import java.util.List;
-
 public class SpriterObject {
 	
 	private int file;
@@ -10,9 +8,13 @@ public class SpriterObject {
 	private float y;
 	private float pivotX;
 	private float pivotY;
+	private float scale_x;
+	private float scale_y;
 	private int zIndex;
 	private float angle;
 	private int spin;
+	private float alpha;
+	
 	private Integer parent = null;
 	
 	public int getFile() {
@@ -78,6 +80,29 @@ public class SpriterObject {
 	public void setParent(Integer parentId) {
 		this.parent = parentId;
 	}
-	
+
+	public float getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(float alpha) {
+		this.alpha = alpha;
+	}
+
+	public float getScale_x() {
+		return scale_x;
+	}
+
+	public void setScale_x(float scale_x) {
+		this.scale_x = scale_x;
+	}
+
+	public float getScale_y() {
+		return scale_y;
+	}
+
+	public void setScale_y(float scale_y) {
+		this.scale_y = scale_y;
+	}	
 	
 }

@@ -1,11 +1,7 @@
 package com.discobeard.spriter;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.net.URL;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -15,25 +11,21 @@ import com.discobeard.spriter.dom.SpriterData;
 
 public class SCMLParser {
 	
-	private final URL DIRECTORY;
+	final private File scmlFile;
 	
-	public SCMLParser(String Directory)
+	public SCMLParser(File scmlFile)
 	{
-		this.DIRECTORY = getClass().getResource("/"+Directory);
-		
+		this.scmlFile=scmlFile;
 	}
 	
 	public SpriterData parse(){
-		File folder = new File(DIRECTORY.getPath());
-		
-		File scmlFile = getSCML(folder);
 		try {
 			return parseSpriterData(scmlFile);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR: SCML File Not Found :"+ scmlFile.getPath());
 			e.printStackTrace();
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR: Failed to make scml :"+ scmlFile.getPath() + " contents map to spriter objects, likely your using an SCML version that is not currently supporter");
 			e.printStackTrace();
 		}
 		return null;
@@ -50,26 +42,5 @@ public class SCMLParser {
 		SpriterData spriterData = root.getValue();
 		return spriterData;
 		
-	}
-	
-	private File getSCML(File folder){
-		
-		FilenameFilter scmlFilter = new FilenameFilter(){
-
-			@Override
-			public boolean accept(File dir, String name) {
-				String lowercaseName = name.toLowerCase();
-				if (lowercaseName.endsWith(".scml")) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-			
-		};
-		
-		File[] files = folder.listFiles(scmlFilter);
-		
-		return files[0];
 	}
 }

@@ -1,6 +1,7 @@
-package com.discobeard.spriter;
+package com.discobeard.spriter.file;
 
 import java.util.HashMap;
+
 
 public abstract class FileLoader<I> {
 

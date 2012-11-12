@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.util.ResourceLoader;
 
-import com.discobeard.spriter.FileLoader;
-import com.discobeard.spriter.Reference;
+import com.discobeard.spriter.file.FileLoader;
+import com.discobeard.spriter.file.Reference;
 
 public class TextureLoader extends FileLoader<Texture>{
 

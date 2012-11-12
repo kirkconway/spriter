@@ -22,7 +22,6 @@ public class SpriterBoneMerger implements Merger<BoneRef,Key,SpriterBone>{
 		bone.setX(obj.getX().floatValue());
 		bone.setY(obj.getY().floatValue());
 		bone.setSpin(key.getSpin());
-		System.out.println(key.getSpin());
 		return bone;
 	}
 

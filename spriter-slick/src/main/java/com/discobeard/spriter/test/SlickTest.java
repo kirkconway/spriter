@@ -6,10 +6,8 @@ import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-
-import com.discobeard.spriter.objects.Spriter;
+import com.discobeard.spriter.Spriter;
  
 public class SlickTest extends BasicGame{
  
@@ -29,8 +27,8 @@ public class SlickTest extends BasicGame{
     	
     	ImageLoader loader = new ImageLoader();
     	Graphics g = gc.getGraphics();
-		spriter = Spriter.getSpriter("monster",new ImageDrawer(loader,800,g),loader);
-		spriter.playAnimation(0,true);
+		spriter = Spriter.getSpriter("monster/basic.scml",new ImageDrawer(loader,800,g),loader);
+		spriter.playAnimation(2,true);
     }
  
     @Override

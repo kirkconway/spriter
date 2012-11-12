@@ -1,4 +1,4 @@
-package com.discobeard.spriter;
+package com.discobeard.spriter.file;
 
 public class Reference {
 	

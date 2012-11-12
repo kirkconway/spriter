@@ -99,7 +99,10 @@
 		<xs:attribute name="y" type="xs:decimal" default="0"/>
 		<xs:attribute name="pivot_x" type="xs:decimal" default="0"/>
 		<xs:attribute name="pivot_y" type="xs:decimal" default="1"/>
+		<xs:attribute name="scale_x" type="xs:decimal" default="1"/>
+		<xs:attribute name="scale_y" type="xs:decimal" default="1"/>
 		<xs:attribute name="angle" type="xs:decimal" default="0"/>
+		<xs:attribute name="a" type="xs:decimal" default="1"/>
 	</xs:complexType>
 	
 	<xs:complexType name="BoneRef">

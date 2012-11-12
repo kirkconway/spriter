@@ -2,39 +2,43 @@ package com.discobeard.spriter.test;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import com.discobeard.spriter.FileLoader;
-import com.discobeard.spriter.Reference;
-import com.discobeard.spriter.draw.Drawer;
+import com.discobeard.spriter.file.FileLoader;
+import com.discobeard.spriter.draw.DrawInstruction;
+import com.discobeard.spriter.draw.AbstractDrawer;
 
-public class ImageDrawer implements Drawer {
+public class ImageDrawer extends AbstractDrawer<Image> {
 
-	private final FileLoader<Image> IMAGE_LOADER;
 	private float screenheight;
 	private Graphics g;
 
 	public ImageDrawer(FileLoader<Image> loader, float screenheight, Graphics g) {
-		this.IMAGE_LOADER = loader;
+		super(loader);
 		this.screenheight = screenheight;
 		this.g = g;
 	}
 
-	public void draw(Image image, float x, float y, float pivot_x, float pivot_y, float angle) {
+	public void draw(Image image, float x, float y, float pivot_x, float pivot_y,float scale_x,float scale_y, float angle, float alpha) {
 
 		float newPivotX = (image.getWidth() * pivot_x);
 		float newX = x - newPivotX;
-		
+
 		float newPivotY = (image.getHeight() * pivot_y);
 		float newY = (screenheight - y) - (image.getHeight() - newPivotY);
 
-		g.rotate(x, (screenheight - y), -angle);
+		//float width = image.getWidth()*scale_x;
+		//float height = image.getHeight()*scale_y;
 		
-		image.draw(newX, newY);
+		g.rotate(x, (screenheight - y), -angle);
+		image.setAlpha(alpha);
+		image.draw(newX, newY,image.getWidth()*scale_x,image.getHeight()*scale_y);
 		g.resetTransform();
 	}
 
 	@Override
-	public void draw(Reference ref, float x, float y, float pivot_x, float pivot_y, float angle) {
-		draw(IMAGE_LOADER.get(ref), x, y, pivot_x, pivot_y, angle);
+	public void draw(DrawInstruction instruction) {
+		draw(getFile(instruction.getRef()), instruction.getX(), instruction.getY(), instruction.getPivot_x(),
+				instruction.getPivot_y(), instruction.getScale_x(), instruction.getScale_y(), instruction.getAngle(),
+				instruction.getAlpha());
 	}
 
 }

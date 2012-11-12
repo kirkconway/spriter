@@ -1,56 +1,62 @@
 package com.discobeard.spriter.test;
 
-import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.*;
 import org.newdawn.slick.opengl.Texture;
-import com.discobeard.spriter.FileLoader;
-import com.discobeard.spriter.Reference;
-import com.discobeard.spriter.draw.Drawer;
+import com.discobeard.spriter.draw.DrawInstruction;
+import com.discobeard.spriter.draw.AbstractDrawer;
+import com.discobeard.spriter.file.FileLoader;
 
-public class TextureDrawer implements Drawer{
-	
-	private final FileLoader<Texture> TEXTURE_LOADER;
-	
-	public TextureDrawer(FileLoader<Texture> loader){
-		this.TEXTURE_LOADER =loader;
+public class TextureDrawer extends AbstractDrawer<Texture> {
+
+	public TextureDrawer(FileLoader<Texture> loader) {
+		super(loader);
 	}
-	
-	public void draw(Texture texture,float x, float y, float pivot_x,float pivot_y,float angle)
-	{
-		GL11.glLoadIdentity();            
-		GL11.glTranslatef(x,y,0);
-		GL11.glRotatef(angle,0f,0f,1f);
+
+	public void draw(Texture texture, float x, float y, float pivot_x, float pivot_y, float scale_x, float scale_y,
+			float angle, float alpha) {
+		glLoadIdentity();
+		glTranslatef(x, y, 0);
+		glRotatef(angle, 0f, 0f, 1f);
 
 		float original_width = texture.getTextureWidth();
 		float original_height = texture.getTextureHeight();
-				
-		
+
 		float textureDown = 0;
-		float textureUp = textureDown + (1/(original_height/texture.getImageHeight()));
+		float textureUp = textureDown + (1 / (original_height / texture.getImageHeight()));
 		float textureLeft = 0;
-		float textureRight = textureLeft+(1/(original_width/texture.getImageWidth()));
+		float textureRight = textureLeft + (1 / (original_width / texture.getImageWidth()));
 
 		texture.bind();
-		
-		GL11.glBegin(GL11.GL_QUADS);
-		
-			GL11.glTexCoord2f(textureLeft,textureUp); //Upper left	
-			GL11.glVertex2f(-(texture.getImageWidth()*pivot_x), -((texture.getImageHeight()*pivot_y))+0.01f);
 
-			GL11.glTexCoord2f(textureRight,textureUp); //Upper right
-			GL11.glVertex2f((-(texture.getImageWidth()*pivot_x))+texture.getImageWidth(), (-(texture.getImageHeight()*pivot_y)+0.01f));
+		glBegin(GL_QUADS);
 
-			GL11.glTexCoord2f(textureRight,textureDown); // Lower right	
-			GL11.glVertex2f((-(texture.getImageWidth()*pivot_x))+texture.getImageWidth(), (-(texture.getImageHeight()*pivot_y)+0.01f)+texture.getImageHeight());
-			
-			GL11.glTexCoord2f(textureLeft,textureDown); //Lower left
-			GL11.glVertex2f(-(texture.getImageWidth()*pivot_x), (-(texture.getImageHeight()*pivot_y)+0.01f)+texture.getImageHeight());
+		glColor4f(1.0f, 1.0f, 1.0f, alpha);
+		glTexCoord2f(textureLeft, textureUp); // Upper left
+		glVertex2f(-((texture.getImageWidth()*scale_x) * pivot_x), -(((texture.getImageHeight()*scale_y) * pivot_y)));
 
-       	GL11.glEnd(); 
+		glColor4f(1.0f, 1.0f, 1.0f, alpha);
+		glTexCoord2f(textureRight, textureUp); // Upper right
+		glVertex2f((-((texture.getImageWidth()*scale_x) * pivot_x)) + (texture.getImageWidth()*scale_x),
+				(-((texture.getImageHeight()*scale_y) * pivot_y)));
+
+		glColor4f(1.0f, 1.0f, 1.0f, alpha);
+		glTexCoord2f(textureRight, textureDown); // Lower right
+		glVertex2f((-((texture.getImageWidth()*scale_x) * pivot_x)) + (texture.getImageWidth()*scale_x),
+				(-((texture.getImageHeight()*scale_y) * pivot_y)) + (texture.getImageHeight()*scale_y));
+
+		glColor4f(1.0f, 1.0f, 1.0f, alpha);
+		glTexCoord2f(textureLeft, textureDown); // Lower left
+		glVertex2f(-((texture.getImageWidth()*scale_x) * pivot_x),
+				(-((texture.getImageHeight()*scale_y) * pivot_y)) + (texture.getImageHeight()*scale_y));
+
+		glEnd();
 	}
-	
+
 	@Override
-	public void draw(Reference ref, float x, float y, float pivot_x,float pivot_y, float angle) {
-		draw(TEXTURE_LOADER.get(ref),x ,y,pivot_x,pivot_y,angle);
+	public void draw(DrawInstruction instruction) {
+		draw(getFile(instruction.getRef()), instruction.getX(), instruction.getY(), instruction.getPivot_x(),
+				instruction.getPivot_y(), instruction.getScale_x(), instruction.getScale_y(), instruction.getAngle(),
+				instruction.getAlpha());
 	}
-	
+
 }

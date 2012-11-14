@@ -9,8 +9,7 @@ public class SpriterTest {
 	
 	private Spriter spriter;
 	private FileLoader<Texture> loader;
-	private int i=0;
-	private int currentAnimation=2;
+	private int currentAnimation=1;
 	
 	public SpriterTest(){
 		loader = new TextureLoader();

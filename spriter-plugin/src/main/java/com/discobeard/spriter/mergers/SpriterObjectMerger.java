@@ -10,7 +10,7 @@ public class SpriterObjectMerger implements Merger<AnimationObjectRef, Key, Spri
 	@Override
 	public SpriterObject merge(AnimationObjectRef ref, Key key) {
 
-		AnimationObject obj = key.getObject(); 
+		AnimationObject obj = key.getObject().get(0); 
 		SpriterObject spriterObject = new SpriterObject();
 		spriterObject.setAngle(obj.getAngle().floatValue());
 		spriterObject.setFile(obj.getFile());

@@ -14,8 +14,9 @@ public class SpriterObject {
 	private float angle;
 	private int spin;
 	private float alpha;
-	
 	private Integer parent = null;
+	private boolean transientObject = false;
+	
 	
 	public int getFile() {
 		return file;
@@ -103,6 +104,14 @@ public class SpriterObject {
 
 	public void setScale_y(float scale_y) {
 		this.scale_y = scale_y;
+	}
+
+	public boolean isTransientObject() {
+		return transientObject;
+	}
+
+	public void setTransientObject(boolean transientObject) {
+		this.transientObject = transientObject;
 	}	
 	
 }

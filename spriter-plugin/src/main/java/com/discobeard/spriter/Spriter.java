@@ -9,22 +9,37 @@ import com.discobeard.spriter.file.FileLoader;
 import com.discobeard.spriter.file.Reference;
 import com.discobeard.spriter.objects.SpriterAnimation;
 
+/**
+ * 
+ * @author Discobeard.com
+ * 
+ */
 public class Spriter {
 
-	public static Spriter getSpriter(String path, AbstractDrawer drawer, FileLoader<?> loader) {
+	/**
+	 * Creates a spriter object.
+	 * 
+	 * @param path
+	 * @param drawer
+	 *            a drawer extended from the AbstractDrawer
+	 * @param loader
+	 *            a loader extended from the AbstractLoader
+	 * @return a Spriter Object
+	 */
+
+	public static Spriter getSpriter(String path, AbstractDrawer<?> drawer, FileLoader<?> loader) {
 		return new Spriter(path, drawer, loader);
 	}
 
-	final private SpriterData spriter_data;
-	final private File scml_file;
-	final private AbstractDrawer drawer;
+	final private AbstractDrawer<?> drawer;
 	final private FileLoader<?> loader;
-
-	private long startTime = 0;
-	private long animationTime = 0;
+	final private File scml_file;
+	final private SpriterData spriter_data;
 	private SpriterAnimation animation = null;
+	private long animationTime = 0;
+	private long startTime = 0;
 
-	public Spriter(String scml_path, AbstractDrawer drawer, FileLoader<?> loader) {
+	private Spriter(String scml_path, AbstractDrawer<?> drawer, FileLoader<?> loader) {
 		this.scml_file = new File(getClass().getResource("/" + scml_path).getPath());
 		this.spriter_data = new SCMLParser(scml_file).parse();
 		this.drawer = drawer;
@@ -32,28 +47,60 @@ public class Spriter {
 		loadResources();
 	}
 
+	/**
+	 * Draw the current frame of the spriter object
+	 * 
+	 * @param xOffset
+	 * @param yOffset
+	 */
 	public void draw(float xOffset, float yOffset) {
 
 		updateAnimationTime();
 
-		for (int k = animation.getKeyFrames().length - 1; k > -1; k--) {
-			if (animationTime >= animation.getKeyFrames()[k].getStartTime()) {
-				if (k == animation.getKeyFrames().length - 1) {
+		int currentKey = animation.getCurrentKey();
 
-					if (animation.shouldLoop()) {
-						drawSceneWithOffset(animation.createDrawInstructions(animation.getKeyFrames()[k],
-								animation.getKeyFrames()[0], animationTime, animation.getLenght(),xOffset, yOffset));
-					} else {
-						drawSceneWithOffset(animation.createDrawInstructions(animation.getKeyFrames()[k], xOffset,
-								yOffset));
-					}
-				} else {
-					drawSceneWithOffset(animation.createDrawInstructions(animation.getKeyFrames()[k],
-							animation.getKeyFrames()[k + 1], animationTime, xOffset, yOffset));
-				}
+		if (animationTime > animation.getKeyFrames()[currentKey].getEndTme()) {
+			animation.setCurrentKey(currentKey + 1);
+			//System.out.println("next keyframe" + (currentKey + 1));
+		}
+		if (currentKey == animation.getKeyFrames().length - 1) {
 
-				break;
+			if (animation.shouldLoop()) {
+				drawSceneWithOffset(animation.createDrawInstructions(animation.getKeyFrames()[currentKey],
+						animation.getKeyFrames()[0], animationTime, animation.getLenght(), xOffset, yOffset));
+			} else {
+				drawSceneWithOffset(animation.createDrawInstructions(animation.getKeyFrames()[currentKey], xOffset,
+						yOffset));
 			}
+
+		} else {
+			drawSceneWithOffset(animation.createDrawInstructions(animation.getKeyFrames()[currentKey],
+					animation.getKeyFrames()[currentKey + 1], animationTime, xOffset, yOffset));
+		}
+
+	}
+
+	/**
+	 * Starts the animation running.
+	 * 
+	 * @param animationNumer
+	 *            the animation number in the scml file
+	 * @param loop
+	 *            if you want the animation to loop or not.
+	 */
+	public void playAnimation(int animationNumer, boolean loop) {
+		startTime = System.currentTimeMillis();
+		Animation currentAnimation = spriter_data.getEntity().get(0).getAnimation().get(animationNumer);
+		animation = SpriterAnimation.createAnimation(currentAnimation, loop);
+	}
+
+	private void updateAnimationTime() {
+		animationTime = System.currentTimeMillis() - startTime;
+
+		if (animationTime > animation.getLenght()) {
+			startTime = System.currentTimeMillis();
+			animationTime = 0;
+			animation.setCurrentKey(0);
 		}
 	}
 
@@ -73,22 +120,9 @@ public class Spriter {
 				loader.load(new Reference(folder, file),
 						scml_file.getParent() + "/"
 								+ spriter_data.getFolder().get(folder).getFile().get(file).getName());
+				System.out.println("Loaded File " + scml_file.getParent() + "/"
+						+ spriter_data.getFolder().get(folder).getFile().get(file).getName());
 			}
-		}
-	}
-
-	public void playAnimation(int animationNumer, boolean isLooping) {
-		startTime = System.currentTimeMillis();
-		Animation currentAnimation = spriter_data.getEntity().get(0).getAnimation().get(animationNumer);
-		animation = SpriterAnimation.createAnimation(currentAnimation, isLooping);
-	}
-
-	private void updateAnimationTime() {
-		animationTime = System.currentTimeMillis() - startTime;
-
-		if (animationTime > animation.getLenght()) {
-			startTime = System.currentTimeMillis();
-			animationTime = 0;
 		}
 	}
 }

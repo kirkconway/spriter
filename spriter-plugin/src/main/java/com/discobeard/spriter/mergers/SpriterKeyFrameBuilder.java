@@ -3,7 +3,9 @@ package com.discobeard.spriter.mergers;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.discobeard.spriter.converters.SpriterObjectConverter;
 import com.discobeard.spriter.dom.Animation;
+import com.discobeard.spriter.dom.AnimationObject;
 import com.discobeard.spriter.dom.AnimationObjectRef;
 import com.discobeard.spriter.dom.BoneRef;
 import com.discobeard.spriter.dom.Key;
@@ -17,6 +19,7 @@ public class SpriterKeyFrameBuilder {
 
 	final private SpriterBoneMerger boneMerger = new SpriterBoneMerger();
 	final private SpriterObjectMerger objectMerger = new SpriterObjectMerger();
+	final private SpriterObjectConverter objectConverter = new SpriterObjectConverter();
 	
 	public SpriterKeyFrame[] buildKeyFrameArray(Animation animation){
 		
@@ -39,6 +42,10 @@ public class SpriterKeyFrameBuilder {
 			
 			for(AnimationObjectRef objectRef : key.getObjectRef()){
 				tempObjects.add(objectMerger.merge(objectRef, timeLines.get(objectRef.getTimeline()).getKey().get(objectRef.getKey())));
+			}
+			
+			for(AnimationObject object : key.getObject()){
+				tempObjects.add(objectConverter.convert(object));
 			}
 			
 			spriterKeyFrames[k] = new SpriterKeyFrame();

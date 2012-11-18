@@ -74,7 +74,7 @@
 	
 	<xs:complexType name="Key">
 		<xs:sequence>
-			<xs:element name="object" type="AnimationObject" minOccurs="0" maxOccurs="1" />
+			<xs:element name="object" type="AnimationObject" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="object_ref" type="AnimationObjectRef" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="bone_ref" type="BoneRef" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="bone" type="Bone" minOccurs="0" maxOccurs="1" />
@@ -103,6 +103,7 @@
 		<xs:attribute name="scale_y" type="xs:decimal" default="1"/>
 		<xs:attribute name="angle" type="xs:decimal" default="0"/>
 		<xs:attribute name="a" type="xs:decimal" default="1"/>
+		<xs:attribute name="z_index" type="xs:int" default="0"/>
 	</xs:complexType>
 	
 	<xs:complexType name="BoneRef">

@@ -27,7 +27,7 @@ public class SpriterKeyFrame {
 		this.objects = objects;
 	}
 
-	public long getEndTme() {
+	public long getEndTime() {
 		return endTme;
 	}
 

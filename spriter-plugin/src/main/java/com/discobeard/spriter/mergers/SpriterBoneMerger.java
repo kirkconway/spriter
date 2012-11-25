@@ -7,13 +7,12 @@ import com.discobeard.spriter.objects.SpriterBone;
 
 public class SpriterBoneMerger implements Merger<BoneRef,Key,SpriterBone>{
 
-	@Override
 	public SpriterBone merge(BoneRef ref, Key key) {
 		
 		Bone obj = key.getBone();
 		
 		SpriterBone bone = new SpriterBone();
-		
+		bone.setTimeline(ref.getTimeline());
 		bone.setParent(ref.getParent());
 		bone.setId(ref.getId());
 		bone.setAngle(obj.getAngle().floatValue());

@@ -37,7 +37,7 @@ public class SpriterKeyFrameBuilder {
 			List<SpriterBone> tempBones = new ArrayList<SpriterBone>();
 			
 			for(BoneRef boneRef : key.getBoneRef()){
-				tempBones.add(boneRef.getId(),(boneMerger.merge(boneRef, timeLines.get(boneRef.getTimeline()).getKey().get(boneRef.getKey()))));
+				tempBones.add(boneMerger.merge(boneRef, timeLines.get(boneRef.getTimeline()).getKey().get(boneRef.getKey())));
 			}
 			
 			for(AnimationObjectRef objectRef : key.getObjectRef()){
@@ -55,8 +55,6 @@ public class SpriterKeyFrameBuilder {
 			spriterKeyFrames[k].setStartTime(key.getTime());
 			spriterKeyFrames[k].setEndTme(k<keyFrames.size()-1 ? keyFrames.get(k+1).getTime()-1 : animation.getLength());
 		}
-
-		System.out.println(String.format("Created %s keyFrames", keyFrames.size()));
 		
 		return spriterKeyFrames;
 	}

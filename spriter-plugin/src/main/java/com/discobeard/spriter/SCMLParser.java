@@ -9,6 +9,7 @@ import javax.xml.bind.Unmarshaller;
 
 import com.discobeard.spriter.dom.SpriterData;
 
+@SuppressWarnings("restriction")
 public class SCMLParser {
 	
 	final private File scmlFile;

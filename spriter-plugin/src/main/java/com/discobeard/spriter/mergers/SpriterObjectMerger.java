@@ -7,11 +7,13 @@ import com.discobeard.spriter.objects.SpriterObject;
 
 public class SpriterObjectMerger implements Merger<AnimationObjectRef, Key, SpriterObject> {
 
-	@Override
 	public SpriterObject merge(AnimationObjectRef ref, Key key) {
 
 		AnimationObject obj = key.getObject().get(0); 
+		
 		SpriterObject spriterObject = new SpriterObject();
+		spriterObject.setId(ref.getId());
+		spriterObject.setTimeline(ref.getTimeline());
 		spriterObject.setAngle(obj.getAngle().floatValue());
 		spriterObject.setFile(obj.getFile());
 		spriterObject.setFolder(obj.getFolder());

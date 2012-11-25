@@ -1,6 +1,6 @@
 package com.discobeard.spriter.objects;
 
-public class SpriterObject {
+public class SpriterObject implements Comparable<SpriterObject>{
 	
 	private int file;
 	private int folder;
@@ -14,6 +14,8 @@ public class SpriterObject {
 	private float angle;
 	private int spin;
 	private float alpha;
+	private int id;
+	private int timeline;
 	private Integer parent = null;
 	private boolean transientObject = false;
 	
@@ -55,7 +57,7 @@ public class SpriterObject {
 	public void setPivotY(float pivotY) {
 		this.pivotY = pivotY;
 	}
-	public int getzIndex() {
+	public int getZIndex() {
 		return zIndex;
 	}
 	public void setzIndex(int zIndex) {
@@ -90,7 +92,7 @@ public class SpriterObject {
 		this.alpha = alpha;
 	}
 
-	public float getScale_x() {
+	public float getScaleX() {
 		return scale_x;
 	}
 
@@ -98,7 +100,7 @@ public class SpriterObject {
 		this.scale_x = scale_x;
 	}
 
-	public float getScale_y() {
+	public float getScaleY() {
 		return scale_y;
 	}
 
@@ -112,6 +114,28 @@ public class SpriterObject {
 
 	public void setTransientObject(boolean transientObject) {
 		this.transientObject = transientObject;
-	}	
+	}
+
+	public int compareTo(SpriterObject o) {
+		if(this.zIndex < o.zIndex) return -1;
+		else if(this.zIndex > o.zIndex) return 1;
+		else return 0;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getTimeline() {
+		return timeline;
+	}
+
+	public void setTimeline(int timeline) {
+		this.timeline = timeline;
+	}
 	
 }

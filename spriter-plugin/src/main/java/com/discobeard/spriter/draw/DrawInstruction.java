@@ -4,27 +4,27 @@ import com.discobeard.spriter.file.Reference;
 
 public class DrawInstruction {
 
-	private final Reference ref;
-	private final float x;
-	private final float y;
-	private final float pivot_x;
-	private final float pivot_y;
-	private final float angle;
-	private final float alpha;
-	private final float scale_x;
-	private final float scale_y;
+	public Reference ref;
+	public float x;
+	public float y;
+	public float pivotX;
+	public float pivotY;
+	public float angle;
+	public float alpha;
+	public float scaleX;
+	public float scaleY;
 	
-	public DrawInstruction(Reference ref, float x, float y, float pivot_x,
-			float pivot_y,float scale_x, float scale_y, float angle,float alpha) {
+	public DrawInstruction(Reference ref, float x, float y, float pivotX,
+			float pivotY,float scaleX, float scaleY, float angle,float alpha) {
 		this.ref = ref;
 		this.x = x;
 		this.y = y;
-		this.pivot_x = pivot_x;
-		this.pivot_y = pivot_y;
+		this.pivotX = pivotX;
+		this.pivotY = pivotY;
 		this.angle = angle;
 		this.alpha = alpha;
-		this.scale_x=scale_x;
-		this.scale_y=scale_y;
+		this.scaleX=scaleX;
+		this.scaleY=scaleY;
 	}
 
 	public Reference getRef() {
@@ -40,11 +40,11 @@ public class DrawInstruction {
 	}
 
 	public float getPivot_x() {
-		return pivot_x;
+		return pivotX;
 	}
 
 	public float getPivot_y() {
-		return pivot_y;
+		return pivotY;
 	}
 
 	public float getAngle() {
@@ -56,11 +56,11 @@ public class DrawInstruction {
 	}
 
 	public float getScale_x() {
-		return scale_x;
+		return scaleX;
 	}
 
 	public float getScale_y() {
-		return scale_y;
+		return scaleY;
 	}
 
 }

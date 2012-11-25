@@ -5,7 +5,6 @@ import com.discobeard.spriter.objects.SpriterObject;
 
 public class SpriterObjectConverter implements Converter<AnimationObject, SpriterObject>{
 
-	@Override
 	public SpriterObject convert(AnimationObject from) {
 		
 		SpriterObject object = new SpriterObject();

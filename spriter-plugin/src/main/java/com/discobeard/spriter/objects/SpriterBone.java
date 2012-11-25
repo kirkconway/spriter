@@ -13,6 +13,7 @@ public class SpriterBone {
 	private List<Integer> childIds;
 	private Integer parent = null;
 	private int spin;
+	private int timeline;
 	
 	public void addChildId(int childId){
 		childIds.add(childId);
@@ -74,6 +75,19 @@ public class SpriterBone {
 
 	public void setParent(Integer parent) {
 		this.parent = parent;
+	}
+	
+	@Override
+	public String toString(){
+		return "x: "+this.x+", y: "+this.y+", angle:"+ this.angle+", ";
+	}
+
+	public int getTimeline() {
+		return this.timeline;
+	}
+
+	public void setTimeline(int timeline) {
+		this.timeline = timeline;
 	}
 	
 	

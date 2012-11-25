@@ -2,25 +2,25 @@ package com.discobeard.spriter.file;
 
 public class Reference {
 	
-	final private int FOLDER;
-	final private int FILE;
+	public int folder;
+	public int file;
 	
 	public Reference(int folder,int file){
-		this.FOLDER = folder;
-		this.FILE = file;
+		this.folder = folder;
+		this.file = file;
 	}
 
 	public int getFOLDER() {
-		return FOLDER;
+		return folder;
 	}
 
 	public int getFILE() {
-		return FILE;
+		return file;
 	}
 	
 	@Override
 	public int hashCode(){
-		return (FOLDER+","+FILE).hashCode(); 
+		return (folder+","+file).hashCode(); 
 	}
 	
 	@Override

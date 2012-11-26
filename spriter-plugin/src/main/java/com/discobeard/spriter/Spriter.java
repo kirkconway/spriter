@@ -40,7 +40,7 @@ public class Spriter {
 		this.spriterData = new SCMLParser(scmlFile).parse();
 		this.drawer = drawer;
 		this.loader = loader;
-		this.sp = new SpriterPlayer(spriterData,drawer);
+		//this.sp = new SpriterPlayer(spriterData,drawer);
 		loadResources();
 	}
 

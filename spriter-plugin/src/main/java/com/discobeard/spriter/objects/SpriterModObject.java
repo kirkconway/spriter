@@ -2,7 +2,7 @@ package com.discobeard.spriter.objects;
 
 public class SpriterModObject {
 	
-	private float angle,scaleX,scaleY,alpha;
+	private float angle,scaleX=1f,scaleY=1f,alpha=1f,x,y;
 	private int timeline;
 	private String name;
 
@@ -52,6 +52,22 @@ public class SpriterModObject {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public float getX() {
+		return x;
+	}
+
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public void setY(float y) {
+		this.y = y;
 	}
 
 }

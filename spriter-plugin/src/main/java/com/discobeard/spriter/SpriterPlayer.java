@@ -5,14 +5,11 @@ import com.discobeard.spriter.dom.SpriterData;
 import com.discobeard.spriter.draw.AbstractDrawer;
 import com.discobeard.spriter.draw.DrawInstruction;
 import com.discobeard.spriter.file.Reference;
-import com.discobeard.spriter.mergers.SpriterKeyFrameBuilder;
 import com.discobeard.spriter.objects.SpriterBone;
 import com.discobeard.spriter.objects.SpriterKeyFrame;
 import com.discobeard.spriter.objects.SpriterModObject;
 import com.discobeard.spriter.objects.SpriterObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SpriterPlayer{
@@ -34,10 +31,12 @@ public class SpriterPlayer{
 	private SpriterBone rootParent;
 	private SpriterModObject[] moddedObjects,moddedBones;
 	
-	public SpriterPlayer(SpriterData spriterData, AbstractDrawer<?> drawer){
+	
+	
+	public SpriterPlayer(SpriterData spriterData, AbstractDrawer<?> drawer,List<SpriterKeyFrame[]> keyframes){
 		this.spriterData = spriterData;
+		this.keyframes = keyframes;
 		this.drawer = drawer;
-		this.keyframes = new ArrayList<SpriterKeyFrame[]>();
 		this.generatePool();
 		this.animation = this.spriterData.getEntity().get(0).getAnimation().get(0);
 		this.rootParent = new SpriterBone();
@@ -46,27 +45,13 @@ public class SpriterPlayer{
 	}
 	
 	private void generatePool(){
-		List<Animation> animations = this.spriterData.getEntity().get(0).getAnimation();
-		int maxBones = 0;
-		int maxObjects = 0;
-		for(Animation anim: animations){
-			SpriterKeyFrame[] keyframes = new SpriterKeyFrameBuilder().buildKeyFrameArray(anim);
-			for(SpriterKeyFrame key: keyframes){
-				Arrays.sort(key.getObjects());
-				maxBones = Math.max(key.getBones().length, maxBones);
-				maxObjects = Math.max(key.getObjects().length, maxObjects);
-				for(int i = 0; i < key.getBones().length; i++)
-					key.getBones()[i].setName(anim.getTimeline().get(key.getBones()[i].getTimeline()).getName());
-			}
-			this.keyframes.add(keyframes);
-		}
-		this.instructions = new DrawInstruction[maxObjects];
+		this.instructions = new DrawInstruction[SpriterKeyFrameProvider.MAX_OBJECTS];
 		this.moddedObjects = new SpriterModObject[this.instructions.length];
 		for(int i = 0; i < this.instructions.length; i++){
 			this.instructions[i] = new DrawInstruction(new Reference(0,0),0,0,0,0,0,0,0,0);
 			this.moddedObjects[i] = new SpriterModObject();
 		}
-		this.tempBones = new SpriterBone[maxBones];
+		this.tempBones = new SpriterBone[SpriterKeyFrameProvider.MAX_BONES];
 		this.moddedBones = new SpriterModObject[this.tempBones.length];
 		for(int i = 0; i < this.tempBones.length; i++){
 			this.tempBones[i] = new SpriterBone();
@@ -222,6 +207,8 @@ public class SpriterPlayer{
 				rotation = SpriterCalculator.calculateAngleInterpolation(bone1.getAngle(), bone2.getAngle(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
 			}
 			rotation += this.moddedBones[i].getAngle();
+			scaleX *= this.moddedBones[i].getScaleX();
+			scaleY *= this.moddedBones[i].getScaleY();
 			this.tempBones[i].setAngle((this.tempBones[i].getSpin() == -1) ? 360-rotation: rotation);
 			this.tempBones[i].setId(bone1.getId());
 			this.tempBones[i].setParent(bone1.getParent());
@@ -240,12 +227,13 @@ public class SpriterPlayer{
 			else{
 				this.tempBones[i].setAngle(this.tempBones[i].getAngle() + this.rootParent.getAngle());
 				this.tempBones[i].setScaleX(this.tempBones[i].getScaleX() * this.rootParent.getScaleX());
-				this.tempBones[i].setScaleY(this.tempBones[i].getScaleY() * this.rootParent.getScaleX());
+				this.tempBones[i].setScaleY(this.tempBones[i].getScaleY() * this.rootParent.getScaleY());
 				float[] newstuff = SpriterCalculator.rotatePoint(this.rootParent, this.tempBones[i].getX(), this.tempBones[i].getY());
 				this.tempBones[i].setX(newstuff[0]);
 				this.tempBones[i].setY(newstuff[1]);
 			}
-
+			this.moddedBones[i].setX(this.tempBones[i].getX()+xOffset);
+			this.moddedBones[i].setY(this.tempBones[i].getY()+yOffset);
 		}
 	} 
 	
@@ -277,6 +265,34 @@ public class SpriterPlayer{
 	
 	public void setBoneAngle(int index, float angle){
 		this.moddedBones[index].setAngle(angle);
+	}
+	
+	public void setBoneScaleX(int index, float scaleX){
+		this.moddedBones[index].setScaleX(scaleX);
+	}
+	
+	public void setBoneScaleY(int index, float scaleY){
+		this.moddedBones[index].setScaleX(scaleY);
+	}
+	
+	public float getBoneAngle(int index){
+		return this.moddedBones[index].getAngle();
+	}
+	
+	public float getBoneScaleX(int index){
+		return this.moddedBones[index].getScaleX();
+	}
+	
+	public float getBoneScaleY(int index){
+		return this.moddedBones[index].getScaleY();
+	}
+	
+	public float getBoneX(int index){
+		return this.moddedBones[index].getX();
+	}
+	
+	public float getBoneY(int index){
+		return this.moddedBones[index].getY();
 	}
 	
 	/**
@@ -335,7 +351,7 @@ public class SpriterPlayer{
 	 * @param frameSpeed the frameSpeed to set
 	 */
 	public void setFrameSpeed(int frameSpeed) {
-		this.frameSpeed = 0;//frameSpeed;
+		this.frameSpeed = frameSpeed;
 	}
 
 	

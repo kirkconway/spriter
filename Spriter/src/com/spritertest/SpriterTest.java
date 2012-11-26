@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -21,7 +22,7 @@ import com.discobeard.spriter.file.FileLoader;
 
 public class SpriterTest implements ApplicationListener, InputProcessor {
 	private OrthographicCamera camera;
-	private SpriteBatch batch;
+	private SpriteBatch batch,bitmap;
 	private Spriter spriter;
 	private SpriterPlayer sp;
 	private int animationIndex;
@@ -31,6 +32,7 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 	private int head;
 	private boolean rotateBack = true;
 	private ArrayList<SpriterPlayer> players;
+	private BitmapFont bf;
 	
 	@Override
 	public void create() {
@@ -40,6 +42,7 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		camera = new OrthographicCamera(w,h);
 		
 		batch = new SpriteBatch();
+		bitmap = new SpriteBatch();
 		
 		FileLoader<Sprite> loader = new SpriteLoader();
 		SpriteDrawer drawer = new SpriteDrawer(loader,batch);
@@ -48,12 +51,13 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		
 		spriter = Spriter.getSpriter("data/monster/basic.scml", drawer, loader);
 		this.players = new ArrayList<SpriterPlayer>();
-		for(int i = 0; i < 100; i++){
+		for(int i = 0; i < 200; i++){
 			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData(), drawer, SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData()));
 			this.players.add(sp);
 			sp.setFrameSpeed(10);
 		}
-		x = (-this.players.size()/2)*400;
+		x = (-(this.players.size()/10)/2)*400;
+		y = ((this.players.size()/10))*400;
 		this.sp = this.players.get(0);
 		this.idleIndex = this.sp.getAnimationIndexByName("idle");
 		this.runIndex = this.sp.getAnimationIndexByName("run");
@@ -67,6 +71,8 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		this.head = this.sp.getBoneIndexByName("torso");
 		int torso = this.sp.getBoneIndexByName("leftLowerLeg");
 		this.sp.setBoneScaleX(torso, 1f);
+		
+		this.bf = new BitmapFont();
 	}
 
 	@Override
@@ -80,9 +86,13 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		batch.setProjectionMatrix(camera.combined);
-		
-		for(int i = 0; i < this.players.size(); i++)
-			this.players.get(i).update(x+400*i, y);
+		int k = 0;
+		for(int i = 0; k < this.players.size(); i++){
+			for(int j =0 ; j < 50 && k < this.players.size(); j++){
+				this.players.get(k).update(x+400*j, y-i*400);
+				k++;
+			}
+		}
 		
 		this.y += vspeed;
 		this.x += hspeed;
@@ -121,8 +131,10 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		batch.begin();
 		for(SpriterPlayer sp: this.players)
 			sp.draw();
-
 		batch.end();
+		bitmap.begin();
+		this.bf.draw(bitmap, ""+Gdx.graphics.getFramesPerSecond(), 50, 50);
+		bitmap.end();
 	}
 
 	@Override

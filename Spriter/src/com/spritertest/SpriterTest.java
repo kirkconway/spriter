@@ -93,8 +93,8 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		sp.draw();
 
 		batch.end();
-		head = this.sp.getBoneIndexByName("arm");
-		System.out.println(head);
+		head = 3;//this.sp.getBoneIndexByName("arm");
+		//System.out.println(head);
 	}
 
 	@Override

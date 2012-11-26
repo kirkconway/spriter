@@ -14,6 +14,7 @@ public class SpriterBone {
 	private Integer parent = null;
 	private int spin;
 	private int timeline;
+	private String name;
 	
 	public void addChildId(int childId){
 		childIds.add(childId);
@@ -88,6 +89,14 @@ public class SpriterBone {
 
 	public void setTimeline(int timeline) {
 		this.timeline = timeline;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	

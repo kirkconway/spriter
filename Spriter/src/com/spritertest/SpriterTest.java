@@ -23,6 +23,7 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 	private float x=0f,y=0f,vspeed=0f;
 	private int runIndex, idleIndex, jumpIndex, fallIndex;
 	private float hspeed;
+	private int head;
 	
 	@Override
 	public void create() {
@@ -39,12 +40,12 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		
 		Gdx.input.setInputProcessor(this);
 		
-		spriter = Spriter.getSpriter("data/monster/basic.scml", drawer, loader);
+		spriter = Spriter.getSpriter("monster/basic.scml", drawer, loader);
 		
 		this.sp = new SpriterPlayer(spriter.getSpriterData(), drawer);
-		this.idleIndex = this.sp.getAnimationIndexByName("idle");
-		this.runIndex = this.sp.getAnimationIndexByName("run");
-		this.jumpIndex = this.sp.getAnimationIndexByName("jump");
+		this.idleIndex = this.sp.getAnimationIndexByName("boned");
+		this.runIndex = this.sp.getAnimationIndexByName("idle");
+		this.jumpIndex = this.sp.getAnimationIndexByName("posture");
 		this.fallIndex = this.sp.getAnimationIndexByName("fall");
 		this.sp.setFrameSpeed(10);
 		this.sp.setAnimatioIndex(this.idleIndex);
@@ -92,6 +93,8 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		sp.draw();
 
 		batch.end();
+		head = this.sp.getBoneIndexByName("arm");
+		System.out.println(head);
 	}
 
 	@Override
@@ -165,7 +168,8 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		this.sp.setAngle(-new Vector2(screenX-Gdx.graphics.getWidth()/2-x,screenY-Gdx.graphics.getHeight()/2-y).angle()*this.sp.getFlipX()*this.sp.getFlipY());
+		//this.sp.setAngle(-new Vector2(screenX-Gdx.graphics.getWidth()/2-x,screenY-Gdx.graphics.getHeight()/2-y).angle()*this.sp.getFlipX()*this.sp.getFlipY());
+		this.sp.setBoneAngle(this.head, -new Vector2(screenX-Gdx.graphics.getWidth()/2-x,screenY-Gdx.graphics.getHeight()/2-y).angle());
 		return false;
 	}
 

@@ -115,7 +115,11 @@ public class SpriterObject implements Comparable<SpriterObject>{
 	public void setTransientObject(boolean transientObject) {
 		this.transientObject = transientObject;
 	}
-
+	
+	/**
+	 * Compares the z_index of the given SpriterObject with this.
+	 * @param o SpriterObject to compare with.
+	 */
 	public int compareTo(SpriterObject o) {
 		if(this.zIndex < o.zIndex) return -1;
 		else if(this.zIndex > o.zIndex) return 1;

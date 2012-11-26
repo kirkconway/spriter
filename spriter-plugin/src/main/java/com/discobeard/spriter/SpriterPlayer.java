@@ -8,6 +8,7 @@ import com.discobeard.spriter.file.Reference;
 import com.discobeard.spriter.mergers.SpriterKeyFrameBuilder;
 import com.discobeard.spriter.objects.SpriterBone;
 import com.discobeard.spriter.objects.SpriterKeyFrame;
+import com.discobeard.spriter.objects.SpriterModObject;
 import com.discobeard.spriter.objects.SpriterObject;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class SpriterPlayer{
 	private float angle = 0;
 	private float scale = 1f;
 	private SpriterBone rootParent;
+	private SpriterModObject[] moddedObjects,moddedBones;
 	
 	public SpriterPlayer(SpriterData spriterData, AbstractDrawer<?> drawer){
 		this.spriterData = spriterData;
@@ -53,13 +55,23 @@ public class SpriterPlayer{
 				Arrays.sort(key.getObjects());
 				maxBones = Math.max(key.getBones().length, maxBones);
 				maxObjects = Math.max(key.getObjects().length, maxObjects);
+				for(int i = 0; i < key.getBones().length; i++)
+					key.getBones()[i].setName(anim.getTimeline().get(key.getBones()[i].getTimeline()).getName());
 			}
 			this.keyframes.add(keyframes);
 		}
 		this.instructions = new DrawInstruction[maxObjects];
-		for(int i = 0; i < this.instructions.length; i++) this.instructions[i] = new DrawInstruction(new Reference(0,0),0,0,0,0,0,0,0,0);
+		this.moddedObjects = new SpriterModObject[this.instructions.length];
+		for(int i = 0; i < this.instructions.length; i++){
+			this.instructions[i] = new DrawInstruction(new Reference(0,0),0,0,0,0,0,0,0,0);
+			this.moddedObjects[i] = new SpriterModObject();
+		}
 		this.tempBones = new SpriterBone[maxBones];
-		for(int i = 0; i < this.tempBones.length; i++) this.tempBones[i] = new SpriterBone();
+		this.moddedBones = new SpriterModObject[this.tempBones.length];
+		for(int i = 0; i < this.tempBones.length; i++){
+			this.tempBones[i] = new SpriterBone();
+			this.moddedBones[i] = new SpriterModObject();
+		}
 	}
 	
 	/**
@@ -191,7 +203,9 @@ public class SpriterPlayer{
 		for (int i = 0; i < firstFrame.getBones().length; i++) {
 
 			SpriterBone bone1 = firstFrame.getBones()[i];
-			SpriterBone bone2 = null;//key2.getBones()[i];
+			this.tempBones[i].setName(bone1.getName());
+			this.moddedBones[i].setName(bone1.getName());
+			SpriterBone bone2 = null;
 			boolean found = false;
 			for(int j = 0; j < secondFrame.getBones().length && !found; j++){//Get the right bone to interpolate with
 				if(secondFrame.getBones()[j].getTimeline() == bone1.getTimeline()){
@@ -207,7 +221,7 @@ public class SpriterPlayer{
 				scaleY = SpriterCalculator.calculateInterpolation(bone1.getScaleY(), bone2.getScaleY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
 				rotation = SpriterCalculator.calculateAngleInterpolation(bone1.getAngle(), bone2.getAngle(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
 			}
-
+			rotation += this.moddedBones[i].getAngle();
 			this.tempBones[i].setAngle((this.tempBones[i].getSpin() == -1) ? 360-rotation: rotation);
 			this.tempBones[i].setId(bone1.getId());
 			this.tempBones[i].setParent(bone1.getParent());
@@ -253,6 +267,16 @@ public class SpriterPlayer{
 		for(Animation anim: anims)
 			if(anim.getName().equals(name)) return anim.getId();
 		return 0;
+	}
+	
+	public int getBoneIndexByName(String name){
+		for(int i = 0; i < this.moddedBones.length; i++)
+			if(name.equals(this.moddedBones[i].getName())) return i;
+		return 0;
+	}
+	
+	public void setBoneAngle(int index, float angle){
+		this.moddedBones[index].setAngle(angle);
 	}
 	
 	/**
@@ -311,7 +335,7 @@ public class SpriterPlayer{
 	 * @param frameSpeed the frameSpeed to set
 	 */
 	public void setFrameSpeed(int frameSpeed) {
-		this.frameSpeed = frameSpeed;
+		this.frameSpeed = 0;//frameSpeed;
 	}
 
 	

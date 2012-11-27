@@ -30,6 +30,9 @@ public class SpriterPlayer{
 	private float scale = 1f;
 	private SpriterBone rootParent;
 	private SpriterModObject[] moddedObjects,moddedBones;
+	private SpriterKeyFrame lastFrame;
+	private boolean transitionFixed = true;
+	private int fixCounter = 0;
 	
 	
 	
@@ -42,6 +45,16 @@ public class SpriterPlayer{
 		this.rootParent = new SpriterBone();
 		this.rootParent.setScaleX(this.scale);
 		this.rootParent.setScaleY(this.scale);
+		this.lastFrame = new SpriterKeyFrame();
+		
+		SpriterBone[] tmpBones = this.tempBones.clone();
+		SpriterObject[] tmpObjs = new SpriterObject[this.instructions.length];
+		for(int i = 0; i < tmpObjs.length; i++){
+			tmpObjs[i] = new SpriterObject();
+		}
+		this.lastFrame.setBones(tmpBones);
+		this.lastFrame.setObjects(tmpObjs);
+		
 	}
 	
 	private void generatePool(){
@@ -77,21 +90,42 @@ public class SpriterPlayer{
 	public void update(float xOffset, float yOffset){
 		//Fetch information
 		SpriterKeyFrame[] keyframes = this.keyframes.get(animationIndex);
-		SpriterKeyFrame firstKeyFrame = keyframes[this.currentKey];
-		SpriterKeyFrame secondKeyFrame = keyframes[(this.currentKey+1)%keyframes.length];
+		SpriterKeyFrame firstKeyFrame; 
+		SpriterKeyFrame secondKeyFrame;
+		if(this.transitionFixed){
+			firstKeyFrame = keyframes[this.currentKey];
+			secondKeyFrame = keyframes[(this.currentKey+1)%keyframes.length];
+			
+			//Update
+			if(this.frame > this.animation.getLength())
+				this.frame = 0;
+			this.frame += this.frameSpeed;
+			if (this.frame > keyframes[this.currentKey].getEndTime()){
+				this.currentKey = (this.currentKey+1)%keyframes.length;
+				this.frame = keyframes[this.currentKey].getStartTime();
+			}
+		}
+		else{
+			firstKeyFrame = this.lastFrame;
+			secondKeyFrame = keyframes[this.currentKey];
+			this.fixCounter++;
+			//Update
+			if(this.fixCounter >= 20){
+				this.frame = 0;
+				this.fixCounter = 0;
+				this.transitionFixed = true;
+				System.out.println(this.transitionFixed);
+			}
+			this.frame += this.frameSpeed;
+			/*if (this.frame > keyframes[this.currentKey].getEndTime()){
+				this.currentKey = (this.currentKey+1)%keyframes.length;
+				this.frame = keyframes[this.currentKey].getStartTime();
+			}*/
+		}
 		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		//Interpolate
 		this.interpolateBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);		
 		this.interpolateObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);	
-		
-		//Update
-		if(this.frame > this.animation.getLength())
-			this.frame = 0;
-		this.frame += this.frameSpeed;
-		if (this.frame > keyframes[this.currentKey].getEndTime()){
-			this.currentKey = (this.currentKey+1)%keyframes.length;
-			this.frame = keyframes[this.currentKey].getStartTime();
-		}
 	}
 	
 	private void interpolateObjects(SpriterKeyFrame firstFrame, SpriterKeyFrame secondFrame, float xOffset, float yOffset) {
@@ -243,7 +277,40 @@ public class SpriterPlayer{
 	 */
 	public void setAnimatioIndex(int animationIndex){
 		if(this.animationIndex != animationIndex){
-			this.frame = 0;
+			//this.frame = 0;
+			SpriterKeyFrame curFrame = this.keyframes.get(this.animationIndex)[this.currentKey];
+			this.transitionFixed = false;
+			for(int i = 0; i < this.lastFrame.getBones().length; i++){
+				SpriterBone bone = this.lastFrame.getBones()[i];
+				bone.setX(this.tempBones[i].getX());
+				bone.setY(this.tempBones[i].getY());
+				bone.setAngle(this.tempBones[i].getAngle());
+				bone.setId(this.tempBones[i].getId());
+				bone.setName(this.tempBones[i].getName());
+				bone.setParent(this.tempBones[i].getParent());
+				bone.setScaleX(this.tempBones[i].getScaleX());
+				bone.setScaleY(this.tempBones[i].getScaleY());
+				bone.setSpin(this.tempBones[i].getSpin());
+				bone.setTimeline(this.tempBones[i].getTimeline());
+				System.out.println(bone);
+			}
+			for(int i = 0; i < this.currenObjectsToDraw; i++){
+				SpriterObject obj = this.lastFrame.getObjects()[i];
+				obj.setAlpha(this.instructions[i].alpha);
+				obj.setAngle(this.instructions[i].angle);
+				obj.setFile(this.instructions[i].ref.file);
+				obj.setFolder(this.instructions[i].ref.folder);
+				obj.setX(this.instructions[i].x);
+				obj.setY(this.instructions[i].y);
+				obj.setPivotX(this.instructions[i].pivotX);
+				obj.setPivotY(this.instructions[i].pivotY);
+				obj.setScale_x(this.instructions[i].scaleX);
+				obj.setScale_y(this.instructions[i].scaleY);
+				obj.setSpin(curFrame.getObjects()[i].getSpin());
+				obj.setzIndex(curFrame.getObjects()[i].getZIndex());
+				obj.setTimeline(curFrame.getObjects()[i].getTimeline());
+				obj.setId(curFrame.getObjects()[i].getId());
+			}
 			this.currentKey = 0;
 			this.animationIndex = animationIndex;
 			this.animation = this.spriterData.getEntity().get(0).getAnimation().get(animationIndex);

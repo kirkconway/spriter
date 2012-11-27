@@ -1,6 +1,7 @@
 package com.spritertest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -19,6 +20,7 @@ import com.discobeard.spriter.SpriterCalculator;
 import com.discobeard.spriter.SpriterKeyFrameProvider;
 import com.discobeard.spriter.SpriterPlayer;
 import com.discobeard.spriter.file.FileLoader;
+import com.discobeard.spriter.objects.SpriterKeyFrame;
 
 public class SpriterTest implements ApplicationListener, InputProcessor {
 	private OrthographicCamera camera;
@@ -50,9 +52,10 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		Gdx.input.setInputProcessor(this);
 		
 		spriter = Spriter.getSpriter("data/monster/basic.scml", drawer, loader);
+		List<SpriterKeyFrame[]> keyframes = SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData());
 		this.players = new ArrayList<SpriterPlayer>();
-		for(int i = 0; i < 50; i++){
-			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData(), drawer, SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData()));
+		for(int i = 0; i < 1; i++){
+			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData(), drawer, keyframes);
 			this.players.add(sp);
 			sp.setFrameSpeed(10);
 		}
@@ -68,7 +71,7 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		this.sp.setAnimatioIndex(this.idleIndex);
 		this.sp.setPivot(0f, 0f);
 		this.sp.update(x, y);
-		this.head = this.sp.getBoneIndexByName("head");
+		this.head = this.sp.getBoneIndexByName("torso");
 		//this.sp.setBoneScaleX(torso, 1f);
 		
 		this.bf = new BitmapFont();
@@ -87,7 +90,7 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		batch.setProjectionMatrix(camera.combined);
 		int k = 0;
 		for(int i = 0; k < this.players.size(); i++){
-			for(int j =0 ; j < 50 && k < this.players.size(); j++){
+			for(int j =0 ; j < 10 && k < this.players.size(); j++){
 				this.players.get(k).update(x+400*j, y-i*400);
 				k++;
 			}
@@ -219,6 +222,12 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		if(Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)){
+			this.camera.position.x += Gdx.input.getDeltaX()*this.camera.zoom;
+			this.camera.position.y -= Gdx.input.getDeltaY()*this.camera.zoom;
+			this.camera.update();
+			return true;
+		}
 		return false;
 	}
 	

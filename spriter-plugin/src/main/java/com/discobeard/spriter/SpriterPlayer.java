@@ -60,6 +60,8 @@ public class SpriterPlayer{
 		this.lastFrame.setBones(tmpBones);
 		this.lastFrame.setObjects(tmpObjs);
 		update(0, 0);
+		this.frame = 0;
+		this.currentKey = 0;
 		
 	}
 	

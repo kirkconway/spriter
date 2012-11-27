@@ -17,7 +17,7 @@ public class SpriterPlayer{
 	private SpriterData spriterData;
 	private Animation animation;
 	private long frame = 0;
-	private int frameSpeed = 30;
+	private int frameSpeed = 30, transitionSpeed = 30;
 	private int animationIndex = 0;
 	private int currentKey = 0;
 	private DrawInstruction[] instructions;
@@ -33,6 +33,7 @@ public class SpriterPlayer{
 	private SpriterKeyFrame lastFrame;
 	private boolean transitionFixed = true;
 	private int fixCounter = 0;
+	private int fixMaxSteps = 100;
 	
 	
 	
@@ -49,12 +50,11 @@ public class SpriterPlayer{
 		
 		SpriterBone[] tmpBones = new SpriterBone[this.tempBones.length];
 		SpriterObject[] tmpObjs = new SpriterObject[this.instructions.length];
-		for(int i = 0; i < tmpObjs.length; i++)
-			tmpObjs[i] = new SpriterObject();
-		for(int i = 0; i < tmpBones.length; i++)
-			tmpBones[i] = new SpriterBone();
+		for(int i = 0; i < tmpObjs.length; i++)	tmpObjs[i] = new SpriterObject();
+		for(int i = 0; i < tmpBones.length; i++) tmpBones[i] = new SpriterBone();
 		this.lastFrame.setBones(tmpBones);
 		this.lastFrame.setObjects(tmpObjs);
+		update(0, 0);
 		
 	}
 	
@@ -107,18 +107,19 @@ public class SpriterPlayer{
 			}
 		}
 		else{
-			firstKeyFrame = this.lastFrame;
-			secondKeyFrame = keyframes[0];
-			secondKeyFrame.setStartTime(this.lastFrame.getStartTime()+10*this.frameSpeed);
-			this.fixCounter++;
+			firstKeyFrame = keyframes[0];
+			secondKeyFrame = this.lastFrame;
+			firstKeyFrame.setStartTime(this.lastFrame.getStartTime()+500);
+			float temp =(float)(this.fixCounter)/(float)this.fixMaxSteps;
+			this.frame = this.lastFrame.getStartTime()+(long)(500*temp);
+			this.fixCounter= Math.min(this.fixCounter+this.transitionSpeed,this.fixMaxSteps);
 			//Update
-			if(this.fixCounter >= 10){
+			if(this.fixCounter == this.fixMaxSteps){
 				this.frame = 0;
 				this.fixCounter = 0;
 				this.transitionFixed = true;
-				secondKeyFrame.setStartTime(0);
+				firstKeyFrame.setStartTime(0);
 			}
-			this.frame += this.frameSpeed;
 		}
 		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		//Interpolate
@@ -134,74 +135,63 @@ public class SpriterPlayer{
 			DrawInstruction dI = this.instructions[i];
 
 			if (!obj1.isTransientObject()) {
-					SpriterObject obj2 = null;
-					boolean found = false;
-					for(int j = 0; j < secondFrame.getObjects().length && !found; j++){
-						obj2 = secondFrame.getObjects()[j];
-						found = secondFrame.getObjects()[j].getTimeline() == obj1.getTimeline();
-					}
-					float x=obj1.getX(),y=obj1.getY(),scaleX=obj1.getScaleX(),scaleY=obj1.getScaleY(),rotation=obj1.getAngle(),alpha=obj1.getAlpha();
-					if(obj2 != null){
-						x = SpriterCalculator.calculateInterpolation(obj1.getX(), obj2.getX(), firstFrame.getStartTime(),
-								secondFrame.getStartTime(),	this.frame);
-						y = SpriterCalculator.calculateInterpolation(obj1.getY(), obj2.getY(), firstFrame.getStartTime(),
-								secondFrame.getStartTime(),	this.frame);
-		
-						scaleX = SpriterCalculator.calculateInterpolation(obj1.getScaleX(), obj2.getScaleX(), firstFrame.getStartTime(),
-								secondFrame.getStartTime(), this.frame);
-		
-						scaleY = SpriterCalculator.calculateInterpolation(obj1.getScaleY(), obj2.getScaleY(), firstFrame.getStartTime(),
-								secondFrame.getStartTime(), this.frame);
-		
-						rotation = SpriterCalculator.calculateAngleInterpolation(obj1.getAngle(), obj2.getAngle(), firstFrame.getStartTime(),
-								secondFrame.getStartTime(),	this.frame);
-						alpha = SpriterCalculator.calculateInterpolation(obj1.getAlpha(), obj2.getAlpha(), firstFrame.getStartTime(),
-								secondFrame.getStartTime(), this.frame);
-					}
-					if(this.transitionFixed){
-						this.lastFrame.getObjects()[i].setX(x);
-						this.lastFrame.getObjects()[i].setY(y);
-						this.lastFrame.getObjects()[i].setScaleX(scaleX);
-						this.lastFrame.getObjects()[i].setScaleY(scaleY);
-						this.lastFrame.getObjects()[i].setAngle(rotation);
-						this.lastFrame.getObjects()[i].setAlpha(alpha);
-						this.lastFrame.getObjects()[i].setId(obj1.getId());
-						this.lastFrame.getObjects()[i].setTimeline(obj1.getTimeline());
-						this.lastFrame.getObjects()[i].setFile(obj1.getFile());
-						this.lastFrame.getObjects()[i].setFolder(obj1.getFolder());
-						this.lastFrame.getObjects()[i].setPivotX(obj1.getPivotX());
-						this.lastFrame.getObjects()[i].setPivotY(obj1.getPivotY());
-						this.lastFrame.getObjects()[i].setSpin(obj1.getSpin());
-					}
-					if (obj1.getParent() != null) {					
-						rotation += tempBones[obj1.getParent()].getAngle();
-						scaleX *= tempBones[obj1.getParent()].getScaleX();
-						scaleY *= tempBones[obj1.getParent()].getScaleY();
-						
-						newstuff = SpriterCalculator.rotatePoint(tempBones[obj1.getParent()], x, y);
-						x = newstuff[0];
-						y = newstuff[1];
-	
-					}
-					else{
-						rotation += this.angle;
-						scaleX *= this.scale;
-						scaleY *= this.scale;
-						newstuff = SpriterCalculator.rotatePoint(this.rootParent, x, y);
-						x = newstuff[0];
-						y = newstuff[1];
-					}
-					
-					dI.ref.folder = obj1.getFolder();
-					dI.ref.file = obj1.getFile();
-					dI.x =  x*this.flipX+xOffset;
-					dI.y =  y*this.flipY+yOffset;
-					dI.scaleX =  scaleX*this.flipX;
-					dI.scaleY =  scaleY*this.flipY;
-					dI.pivotX =  obj1.getPivotX();
-					dI.pivotY = obj1.getPivotY();
-					dI.angle = rotation*this.flipX*this.flipY;
-					dI.alpha = alpha;
+				SpriterObject obj2 = null;
+				boolean found = false;
+				for(int j = 0; j < secondFrame.getObjects().length && !found; j++){
+					found = secondFrame.getObjects()[j].getTimeline() == obj1.getTimeline();
+					if(found) obj2 = secondFrame.getObjects()[j];
+				}
+				float x=obj1.getX(),y=obj1.getY(),scaleX=obj1.getScaleX(),scaleY=obj1.getScaleY(),rotation=obj1.getAngle(),alpha=obj1.getAlpha();
+				if(obj2 != null){
+					x = SpriterCalculator.calculateInterpolation(obj1.getX(), obj2.getX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					y = SpriterCalculator.calculateInterpolation(obj1.getY(), obj2.getY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					scaleX = SpriterCalculator.calculateInterpolation(obj1.getScaleX(), obj2.getScaleX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					scaleY = SpriterCalculator.calculateInterpolation(obj1.getScaleY(), obj2.getScaleY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					rotation = SpriterCalculator.calculateAngleInterpolation(obj1.getAngle(), obj2.getAngle(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					alpha = SpriterCalculator.calculateInterpolation(obj1.getAlpha(), obj2.getAlpha(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+				}
+				if(this.transitionFixed){
+					this.lastFrame.getObjects()[i].setX(x);
+					this.lastFrame.getObjects()[i].setY(y);
+					this.lastFrame.getObjects()[i].setScaleX(scaleX);
+					this.lastFrame.getObjects()[i].setScaleY(scaleY);
+					this.lastFrame.getObjects()[i].setAngle(rotation);
+					this.lastFrame.getObjects()[i].setAlpha(alpha);
+					this.lastFrame.getObjects()[i].setId(obj1.getId());
+					this.lastFrame.getObjects()[i].setTimeline(obj1.getTimeline());
+					this.lastFrame.getObjects()[i].setFile(obj1.getFile());
+					this.lastFrame.getObjects()[i].setFolder(obj1.getFolder());
+					this.lastFrame.getObjects()[i].setPivotX(obj1.getPivotX());
+					this.lastFrame.getObjects()[i].setPivotY(obj1.getPivotY());
+					this.lastFrame.getObjects()[i].setSpin(obj1.getSpin());
+				}
+				if (obj1.getParent() != null) {
+					rotation += tempBones[obj1.getParent()].getAngle();
+					scaleX *= tempBones[obj1.getParent()].getScaleX();
+					scaleY *= tempBones[obj1.getParent()].getScaleY();
+					newstuff = SpriterCalculator.rotatePoint(tempBones[obj1.getParent()], x, y);
+					x = newstuff[0];
+					y = newstuff[1];
+				}
+				else{
+					rotation += this.angle;
+					scaleX *= this.scale;
+					scaleY *= this.scale;
+					newstuff = SpriterCalculator.rotatePoint(this.rootParent, x, y);
+					x = newstuff[0];
+					y = newstuff[1];
+				}
+				
+				dI.ref.folder = obj1.getFolder();
+				dI.ref.file = obj1.getFile();
+				dI.x =  x*this.flipX+xOffset;
+				dI.y =  y*this.flipY+yOffset;
+				dI.scaleX =  scaleX*this.flipX;
+				dI.scaleY =  scaleY*this.flipY;
+				dI.pivotX =  obj1.getPivotX();
+				dI.pivotY = obj1.getPivotY();
+				dI.angle = rotation*this.flipX*this.flipY;
+				dI.alpha = alpha;
 					
 			}
 			else
@@ -233,17 +223,14 @@ public class SpriterPlayer{
 	 */
 	private void interpolateBones(SpriterKeyFrame firstFrame, SpriterKeyFrame secondFrame, float xOffset, float yOffset){
 		for (int i = 0; i < firstFrame.getBones().length; i++) {
-
 			SpriterBone bone1 = firstFrame.getBones()[i];
 			this.tempBones[i].setName(bone1.getName());
 			this.moddedBones[i].setName(bone1.getName());
 			SpriterBone bone2 = null;
 			boolean found = false;
 			for(int j = 0; j < secondFrame.getBones().length && !found; j++){//Get the right bone to interpolate with
-				if(secondFrame.getBones()[j].getTimeline() == bone1.getTimeline()){
-					bone2 = secondFrame.getBones()[j];
-					found = true;
-				}
+				found = secondFrame.getBones()[j].getTimeline() == bone1.getTimeline();
+				if(found) bone2 = secondFrame.getBones()[j];
 			}
 			float x=bone1.getX(),y=bone1.getY(),scaleX=bone1.getScaleX(),scaleY=bone1.getScaleY(),rotation=bone1.getAngle();
 			if(bone2 != null){
@@ -257,23 +244,27 @@ public class SpriterPlayer{
 			scaleX *= this.moddedBones[i].getScaleX();
 			scaleY *= this.moddedBones[i].getScaleY();
 			this.tempBones[i].setAngle(/*(bone1.getSpin() == -1) ? 360-rotation:*/ rotation);
-			this.tempBones[i].setId(bone1.getId());
-			this.tempBones[i].setParent(bone1.getParent()); 
 			this.tempBones[i].setScaleX(scaleX);
 			this.tempBones[i].setScaleY(scaleY);
 			this.tempBones[i].setX(x); 
 			this.tempBones[i].setY(y);
+			this.tempBones[i].setId(bone1.getId());
+			this.tempBones[i].setTimeline(bone1.getTimeline());
+			this.tempBones[i].setParent(bone1.getParent()); 
+			this.tempBones[i].setName(bone1.getName());
+			this.tempBones[i].setSpin(bone1.getSpin());
 			if(this.transitionFixed){
-				this.lastFrame.getBones()[i].setX(x);
+				this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
+				/*this.lastFrame.getBones()[i].setX(x);
 				this.lastFrame.getBones()[i].setY(y);
-				this.lastFrame.getBones()[i].setScaleY(this.tempBones[i].getScaleY());
 				this.lastFrame.getBones()[i].setScaleX(this.tempBones[i].getScaleX());
+				this.lastFrame.getBones()[i].setScaleY(this.tempBones[i].getScaleY());
 				this.lastFrame.getBones()[i].setParent(this.tempBones[i].getParent());
-				this.lastFrame.getBones()[i].setId(bone1.getId());
 				this.lastFrame.getBones()[i].setAngle(this.tempBones[i].getAngle());
+				this.lastFrame.getBones()[i].setId(bone1.getId());
 				this.lastFrame.getBones()[i].setTimeline(bone1.getTimeline());
 				this.lastFrame.getBones()[i].setName(bone1.getName());
-				this.lastFrame.getBones()[i].setSpin(bone1.getSpin());
+				this.lastFrame.getBones()[i].setSpin(bone1.getSpin());*/
 			}
 			if (this.tempBones[i].getParent() != null) {
 				this.tempBones[i].setAngle(this.tempBones[i].getAngle() + tempBones[this.tempBones[i].getParent()].getAngle());
@@ -300,14 +291,20 @@ public class SpriterPlayer{
 	 * Sets the current animation index for this player.
 	 * @param animationIndex
 	 */
-	public void setAnimatioIndex(int animationIndex){
+	public void setAnimatioIndex(int animationIndex, int transitionSpeed, int transitionSteps){
+		//int curKey = this.currentKey;
+		//long frame = this.frame;
 		if(this.animationIndex != animationIndex){
-			//this.frame = 0;
+			/*update(0,0);
+			this.frame = frame;
+			this.currentKey = curKey;*/
 			this.lastFrame.setStartTime(this.frame);
 			this.transitionFixed = false;
 			this.currentKey = 0;
 			this.animationIndex = animationIndex;
 			this.animation = this.spriterData.getEntity().get(0).getAnimation().get(animationIndex);
+			this.transitionSpeed = transitionSpeed;
+			this.fixMaxSteps = transitionSteps;
 		}
 	}
 	

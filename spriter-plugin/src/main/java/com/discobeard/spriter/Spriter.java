@@ -76,7 +76,7 @@ public class Spriter {
 	 *            if you want the animation to loop or not.
 	 */
 	public void playAnimation(int animationNumer, boolean loop) {
-		this.sp.setAnimatioIndex(animationNumer);
+		this.sp.setAnimatioIndex(animationNumer,0,0);
 	}
 	
 	public void setFrameSpeed(int frameSpeed){

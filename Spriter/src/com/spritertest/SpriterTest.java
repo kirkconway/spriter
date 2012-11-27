@@ -60,7 +60,8 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 			sp.setFrameSpeed(10);
 		}
 		x = (-(this.players.size()/10)/2)*400;
-		y = ((this.players.size()/10))*400;
+		y = 0;//((this.players.size()/10))*10;
+		vspeed = 0;
 		this.sp = this.players.get(0);
 		this.idleIndex = this.sp.getAnimationIndexByName("idle");
 		this.runIndex = this.sp.getAnimationIndexByName("run");
@@ -68,11 +69,9 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		this.fallIndex = this.sp.getAnimationIndexByName("fall");
 		
 		this.sp.setFrameSpeed(10);
-		this.sp.setAnimatioIndex(this.idleIndex);
-		this.sp.setPivot(0f, 0f);
+		this.sp.setAnimatioIndex(this.idleIndex, 0, 0);
 		this.sp.update(x, y);
-		this.head = this.sp.getBoneIndexByName("torso");
-		//this.sp.setBoneScaleX(torso, 1f);
+		this.head = this.sp.getBoneIndexByName("head");
 		
 		this.bf = new BitmapFont();
 	}
@@ -115,9 +114,10 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 				sp.setFrameSpeed(15);
 		}
 		for(SpriterPlayer sp: this.players)
-			sp.setAnimatioIndex(this.animationIndex);
+			sp.setAnimatioIndex(this.animationIndex,10,120);
 		vspeed -= 0.5f;
 		if(y < 0){
+			y = 0;
 			vspeed = 0;
 			this.animationIndex = this.idleIndex;
 		}

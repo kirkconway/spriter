@@ -8,8 +8,8 @@ public class SpriterObject implements Comparable<SpriterObject>{
 	private float y;
 	private float pivotX;
 	private float pivotY;
-	private float scale_x;
-	private float scale_y;
+	private float scaleX;
+	private float scaleY;
 	private int zIndex;
 	private float angle;
 	private int spin;
@@ -93,19 +93,19 @@ public class SpriterObject implements Comparable<SpriterObject>{
 	}
 
 	public float getScaleX() {
-		return scale_x;
+		return scaleX;
 	}
 
 	public void setScaleX(float scale_x) {
-		this.scale_x = scale_x;
+		this.scaleX = scale_x;
 	}
 
 	public float getScaleY() {
-		return scale_y;
+		return scaleY;
 	}
 
 	public void setScaleY(float scale_y) {
-		this.scale_y = scale_y;
+		this.scaleY = scale_y;
 	}
 
 	public boolean isTransientObject() {
@@ -140,6 +140,10 @@ public class SpriterObject implements Comparable<SpriterObject>{
 
 	public void setTimeline(int timeline) {
 		this.timeline = timeline;
+	}
+	
+	public String toString(){
+		return "x: "+this.x+", y: "+this.y+", angle: "+this.alpha;
 	}
 	
 }

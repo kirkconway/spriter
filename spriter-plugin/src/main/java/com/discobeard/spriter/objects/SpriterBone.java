@@ -99,5 +99,17 @@ public class SpriterBone {
 		this.name = name;
 	}
 	
+	public void copyValuesTo(SpriterBone bone){
+		bone.setX(x);
+		bone.setY(y);
+		bone.setScaleX(getScaleX());
+		bone.setScaleY(getScaleY());
+		bone.setParent(getParent());
+		bone.setAngle(getAngle());
+		bone.setId(getId());
+		bone.setTimeline(getTimeline());
+		bone.setName(getName());
+		bone.setSpin(getSpin());
+	}
 	
 }

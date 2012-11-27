@@ -51,7 +51,7 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		
 		spriter = Spriter.getSpriter("data/monster/basic.scml", drawer, loader);
 		this.players = new ArrayList<SpriterPlayer>();
-		for(int i = 0; i < 200; i++){
+		for(int i = 0; i < 50; i++){
 			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData(), drawer, SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData()));
 			this.players.add(sp);
 			sp.setFrameSpeed(10);
@@ -68,9 +68,8 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		this.sp.setAnimatioIndex(this.idleIndex);
 		this.sp.setPivot(0f, 0f);
 		this.sp.update(x, y);
-		this.head = this.sp.getBoneIndexByName("torso");
-		int torso = this.sp.getBoneIndexByName("leftLowerLeg");
-		this.sp.setBoneScaleX(torso, 1f);
+		this.head = this.sp.getBoneIndexByName("head");
+		//this.sp.setBoneScaleX(torso, 1f);
 		
 		this.bf = new BitmapFont();
 	}

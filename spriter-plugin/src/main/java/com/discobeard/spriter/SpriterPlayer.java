@@ -36,7 +36,12 @@ public class SpriterPlayer{
 	private int fixMaxSteps = 100;
 	
 	
-	
+	/**
+	 * Constructs a new SpriterPlayer object which animates the given SpriterData.
+	 * @param spriterData
+	 * @param drawer
+	 * @param keyframes A list of SpriterKeyFrame arrays. See {@link #SpriterKeyFrameProvider.generateKeyFramePool(SpriterData)} to get the list.
+	 */
 	public SpriterPlayer(SpriterData spriterData, AbstractDrawer<?> drawer,List<SpriterKeyFrame[]> keyframes){
 		this.spriterData = spriterData;
 		this.keyframes = keyframes;
@@ -84,7 +89,7 @@ public class SpriterPlayer{
 	}
 	
 	/**
-	 * Updates this player at current animation index.
+	 * Updates this player and translates the animation to xOffset and yOffset.
 	 * @param xOffset
 	 * @param yOffset
 	 */
@@ -127,6 +132,13 @@ public class SpriterPlayer{
 		this.interpolateObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);	
 	}
 	
+	/**
+	 * Interpolates the objects of firstFrame and secondFrame.
+	 * @param firstFrame
+	 * @param secondFrame
+	 * @param xOffset
+	 * @param yOffset
+	 */
 	private void interpolateObjects(SpriterKeyFrame firstFrame, SpriterKeyFrame secondFrame, float xOffset, float yOffset) {
 		float[] newstuff;
 		for (int i = 0; i < this.currenObjectsToDraw; i++) {
@@ -253,19 +265,8 @@ public class SpriterPlayer{
 			this.tempBones[i].setParent(bone1.getParent()); 
 			this.tempBones[i].setName(bone1.getName());
 			this.tempBones[i].setSpin(bone1.getSpin());
-			if(this.transitionFixed){
+			if(this.transitionFixed)
 				this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
-				/*this.lastFrame.getBones()[i].setX(x);
-				this.lastFrame.getBones()[i].setY(y);
-				this.lastFrame.getBones()[i].setScaleX(this.tempBones[i].getScaleX());
-				this.lastFrame.getBones()[i].setScaleY(this.tempBones[i].getScaleY());
-				this.lastFrame.getBones()[i].setParent(this.tempBones[i].getParent());
-				this.lastFrame.getBones()[i].setAngle(this.tempBones[i].getAngle());
-				this.lastFrame.getBones()[i].setId(bone1.getId());
-				this.lastFrame.getBones()[i].setTimeline(bone1.getTimeline());
-				this.lastFrame.getBones()[i].setName(bone1.getName());
-				this.lastFrame.getBones()[i].setSpin(bone1.getSpin());*/
-			}
 			if (this.tempBones[i].getParent() != null) {
 				this.tempBones[i].setAngle(this.tempBones[i].getAngle() + tempBones[this.tempBones[i].getParent()].getAngle());
 				this.tempBones[i].setScaleX(this.tempBones[i].getScaleX() * tempBones[this.tempBones[i].getParent()].getScaleX());
@@ -288,16 +289,13 @@ public class SpriterPlayer{
 	} 
 	
 	/**
-	 * Sets the current animation index for this player.
+	 * Switches the current animation to the given one, with smooth transition if required.
 	 * @param animationIndex
+	 * @param transitionSpeed indicates how fast the animations have to switch
+	 * @param transitionSteps indicates how many steps are required to switch between the animations.
 	 */
 	public void setAnimatioIndex(int animationIndex, int transitionSpeed, int transitionSteps){
-		//int curKey = this.currentKey;
-		//long frame = this.frame;
 		if(this.animationIndex != animationIndex){
-			/*update(0,0);
-			this.frame = frame;
-			this.currentKey = curKey;*/
 			this.lastFrame.setStartTime(this.frame);
 			this.transitionFixed = false;
 			this.currentKey = 0;
@@ -308,27 +306,52 @@ public class SpriterPlayer{
 		}
 	}
 	
+	/**
+	 * Searches for the animation index with the given name and returns the right one
+	 * @param name name of the animation.
+	 * @return index of the animation if the given name was found, otherwise it returns -1
+	 */
 	public int getAnimationIndexByName(String name){
 		List<Animation> anims = this.spriterData.getEntity().get(0).getAnimation();
 		for(Animation anim: anims)
 			if(anim.getName().equals(name)) return anim.getId();
-		return 0;
+		return -1;
 	}
 	
+	/**
+	 * Searches for the bone index with the given name and returns the right one
+	 * @param name name of the bone.
+	 * @return index of the bone if the given name was found, otherwise it returns -1
+	 */
 	public int getBoneIndexByName(String name){
 		for(int i = 0; i < this.moddedBones.length; i++)
 			if(name.equals(this.moddedBones[i].getName())) return i;
-		return 0;
+		return -1;
 	}
 	
+	/**
+	 * Modifies the bone's angle with the given bone index
+	 * @param index index of the bone
+	 * @param angle new angle of the given bone, angle = 0 means no moddification
+	 */
 	public void setBoneAngle(int index, float angle){
 		this.moddedBones[index].setAngle(angle);
 	}
 	
+	/**
+	 * Modifies the bone's scale x with the given bone index
+	 * @param index index of the bone
+	 * @param scaleX new scale of the given bone, scaleX = 1 means no moddification
+	 */
 	public void setBoneScaleX(int index, float scaleX){
 		this.moddedBones[index].setScaleX(scaleX);
 	}
 	
+	/**
+	 * Modifies the bone's scale y with the given bone index
+	 * @param index index of the bone
+	 * @param scaleY new scale of the given bone, scaleY = 1 means no moddification
+	 */
 	public void setBoneScaleY(int index, float scaleY){
 		this.moddedBones[index].setScaleX(scaleY);
 	}
@@ -385,13 +408,7 @@ public class SpriterPlayer{
 	}
 
 	/**
-	 * @return the frame
-	 */
-	public long getFrame() {
-		return frame;
-	}
-
-	/**
+	 * Changes the current frame to the given one. Note: You can't change the frame while this object is switching to another animation.
 	 * @param frame the frame to set
 	 */
 	public void setFrame(long frame) {
@@ -399,10 +416,10 @@ public class SpriterPlayer{
 	}
 
 	/**
-	 * @return the frameSpeed
+	 * @return the frame
 	 */
-	public int getFrameSpeed() {
-		return frameSpeed;
+	public long getFrame() {
+		return frame;
 	}
 
 	/**
@@ -410,6 +427,12 @@ public class SpriterPlayer{
 	 */
 	public void setFrameSpeed(int frameSpeed) {
 		this.frameSpeed = frameSpeed;
+	}
+	/**
+	 * @return the frameSpeed
+	 */
+	public int getFrameSpeed() {
+		return frameSpeed;
 	}
 
 	
@@ -419,27 +442,41 @@ public class SpriterPlayer{
 	public Animation getAnimation() {
 		return animation;
 	}
-
 	
 	/**
-	 * @param anim the anim to set
+	 * Flips this around the x-axis.
 	 */
-	public void setAnimation(Animation anim) {
-		this.animation = anim;
-	}
-	
-	public int getFlipX(){
-		return this.flipX;
-	}
-	
 	public void flipX(){
 		this.flipX *=-1;
 	}
 	
+	/**
+	 * @return indicates whether this is flipped around the x-axis or not. 1 means is not flipped.
+	 */
+	public int getFlipX(){
+		return this.flipX;
+	}
+
+	
+	/**
+	 * Flips this around the y-axis.
+	 */
 	public void flipY(){
 		this.flipY *=-1;
 	}
+
 	
+	/**
+	 * @return indicates whether this is flipped around the y-axis or not. 1 means is not flipped.
+	 */
+	public float getFlipY() {
+		return this.flipY;
+	}
+	
+	/**
+	 * Changes the angle of this.
+	 * @param angle to rotate all objects , angle = 0 means no rotation
+	 */
 	public void setAngle(float angle){
 		this.rootParent.setAngle(this.angle);
 		this.angle = angle;
@@ -447,10 +484,6 @@ public class SpriterPlayer{
 	
 	public float getAngle(){
 		return this.angle;
-	}
-
-	public float getFlipY() {
-		return this.flipY;
 	}
 
 	/**
@@ -461,7 +494,8 @@ public class SpriterPlayer{
 	}
 
 	/**
-	 * @param scaleX the scaleX to set
+	 * Scales this to the given value.
+	 * @param scale the scale to set, scale = 1.0f normal scale
 	 */
 	public void setScale(float scale) {
 		this.scale = scale;
@@ -469,6 +503,11 @@ public class SpriterPlayer{
 		this.rootParent.setScaleY(this.scale);
 	}
 	
+	/**
+	 * Sets the center point of this. pivotX = 0, pivotY = 0 means the same rotation point as in Spriter.
+	 * @param pivotX
+	 * @param pivotY
+	 */
 	public void setPivot(float pivotX, float pivotY){
 		this.rootParent.setX(pivotX);
 		this.rootParent.setY(pivotY);

@@ -14,8 +14,8 @@ public class SpriterObjectConverter implements Converter<AnimationObject, Sprite
 		object.setFolder(from.getFolder());
 		object.setPivotX(from.getPivotX().floatValue());
 		object.setPivotY(from.getPivotY().floatValue());
-		object.setScale_x(from.getScaleX().floatValue());
-		object.setScale_y(from.getScaleY().floatValue());
+		object.setScaleX(from.getScaleX().floatValue());
+		object.setScaleY(from.getScaleY().floatValue());
 		object.setX(from.getX().floatValue());
 		object.setY(from.getY().floatValue());
 		object.setzIndex(from.getZIndex());

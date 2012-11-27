@@ -96,7 +96,7 @@ public class SpriterObject implements Comparable<SpriterObject>{
 		return scale_x;
 	}
 
-	public void setScale_x(float scale_x) {
+	public void setScaleX(float scale_x) {
 		this.scale_x = scale_x;
 	}
 
@@ -104,7 +104,7 @@ public class SpriterObject implements Comparable<SpriterObject>{
 		return scale_y;
 	}
 
-	public void setScale_y(float scale_y) {
+	public void setScaleY(float scale_y) {
 		this.scale_y = scale_y;
 	}
 

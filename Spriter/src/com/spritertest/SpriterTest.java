@@ -209,8 +209,8 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		this.rotateBack = false;
-		this.roatateToMouse(screenX, screenY);
+		this.rotateBack = Gdx.input.isKeyPressed(Keys.CONTROL_LEFT);
+		//this.roatateToMouse(screenX, screenY);
 		return true;
 	}
 

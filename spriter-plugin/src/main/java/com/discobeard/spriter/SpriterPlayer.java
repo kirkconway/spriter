@@ -33,6 +33,7 @@ public class SpriterPlayer{
 	private SpriterKeyFrame lastFrame;
 	private boolean transitionFixed = true;
 	private int fixCounter = 0;
+	private float xOffset, yOffset;
 	
 	
 	
@@ -89,6 +90,8 @@ public class SpriterPlayer{
 	 */
 	public void update(float xOffset, float yOffset){
 		//Fetch information
+		this.xOffset = xOffset;
+		this.yOffset = yOffset;
 		SpriterKeyFrame[] keyframes = this.keyframes.get(animationIndex);
 		SpriterKeyFrame firstKeyFrame; 
 		SpriterKeyFrame secondKeyFrame;
@@ -108,6 +111,7 @@ public class SpriterPlayer{
 		else{
 			firstKeyFrame = this.lastFrame;
 			secondKeyFrame = keyframes[this.currentKey];
+			secondKeyFrame.setStartTime(this.lastFrame.getStartTime()+20);
 			this.fixCounter++;
 			//Update
 			if(this.fixCounter >= 20){
@@ -115,12 +119,9 @@ public class SpriterPlayer{
 				this.fixCounter = 0;
 				this.transitionFixed = true;
 				System.out.println(this.transitionFixed);
+				secondKeyFrame.setStartTime(0);
 			}
-			this.frame += this.frameSpeed;
-			/*if (this.frame > keyframes[this.currentKey].getEndTime()){
-				this.currentKey = (this.currentKey+1)%keyframes.length;
-				this.frame = keyframes[this.currentKey].getStartTime();
-			}*/
+			this.frame++;
 		}
 		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		//Interpolate
@@ -276,36 +277,43 @@ public class SpriterPlayer{
 	 * @param animationIndex
 	 */
 	public void setAnimatioIndex(int animationIndex){
-		if(this.animationIndex != animationIndex){
+		if(this.animationIndex != animationIndex && this.transitionFixed){
 			//this.frame = 0;
 			SpriterKeyFrame curFrame = this.keyframes.get(this.animationIndex)[this.currentKey];
+			this.lastFrame.setStartTime(this.frame);
 			this.transitionFixed = false;
 			for(int i = 0; i < this.lastFrame.getBones().length; i++){
 				SpriterBone bone = this.lastFrame.getBones()[i];
 				bone.setX(this.tempBones[i].getX());
 				bone.setY(this.tempBones[i].getY());
-				bone.setAngle(this.tempBones[i].getAngle());
+				if(this.tempBones[i].getParent() != null){
+					bone.setAngle(this.tempBones[i].getAngle()- this.tempBones[this.tempBones[i].getParent()].getAngle());
+					bone.setScaleX(this.tempBones[i].getScaleX() / tempBones[this.tempBones[i].getParent()].getScaleX());
+					bone.setScaleY(this.tempBones[i].getScaleY() / tempBones[this.tempBones[i].getParent()].getScaleY());
+				}
+				else{
+					bone.setAngle(this.tempBones[i].getAngle()- this.rootParent.getAngle());
+					bone.setScaleX(this.tempBones[i].getScaleX() / this.rootParent.getScaleX());
+					bone.setScaleY(this.tempBones[i].getScaleY() / this.rootParent.getScaleY());
+				}
 				bone.setId(this.tempBones[i].getId());
 				bone.setName(this.tempBones[i].getName());
 				bone.setParent(this.tempBones[i].getParent());
-				bone.setScaleX(this.tempBones[i].getScaleX());
-				bone.setScaleY(this.tempBones[i].getScaleY());
 				bone.setSpin(this.tempBones[i].getSpin());
 				bone.setTimeline(this.tempBones[i].getTimeline());
-				System.out.println(bone);
 			}
 			for(int i = 0; i < this.currenObjectsToDraw; i++){
 				SpriterObject obj = this.lastFrame.getObjects()[i];
 				obj.setAlpha(this.instructions[i].alpha);
-				obj.setAngle(this.instructions[i].angle);
+				obj.setAngle(this.instructions[i].angle*this.flipX*this.flipY);
 				obj.setFile(this.instructions[i].ref.file);
 				obj.setFolder(this.instructions[i].ref.folder);
-				obj.setX(this.instructions[i].x);
-				obj.setY(this.instructions[i].y);
+				obj.setX((this.instructions[i].x-this.xOffset)*this.flipX);
+				obj.setY((this.instructions[i].y-this.yOffset)*this.flipY);
 				obj.setPivotX(this.instructions[i].pivotX);
 				obj.setPivotY(this.instructions[i].pivotY);
-				obj.setScale_x(this.instructions[i].scaleX);
-				obj.setScale_y(this.instructions[i].scaleY);
+				obj.setScale_x(this.instructions[i].scaleX*this.flipX);
+				obj.setScale_y(this.instructions[i].scaleY*this.flipY);
 				obj.setSpin(curFrame.getObjects()[i].getSpin());
 				obj.setzIndex(curFrame.getObjects()[i].getZIndex());
 				obj.setTimeline(curFrame.getObjects()[i].getTimeline());

@@ -53,7 +53,7 @@ public class SpriterKeyFrameBuilder {
 			spriterKeyFrames[k].setBones(tempBones.toArray(new SpriterBone[tempBones.size()]));
 			
 			spriterKeyFrames[k].setStartTime(key.getTime());
-			spriterKeyFrames[k].setEndTme(k<keyFrames.size()-1 ? keyFrames.get(k+1).getTime()-1 : animation.getLength());
+			spriterKeyFrames[k].setEndTime(k<keyFrames.size()-1 ? keyFrames.get(k+1).getTime()-1 : animation.getLength());
 		}
 		
 		return spriterKeyFrames;

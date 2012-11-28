@@ -31,7 +31,7 @@ public class SpriterKeyFrame {
 		return endTme;
 	}
 
-	public void setEndTme(long endTme) {
+	public void setEndTime(long endTme) {
 		this.endTme = endTme;
 	}
 

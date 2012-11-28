@@ -59,9 +59,6 @@ public class SpriterPlayer{
 		for(int i = 0; i < tmpBones.length; i++) tmpBones[i] = new SpriterBone();
 		this.lastFrame.setBones(tmpBones);
 		this.lastFrame.setObjects(tmpObjs);
-		update(0, 0);
-		this.frame = 0;
-		this.currentKey = 0;
 		
 	}
 	
@@ -116,9 +113,8 @@ public class SpriterPlayer{
 		else{
 			firstKeyFrame = keyframes[0];
 			secondKeyFrame = this.lastFrame;
-			firstKeyFrame.setStartTime(this.lastFrame.getStartTime()+500);
 			float temp =(float)(this.fixCounter)/(float)this.fixMaxSteps;
-			this.frame = this.lastFrame.getStartTime()+(long)(500*temp);
+			this.frame = this.lastFrame.getStartTime()+(long)(this.fixMaxSteps*temp);
 			this.fixCounter= Math.min(this.fixCounter+this.transitionSpeed,this.fixMaxSteps);
 			//Update
 			if(this.fixCounter == this.fixMaxSteps){
@@ -131,7 +127,7 @@ public class SpriterPlayer{
 		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		//Interpolate
 		this.interpolateBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);		
-		this.interpolateObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);	
+		this.interpolateObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
 	}
 	
 	/**
@@ -172,13 +168,14 @@ public class SpriterPlayer{
 					this.lastFrame.getObjects()[i].setAngle(rotation);
 					this.lastFrame.getObjects()[i].setAlpha(alpha);
 					this.lastFrame.getObjects()[i].setId(obj1.getId());
-					this.lastFrame.getObjects()[i].setTimeline(obj1.getTimeline());
+					this.lastFrame.getObjects()[i].setTimeline((found) ? obj1.getTimeline() : -1);
 					this.lastFrame.getObjects()[i].setFile(obj1.getFile());
 					this.lastFrame.getObjects()[i].setFolder(obj1.getFolder());
 					this.lastFrame.getObjects()[i].setPivotX(obj1.getPivotX());
 					this.lastFrame.getObjects()[i].setPivotY(obj1.getPivotY());
 					this.lastFrame.getObjects()[i].setSpin(obj1.getSpin());
 				}
+				
 				if (obj1.getParent() != null) {
 					rotation += tempBones[obj1.getParent()].getAngle();
 					scaleX *= tempBones[obj1.getParent()].getScaleX();
@@ -257,7 +254,7 @@ public class SpriterPlayer{
 			rotation += this.moddedBones[i].getAngle();
 			scaleX *= this.moddedBones[i].getScaleX();
 			scaleY *= this.moddedBones[i].getScaleY();
-			this.tempBones[i].setAngle(/*(bone1.getSpin() == -1) ? 360-rotation:*/ rotation);
+			this.tempBones[i].setAngle(rotation);
 			this.tempBones[i].setScaleX(scaleX);
 			this.tempBones[i].setScaleY(scaleY);
 			this.tempBones[i].setX(x); 
@@ -267,8 +264,10 @@ public class SpriterPlayer{
 			this.tempBones[i].setParent(bone1.getParent()); 
 			this.tempBones[i].setName(bone1.getName());
 			this.tempBones[i].setSpin(bone1.getSpin());
-			if(this.transitionFixed)
+			if(this.transitionFixed){
 				this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
+				if(!found) this.tempBones[i].setTimeline(-1);
+			}
 			if (this.tempBones[i].getParent() != null) {
 				this.tempBones[i].setAngle(this.tempBones[i].getAngle() + tempBones[this.tempBones[i].getParent()].getAngle());
 				this.tempBones[i].setScaleX(this.tempBones[i].getScaleX() * tempBones[this.tempBones[i].getParent()].getScaleX());
@@ -298,13 +297,17 @@ public class SpriterPlayer{
 	 */
 	public void setAnimatioIndex(int animationIndex, int transitionSpeed, int transitionSteps){
 		if(this.animationIndex != animationIndex){
-			this.lastFrame.setStartTime(this.frame);
-			this.transitionFixed = false;
-			this.currentKey = 0;
-			this.animationIndex = animationIndex;
-			this.animation = this.spriterData.getEntity().get(0).getAnimation().get(animationIndex);
 			this.transitionSpeed = transitionSpeed;
 			this.fixMaxSteps = transitionSteps;
+			this.lastFrame.setStartTime(this.frame+1);
+			this.lastFrame.setEndTime(this.frame+this.fixMaxSteps-1);
+			this.keyframes.get(animationIndex)[0].setStartTime(this.frame+1+this.fixMaxSteps);
+			System.out.println(this.lastFrame.getStartTime()+", "+this.keyframes.get(animationIndex)[0].getStartTime());
+			this.transitionFixed = false;
+			this.currentKey = 0;
+			this.fixCounter = 0;
+			this.animationIndex = animationIndex;
+			this.animation = this.spriterData.getEntity().get(0).getAnimation().get(animationIndex);
 		}
 	}
 	

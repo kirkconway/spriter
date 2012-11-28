@@ -302,7 +302,6 @@ public class SpriterPlayer{
 			this.lastFrame.setStartTime(this.frame+1);
 			this.lastFrame.setEndTime(this.frame+this.fixMaxSteps-1);
 			this.keyframes.get(animationIndex)[0].setStartTime(this.frame+1+this.fixMaxSteps);
-			System.out.println(this.lastFrame.getStartTime()+", "+this.keyframes.get(animationIndex)[0].getStartTime());
 			this.transitionFixed = false;
 			this.currentKey = 0;
 			this.fixCounter = 0;

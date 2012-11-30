@@ -12,6 +12,26 @@ import com.spriter.objects.SpriterObject;
 
 import java.util.List;
 
+/**
+ * A SpriterPlayer is the core of a spriter animation.
+ * Here you can get as many information as you need.
+ * 
+ * SpriterPlayer plays the given data with the method {@link #update(float, float)}. You have to call this method by your own in your main game loop.
+ * SpriterPlayer updates the frames by its own. See {@link #setFrameSpeed(int)} for setting the playback speed.
+ * 
+ * The animations can be drawn by {@link #draw()} which draws all objects with your own implemented Drawer.
+ * 
+ * Accessing bones and animations via names is also possible. See {@link #getAnimationIndexByName(String)} and {@link #getBoneIndexByName(String)}.
+ * You can modify the whole animation or only bones at runtime with some fancy methods provided by this class.
+ * Have a look at {@link #setAngle(float)}, {@link #flipX()}, {@link #flipY()}, {@link #setScale(float)} for animation moddification.
+ * And see {@link #setBoneAngle(int, float)}, {@link #setBoneScaleX(int, float)}, {@link #setBoneScaleY(int, float)}.
+ * 
+ * All stuff you set you can also receive by the corresponding getters ;) .
+ * 
+ * @author Trixt0r
+ *
+ */
+
 public class SpriterPlayer{
 
 	private SpriterData spriterData;
@@ -38,15 +58,15 @@ public class SpriterPlayer{
 	
 	/**
 	 * Constructs a new SpriterPlayer object which animates the given SpriterData.
-	 * @param spriterData
-	 * @param drawer
-	 * @param keyframes A list of SpriterKeyFrame arrays. See {@link #SpriterKeyFrameProvider.generateKeyFramePool(SpriterData)} to get the list.
+	 * @param spriterData {@link Spriter} which provides a method to load all needed data to animate. See {@link Spriter#getSpriter(String, com.spriter.file.FileLoader)} for mor information.
+	 * @param drawer {@link AbstractDrawer} which you have to implement on your own.
+	 * @param keyframes A list of SpriterKeyFrame arrays. See {@link SpriterKeyFrameProvider#generateKeyFramePool(SpriterData)} to get the list.
 	 */
 	public SpriterPlayer(SpriterData spriterData, AbstractDrawer<?> drawer,List<SpriterKeyFrame[]> keyframes){
 		this.spriterData = spriterData;
 		this.keyframes = keyframes;
 		this.drawer = drawer;
-		this.generatePool();
+		this.generateData();
 		this.animation = this.spriterData.getEntity().get(0).getAnimation().get(0);
 		this.rootParent = new SpriterBone();
 		this.rootParent.setScaleX(this.scale);
@@ -62,7 +82,10 @@ public class SpriterPlayer{
 		
 	}
 	
-	private void generatePool(){
+	/**
+	 * Generates data which is necessary to animate all animations as intended.
+	 */
+	private void generateData(){
 		this.instructions = new DrawInstruction[SpriterKeyFrameProvider.MAX_OBJECTS];
 		this.moddedObjects = new SpriterModObject[this.instructions.length];
 		for(int i = 0; i < this.instructions.length; i++){
@@ -78,7 +101,7 @@ public class SpriterPlayer{
 	}
 	
 	/**
-	 * Draws the current animation
+	 * Draws the current animation with the provided {@link AbstractDrawer}, which is library specific.
 	 */
 	public void draw(){
 		for(int i = 0; i< this.currenObjectsToDraw; i++){
@@ -89,6 +112,8 @@ public class SpriterPlayer{
 	
 	/**
 	 * Updates this player and translates the animation to xOffset and yOffset.
+	 * Frame is updated by previous set frame speed (See {@link #setFrameSpeed(long)} ).
+	 * This method makes sure that the keyframes get played back.
 	 * @param xOffset
 	 * @param yOffset
 	 */
@@ -291,9 +316,11 @@ public class SpriterPlayer{
 	
 	/**
 	 * Switches the current animation to the given one, with smooth transition if required.
-	 * @param animationIndex
+	 * Note: Smooth transitions can only be accomplished, if the bone and object structure of the previous and next animation are the same.
+	 * Otherwise you will get weird effects. So beware!
+	 * @param animationIndex new animation
 	 * @param transitionSpeed indicates how fast the animations have to switch
-	 * @param transitionSteps indicates how many steps are required to switch between the animations.
+	 * @param transitionSteps indicates how many steps are required to switch between the animations. transitionSteps == 0 means no transition.
 	 */
 	public void setAnimatioIndex(int animationIndex, int transitionSpeed, int transitionSteps){
 		if(this.animationIndex != animationIndex){
@@ -360,22 +387,43 @@ public class SpriterPlayer{
 		this.moddedBones[index].setScaleX(scaleY);
 	}
 	
+	/**
+	 * @param index of the bone (the hierarchy of the bones is the same as in Spriter)
+	 * @return angle of the bone at given index (modified angle is included in return statement).
+	 */
 	public float getBoneAngle(int index){
 		return this.moddedBones[index].getAngle();
 	}
 	
+	/**
+	 * @param index of the bone (the hierarchy of the bones is the same as in Spriter)
+	 * @return  x scale of the bone at given index (modified x scale is included in return statement).
+	 */
 	public float getBoneScaleX(int index){
 		return this.moddedBones[index].getScaleX();
 	}
+
 	
+	/**
+	 * @param index of the bone (the hierarchy of the bones is the same as in Spriter)
+	 * @return  y scale of the bone at given index (modified y scale is included in return statement).
+	 */
 	public float getBoneScaleY(int index){
 		return this.moddedBones[index].getScaleY();
 	}
 	
+	/**
+	 * @param index of the bone (the hierarchy of the bones is the same as in Spriter)
+	 * @return absolutt x position of the bone at given index (xOffset is included)
+	 */
 	public float getBoneX(int index){
 		return this.moddedBones[index].getX();
 	}
-	
+
+	/**
+	 * @param index of the bone (the hierarchy of the bones is the same as in Spriter)
+	 * @return absolute y position of the bone at given index (yOffset is included)
+	 */
 	public float getBoneY(int index){
 		return this.moddedBones[index].getY();
 	}
@@ -427,7 +475,7 @@ public class SpriterPlayer{
 	}
 
 	/**
-	 * @param frameSpeed the frameSpeed to set
+	 * @param frameSpeed the frameSpeed to set. Higher value meens playback speed. frameSpeed == 0 means no playback speed.
 	 */
 	public void setFrameSpeed(int frameSpeed) {
 		this.frameSpeed = frameSpeed;
@@ -517,10 +565,19 @@ public class SpriterPlayer{
 		this.rootParent.setY(pivotY);
 	}
 	
+	/**
+	 * Returns the x center coordinate of this.
+	 * @return pivot x
+	 */
 	public float getPivotX(){
 		return this.rootParent.getX();
 	}
+
 	
+	/**
+	 * Returns the y center coordinate of this.
+	 * @return pivot y
+	 */
 	public float getPivotY(){
 		return this.rootParent.getY();
 	}

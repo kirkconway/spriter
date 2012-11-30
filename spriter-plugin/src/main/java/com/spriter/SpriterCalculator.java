@@ -2,6 +2,15 @@ package com.spriter;
 
 import com.spriter.objects.SpriterBone;
 
+/**
+ * A class which provides methods to calculate Spriter specific issues,
+ * like linear interpolation and rotation around a parent objects.
+ * Other interpolation types are coming with the beta release of Spriter.
+ * 
+ * @author Trixt0r
+ *
+ */
+
 public class SpriterCalculator {
 	
 	/**

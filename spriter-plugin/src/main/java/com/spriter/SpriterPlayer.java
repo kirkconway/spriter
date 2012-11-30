@@ -86,13 +86,20 @@ public class SpriterPlayer{
 	 * Generates data which is necessary to animate all animations as intended.
 	 */
 	private void generateData(){
-		this.instructions = new DrawInstruction[SpriterKeyFrameProvider.MAX_OBJECTS];
+		int maxObjects = 0, maxBones = 0;
+		for(SpriterKeyFrame[] key: this.keyframes){
+			for(SpriterKeyFrame k: key){
+				maxBones = Math.max(k.getBones().length, maxBones);
+				maxObjects = Math.max(k.getObjects().length, maxObjects);
+			}
+		}
+		this.instructions = new DrawInstruction[maxObjects];
 		this.moddedObjects = new SpriterModObject[this.instructions.length];
 		for(int i = 0; i < this.instructions.length; i++){
 			this.instructions[i] = new DrawInstruction(new Reference(0,0),0,0,0,0,0,0,0,0);
 			this.moddedObjects[i] = new SpriterModObject();
 		}
-		this.tempBones = new SpriterBone[SpriterKeyFrameProvider.MAX_BONES];
+		this.tempBones = new SpriterBone[maxBones];
 		this.moddedBones = new SpriterModObject[this.tempBones.length];
 		for(int i = 0; i < this.tempBones.length; i++){
 			this.tempBones[i] = new SpriterBone();

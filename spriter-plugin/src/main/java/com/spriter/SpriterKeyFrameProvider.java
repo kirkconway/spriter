@@ -9,12 +9,19 @@ import com.discobeard.spriter.dom.SpriterData;
 import com.spriter.mergers.SpriterKeyFrameBuilder;
 import com.spriter.objects.SpriterKeyFrame;
 
+/**
+ * This class provides the {@link #generateKeyFramePool(SpriterData)} method to generate all necessary data which {@link SpriterPlayer} needs to animate.
+ * It is highly recommended to call this method only once for a SCML file since {@link SpriterPlayer} does not modify the data you pass through the
+ * constructor and also to save memory.
+ * 
+ * @author Trixt0r
+ *
+ */
+
 public class SpriterKeyFrameProvider {
 	
-	public static int MAX_OBJECTS,MAX_BONES;
-	
 	/**
-	 * Generates all needed keyframes from the given spriter data.
+	 * Generates all needed keyframes from the given spriter data. This method sorts all objects by its z_index value to draw them in a proper way.
 	 * @param spriterData SpriterData to generate from.
 	 * @return generated keyframe list.
 	 */
@@ -25,8 +32,6 @@ public class SpriterKeyFrameProvider {
 			SpriterKeyFrame[] keyframes = new SpriterKeyFrameBuilder().buildKeyFrameArray(anim);
 			for(SpriterKeyFrame key: keyframes){
 				Arrays.sort(key.getObjects());
-				MAX_BONES = Math.max(key.getBones().length, MAX_BONES);
-				MAX_OBJECTS = Math.max(key.getObjects().length, MAX_OBJECTS);
 				for(int i = 0; i < key.getBones().length; i++)
 					key.getBones()[i].setName(anim.getTimeline().get(key.getBones()[i].getTimeline()).getName());
 			}

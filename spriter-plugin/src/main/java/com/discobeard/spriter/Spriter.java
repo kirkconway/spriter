@@ -2,7 +2,7 @@ package com.discobeard.spriter;
 
 import java.io.File;
 import com.discobeard.spriter.dom.SpriterData;
-import com.discobeard.spriter.file.FileLoader;
+import com.discobeard.spriter.file.AbstractLoader;
 import com.discobeard.spriter.file.Reference;
 
 /**
@@ -23,15 +23,15 @@ public class Spriter {
 	 * @return a Spriter Object
 	 */
 
-	public static Spriter getSpriter(String path, FileLoader<?> loader) {
+	public static Spriter getSpriter(String path, AbstractLoader<?> loader) {
 		return new Spriter(path, loader);
 	}
 	
-	final private FileLoader<?> loader;
+	final private AbstractLoader<?> loader;
 	final private File scmlFile;
 	final private SpriterData spriterData;
 
-	private Spriter(String scmlPath, FileLoader<?> loader) {
+	private Spriter(String scmlPath, AbstractLoader<?> loader) {
 		this.scmlFile = new File(getClass().getResource("/" + scmlPath).getPath());
 		this.spriterData = new SCMLParser(scmlFile).parse();
 		this.loader = loader;

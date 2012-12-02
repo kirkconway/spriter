@@ -1,4 +1,5 @@
 package com.discobeard.spriter;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,7 +10,6 @@ import javax.xml.bind.Unmarshaller;
 
 import com.discobeard.spriter.dom.SpriterData;
 
-@SuppressWarnings("restriction")
 public class SCMLParser {
 	
 	final private File scmlFile;

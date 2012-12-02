@@ -10,11 +10,16 @@
     <version>1.0</version>
     <name>spriter-project</name>
 
+    <properties>
+        <lwjgl.version>2.8.1</lwjgl.version>
+        <slick.version>274</slick.version>
+    </properties>
+        
     <modules>
-        <module>spriter-dom</module>
+        <module>spriter-scml-dom</module>
         <module>spriter-plugin</module>
-		<module>spriter-test</module>
-		<module>spriter-slick</module>
+        <module>spriter-test-projects/spriter-lwjgl-test</module>
+        <module>spriter-test-projects/spriter-slick-test</module>
     </modules>
 	
 </project>

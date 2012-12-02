@@ -4,12 +4,15 @@ import com.discobeard.spriter.dom.Animation;
 import com.discobeard.spriter.dom.SpriterData;
 import com.discobeard.spriter.draw.AbstractDrawer;
 import com.discobeard.spriter.draw.DrawInstruction;
+import com.discobeard.spriter.file.AbstractLoader;
 import com.discobeard.spriter.file.Reference;
+import com.discobeard.spriter.objects.SpriterAnimation;
 import com.discobeard.spriter.objects.SpriterBone;
 import com.discobeard.spriter.objects.SpriterKeyFrame;
 import com.discobeard.spriter.objects.SpriterModObject;
 import com.discobeard.spriter.objects.SpriterObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpriterPlayer{
@@ -23,7 +26,6 @@ public class SpriterPlayer{
 	private DrawInstruction[] instructions;
 	private List<SpriterKeyFrame[]> keyframes;
 	private SpriterBone[] tempBones;
-	private AbstractDrawer<?> drawer;
 	private int currenObjectsToDraw;
 	private int flipX = 1, flipY = 1;
 	private float angle = 0;
@@ -35,6 +37,21 @@ public class SpriterPlayer{
 	private int fixCounter = 0;
 	private int fixMaxSteps = 100;
 	
+	
+	ArrayList<SpriterAnimation> animations = new ArrayList<>();
+	
+	@SuppressWarnings("unused")
+	private AbstractLoader<?> loader;
+	private AbstractDrawer<?> drawer;
+	
+	public SpriterPlayer(final AbstractLoader<?> loader, final AbstractDrawer<?> drawer){
+		this.loader = loader;
+		this.drawer = drawer;
+	}
+	
+	public void addAnimation(SpriterAnimation animation){
+		animations.add(animation);
+	}
 	
 	/**
 	 * Constructs a new SpriterPlayer object which animates the given SpriterData.

@@ -1,14 +1,14 @@
 package com.discobeard.spriter.draw;
 
 
-import com.discobeard.spriter.file.FileLoader;
+import com.discobeard.spriter.file.AbstractLoader;
 import com.discobeard.spriter.file.Reference;
 
 public abstract class AbstractDrawer<L> {
 	
-	private final FileLoader<L> loader;
+	private final AbstractLoader<L> loader;
 	
-	public AbstractDrawer(FileLoader<L> loader){
+	public AbstractDrawer(AbstractLoader<L> loader){
 		this.loader=loader;
 	}
 	

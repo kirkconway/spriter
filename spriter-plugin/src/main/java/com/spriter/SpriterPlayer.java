@@ -34,7 +34,7 @@ import java.util.List;
 
 public class SpriterPlayer{
 
-	private SpriterData spriterData;
+	protected SpriterData spriterData;
 	private Animation animation;
 	private long frame = 0;
 	private int frameSpeed = 30, transitionSpeed = 30;
@@ -43,7 +43,7 @@ public class SpriterPlayer{
 	private DrawInstruction[] instructions;
 	private List<SpriterKeyFrame[]> keyframes;
 	private SpriterBone[] tempBones;
-	private AbstractDrawer<?> drawer;
+	protected AbstractDrawer<?> drawer;
 	private int currenObjectsToDraw;
 	private int flipX = 1, flipY = 1;
 	private float angle = 0;
@@ -130,15 +130,25 @@ public class SpriterPlayer{
 		SpriterKeyFrame firstKeyFrame; 
 		SpriterKeyFrame secondKeyFrame;
 		if(this.transitionFixed){
-			firstKeyFrame = keyframes[this.currentKey];
-			secondKeyFrame = keyframes[(this.currentKey+1)%keyframes.length];
-			
+			if(this.frameSpeed >= 0){
+				firstKeyFrame = keyframes[this.currentKey];
+				secondKeyFrame = keyframes[(this.currentKey+1)%keyframes.length];
+			}
+			else{
+				secondKeyFrame = keyframes[this.currentKey];
+				firstKeyFrame = keyframes[((this.currentKey-1)+keyframes.length)%keyframes.length];
+			}
 			//Update
 			if(this.frame > this.animation.getLength())
 				this.frame = 0;
+			else if(this.frame < 0) this.frame = this.animation.getLength();
 			this.frame += this.frameSpeed;
-			if (this.frame > keyframes[this.currentKey].getEndTime()){
+			if (this.frame > firstKeyFrame.getEndTime() && this.frameSpeed > 0){
 				this.currentKey = (this.currentKey+1)%keyframes.length;
+				this.frame = keyframes[this.currentKey].getStartTime();
+			}
+			else if(this.frame < firstKeyFrame.getStartTime()){
+				this.currentKey = ((this.currentKey-1)+keyframes.length)%keyframes.length;
 				this.frame = keyframes[this.currentKey].getStartTime();
 			}
 		}
@@ -185,12 +195,12 @@ public class SpriterPlayer{
 				}
 				float x=obj1.getX(),y=obj1.getY(),scaleX=obj1.getScaleX(),scaleY=obj1.getScaleY(),rotation=obj1.getAngle(),alpha=obj1.getAlpha();
 				if(obj2 != null){
-					x = SpriterCalculator.calculateInterpolation(obj1.getX(), obj2.getX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
-					y = SpriterCalculator.calculateInterpolation(obj1.getY(), obj2.getY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
-					scaleX = SpriterCalculator.calculateInterpolation(obj1.getScaleX(), obj2.getScaleX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
-					scaleY = SpriterCalculator.calculateInterpolation(obj1.getScaleY(), obj2.getScaleY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
-					rotation = SpriterCalculator.calculateAngleInterpolation(obj1.getAngle(), obj2.getAngle(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
-					alpha = SpriterCalculator.calculateInterpolation(obj1.getAlpha(), obj2.getAlpha(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					x = this.interpolate(obj1.getX(), obj2.getX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					y = this.interpolate(obj1.getY(), obj2.getY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					scaleX = this.interpolate(obj1.getScaleX(), obj2.getScaleX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					scaleY = this.interpolate(obj1.getScaleY(), obj2.getScaleY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					rotation = this.interpolateAngle(obj1.getAngle(), obj2.getAngle(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+					alpha = this.interpolate(obj1.getAlpha(), obj2.getAlpha(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
 				}
 				if(this.transitionFixed){
 					this.lastFrame.getObjects()[i].setX(x);
@@ -277,11 +287,11 @@ public class SpriterPlayer{
 			}
 			float x=bone1.getX(),y=bone1.getY(),scaleX=bone1.getScaleX(),scaleY=bone1.getScaleY(),rotation=bone1.getAngle();
 			if(bone2 != null){
-				x = SpriterCalculator.calculateInterpolation(bone1.getX(), bone2.getX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
-				y = SpriterCalculator.calculateInterpolation(bone1.getY(), bone2.getY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
-				scaleX = SpriterCalculator.calculateInterpolation(bone1.getScaleX(), bone2.getScaleX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
-				scaleY = SpriterCalculator.calculateInterpolation(bone1.getScaleY(), bone2.getScaleY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
-				rotation = SpriterCalculator.calculateAngleInterpolation(bone1.getAngle(), bone2.getAngle(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+				x = this.interpolate(bone1.getX(), bone2.getX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+				y = this.interpolate(bone1.getY(), bone2.getY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+				scaleX = this.interpolate(bone1.getScaleX(), bone2.getScaleX(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+				scaleY = this.interpolate(bone1.getScaleY(), bone2.getScaleY(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
+				rotation = this.interpolateAngle(bone1.getAngle(), bone2.getAngle(), firstFrame.getStartTime(), secondFrame.getStartTime(), this.frame);
 			}
 			rotation += this.moddedBones[i].getAngle();
 			scaleX *= this.moddedBones[i].getScaleX();
@@ -587,5 +597,21 @@ public class SpriterPlayer{
 	 */
 	public float getPivotY(){
 		return this.rootParent.getY();
+	}
+	
+	/**
+	 * See {@link SpriterCalculator#calculateInterpolation(float, float, float, float, long)}
+	 * Can be inherited, to handle other interpolation techniques. Standard is linear interpolation.
+	 */
+	protected float interpolate(float a, float b, float timeA, float timeB, long currentTime){
+		return SpriterCalculator.calculateInterpolation(a, b, timeA, timeB, currentTime);
+	}
+	
+	/**
+	 * See {@link SpriterCalculator#calculateInterpolation(float, float, float, float, long)}
+	 * Can be inherited, to handle other interpolation techniques. Standard is linear interpolation.
+	 */
+	protected float interpolateAngle(float a, float b, float timeA, float timeB, long currentTime){
+		return SpriterCalculator.calculateAngleInterpolation(a, b, timeA, timeB, currentTime);
 	}
 }

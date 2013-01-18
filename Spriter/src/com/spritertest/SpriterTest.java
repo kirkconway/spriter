@@ -15,12 +15,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-import com.discobeard.spriter.Spriter;
-import com.discobeard.spriter.SpriterCalculator;
-import com.discobeard.spriter.SpriterKeyFrameProvider;
-import com.discobeard.spriter.SpriterPlayer;
-import com.discobeard.spriter.file.FileLoader;
-import com.discobeard.spriter.objects.SpriterKeyFrame;
+import com.spriter.Spriter;
+import com.spriter.SpriterCalculator;
+import com.spriter.SpriterKeyFrameProvider;
+import com.spriter.SpriterPlayer;
+import com.spriter.file.FileLoader;
+import com.spriter.objects.SpriterKeyFrame;
 
 public class SpriterTest implements ApplicationListener, InputProcessor {
 	private OrthographicCamera camera;
@@ -51,10 +51,11 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		
 		Gdx.input.setInputProcessor(this);
 		
-		spriter = Spriter.getSpriter("data/monster/basic.scml", drawer, loader);
+		spriter = Spriter.getSpriter("data/monster/basic.scml", loader);
 		List<SpriterKeyFrame[]> keyframes = SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData());
 		this.players = new ArrayList<SpriterPlayer>();
-		for(int i = 0; i < 1; i++){
+		int max = 1;
+		for(int i = 0; i < max; i++){
 			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData(), drawer, keyframes);
 			this.players.add(sp);
 			sp.setFrameSpeed(10);
@@ -66,7 +67,7 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		this.idleIndex = this.sp.getAnimationIndexByName("idle");
 		this.runIndex = this.sp.getAnimationIndexByName("run");
 		this.jumpIndex = this.sp.getAnimationIndexByName("jump");
-		this.fallIndex = this.sp.getAnimationIndexByName("fall");
+		this.fallIndex =this.sp.getAnimationIndexByName("fall");
 		
 		this.sp.setFrameSpeed(10);
 		this.sp.setAnimatioIndex(this.idleIndex, 0, 0);
@@ -103,15 +104,15 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 			for(SpriterPlayer sp: this.players)
 				sp.setFrameSpeed(25);
 		}
-		else if(this.animationIndex != this.runIndex){
+		else if(this.animationIndex != this.runIndex && hspeed == 0 && vspeed == 0 && y == 0){
 			this.animationIndex = this.idleIndex;
 			for(SpriterPlayer sp: this.players)
-				sp.setFrameSpeed(15);
+				sp.setFrameSpeed(18);
 		}
-		if(this.hspeed != 0 && vspeed == 0){
+		if(this.hspeed != 0 && vspeed == 0 && y == 0){
 			this.animationIndex = this.runIndex;
 			for(SpriterPlayer sp: this.players)
-				sp.setFrameSpeed(15);
+				sp.setFrameSpeed(25);
 		}
 		for(SpriterPlayer sp: this.players)
 			sp.setAnimatioIndex(this.animationIndex,10,120);
@@ -193,7 +194,6 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 	@Override
 	public boolean keyUp(int keycode) {
 		if(keycode == Keys.LEFT || keycode == Keys.RIGHT){
-			this.animationIndex = this.idleIndex;
 			this.hspeed = 0f;
 			for(SpriterPlayer sp: this.players)
 				sp.setFrameSpeed(10);

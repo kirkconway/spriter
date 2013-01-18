@@ -2,9 +2,9 @@ package com.spritertest;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.discobeard.spriter.draw.AbstractDrawer;
-import com.discobeard.spriter.draw.DrawInstruction;
-import com.discobeard.spriter.file.FileLoader;
+import com.spriter.draw.AbstractDrawer;
+import com.spriter.draw.DrawInstruction;
+import com.spriter.file.FileLoader;
 
 public class SpriteDrawer extends AbstractDrawer<Sprite> {
 

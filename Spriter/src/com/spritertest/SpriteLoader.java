@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.discobeard.spriter.file.FileLoader;
-import com.discobeard.spriter.file.Reference;
+import com.spriter.file.FileLoader;
+import com.spriter.file.Reference;
 
 public class SpriteLoader extends FileLoader<Sprite>{
 

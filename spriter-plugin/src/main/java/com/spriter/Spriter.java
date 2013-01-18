@@ -1,6 +1,7 @@
 package com.spriter;
 
 import java.io.File;
+
 import com.discobeard.spriter.dom.SpriterData;
 import com.spriter.file.FileLoader;
 import com.spriter.file.Reference;
@@ -32,7 +33,10 @@ public class Spriter {
 	final private SpriterData spriterData;
 
 	private Spriter(String scmlPath, FileLoader<?> loader) {
-		this.scmlFile = new File(getClass().getResource("/" + scmlPath).getPath());
+		//this.scmlFile = new File(getClass().getResource("/" + scmlPath).getPath());
+		/*System.out.println(getClass());
+		System.out.println(getClass().getResource("/").getPath().replaceFirst("/", ""));*/
+		this.scmlFile = new File(scmlPath);//getClass().getResource("/").getPath().replaceFirst("/", "")+scmlPath);
 		this.spriterData = new SCMLParser(scmlFile).parse();
 		this.loader = loader;
 		loadResources();

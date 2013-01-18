@@ -60,7 +60,7 @@ public class SpriterObject implements Comparable<SpriterObject>{
 	public int getZIndex() {
 		return zIndex;
 	}
-	public void setzIndex(int zIndex) {
+	public void setZIndex(int zIndex) {
 		this.zIndex = zIndex;
 	}
 	public float getAngle() {

@@ -21,7 +21,7 @@ public class SpriterObjectMerger implements Merger<AnimationObjectRef, Key, Spri
 		spriterObject.setPivotY(obj.getPivotY().floatValue());
 		spriterObject.setX(obj.getX().floatValue());
 		spriterObject.setY(obj.getY().floatValue());
-		spriterObject.setzIndex(ref.getZIndex());
+		spriterObject.setZIndex(ref.getZIndex());
 		spriterObject.setSpin(key.getSpin());
 		spriterObject.setParent(ref.getParent());
 		spriterObject.setAlpha(obj.getA().floatValue());

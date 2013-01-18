@@ -33,13 +33,18 @@ public class Spriter {
 	final private SpriterData spriterData;
 
 	private Spriter(String scmlPath, FileLoader<?> loader) {
-		//this.scmlFile = new File(getClass().getResource("/" + scmlPath).getPath());
-		/*System.out.println(getClass());
-		System.out.println(getClass().getResource("/").getPath().replaceFirst("/", ""));*/
-		this.scmlFile = new File(scmlPath);//getClass().getResource("/").getPath().replaceFirst("/", "")+scmlPath);
+		this.scmlFile = new File(getClass().getResource("/" + scmlPath).getPath());
 		this.spriterData = new SCMLParser(scmlFile).parse();
 		this.loader = loader;
 		loadResources();
+	}
+	
+	public Spriter(SpriterData spriterData, FileLoader<?> loader, File scmlFile){
+		System.out.println(scmlFile.getAbsolutePath());
+		this.scmlFile = scmlFile;
+		this.spriterData = spriterData;
+		this.loader = loader;
+		this.loadResources();
 	}
 
 	private void loadResources() {

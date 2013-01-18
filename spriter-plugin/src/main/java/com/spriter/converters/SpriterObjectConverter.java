@@ -18,7 +18,7 @@ public class SpriterObjectConverter implements Converter<AnimationObject, Sprite
 		object.setScaleY(from.getScaleY().floatValue());
 		object.setX(from.getX().floatValue());
 		object.setY(from.getY().floatValue());
-		object.setzIndex(from.getZIndex());
+		object.setZIndex(from.getZIndex());
 		object.setTransientObject(true);
 		return object;
 	}

@@ -13,7 +13,7 @@ public class SpriteLoader extends FileLoader<Sprite>{
 
 	@Override
 	public void load(Reference ref, String path) {
-		Pixmap pix = new Pixmap(Gdx.files.local(path));
+		Pixmap pix = new Pixmap(Gdx.files.internal(path));
 		Pixmap pix1 = new Pixmap(roundToPowerOfTwo(pix.getWidth()),roundToPowerOfTwo(pix.getHeight()),Pixmap.Format.RGBA8888);
 		pix1.drawPixmap(pix, 0, 0);
 		Texture texture = new Texture(pix1);

@@ -22,6 +22,15 @@ import com.spriter.SpriterPlayer;
 import com.spriter.file.FileLoader;
 import com.spriter.objects.SpriterKeyFrame;
 
+
+/**
+ * Simple SpriterAnimation test.
+ * Note: If you want to run the whole stuff on android, you have to use the GdxSpriter.getSpriter(String,FileLoader<?>) method.
+ * Otherwise the application will crash because the way discobeard is reading xml files is not supported on android.
+ * @author Trixt0r
+ *
+ */
+
 public class SpriterTest implements ApplicationListener, InputProcessor {
 	private OrthographicCamera camera;
 	private SpriteBatch batch,bitmap;

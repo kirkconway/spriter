@@ -60,12 +60,12 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		
 		Gdx.input.setInputProcessor(this);
 		
-		spriter = Spriter.getSpriter("data/monster/basic.scml", loader);
+		spriter = GdxSpriter.getSpriter("data/monster/basic.scml", loader);
 		List<SpriterKeyFrame[]> keyframes = SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData());
 		this.players = new ArrayList<SpriterPlayer>();
-		int max = 1;
+		int max = 10;
 		for(int i = 0; i < max; i++){
-			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData(), drawer, keyframes);
+			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData().getEntity().get(0), drawer, keyframes);
 			this.players.add(sp);
 			sp.setFrameSpeed(10);
 		}

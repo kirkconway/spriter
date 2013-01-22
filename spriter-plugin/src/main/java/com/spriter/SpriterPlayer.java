@@ -1,6 +1,7 @@
 package com.spriter;
 
 import com.discobeard.spriter.dom.Animation;
+import com.discobeard.spriter.dom.Entity;
 import com.discobeard.spriter.dom.SpriterData;
 import com.spriter.draw.AbstractDrawer;
 import com.spriter.draw.DrawInstruction;
@@ -34,7 +35,7 @@ import java.util.List;
 
 public class SpriterPlayer{
 
-	protected SpriterData spriterData;
+	protected Entity entity;
 	private Animation animation;
 	private long frame = 0;
 	private int frameSpeed = 30, transitionSpeed = 30;
@@ -54,20 +55,21 @@ public class SpriterPlayer{
 	private boolean transitionFixed = true;
 	private int fixCounter = 0;
 	private int fixMaxSteps = 100;
+	private Interpolator interpolator;
 	
 	
 	/**
 	 * Constructs a new SpriterPlayer object which animates the given SpriterData.
-	 * @param spriterData {@link Spriter} which provides a method to load all needed data to animate. See {@link Spriter#getSpriter(String, com.spriter.file.FileLoader)} for mor information.
+	 * @param entity {@link Spriter} which provides a method to load all needed data to animate. See {@link Spriter#getSpriter(String, com.spriter.file.FileLoader)} for mor information.
 	 * @param drawer {@link AbstractDrawer} which you have to implement on your own.
 	 * @param keyframes A list of SpriterKeyFrame arrays. See {@link SpriterKeyFrameProvider#generateKeyFramePool(SpriterData)} to get the list.
 	 */
-	public SpriterPlayer(SpriterData spriterData, AbstractDrawer<?> drawer,List<SpriterKeyFrame[]> keyframes){
-		this.spriterData = spriterData;
+	public SpriterPlayer(Entity entity, AbstractDrawer<?> drawer,List<SpriterKeyFrame[]> keyframes){
+		this.entity = entity;
 		this.keyframes = keyframes;
 		this.drawer = drawer;
 		this.generateData();
-		this.animation = this.spriterData.getEntity().get(0).getAnimation().get(0);
+		this.animation = this.entity.getAnimation().get(0);
 		this.rootParent = new SpriterBone();
 		this.rootParent.setScaleX(this.scale);
 		this.rootParent.setScaleY(this.scale);
@@ -79,6 +81,7 @@ public class SpriterPlayer{
 		for(int i = 0; i < tmpBones.length; i++) tmpBones[i] = new SpriterBone();
 		this.lastFrame.setBones(tmpBones);
 		this.lastFrame.setObjects(tmpObjs);
+		this.interpolator = new LinearInterpolator();
 		
 	}
 	
@@ -139,9 +142,6 @@ public class SpriterPlayer{
 				firstKeyFrame = keyframes[((this.currentKey-1)+keyframes.length)%keyframes.length];
 			}
 			//Update
-			if(this.frame > this.animation.getLength())
-				this.frame = 0;
-			else if(this.frame < 0) this.frame = this.animation.getLength();
 			this.frame += this.frameSpeed;
 			if (this.frame > firstKeyFrame.getEndTime() && this.frameSpeed > 0){
 				this.currentKey = (this.currentKey+1)%keyframes.length;
@@ -151,6 +151,9 @@ public class SpriterPlayer{
 				this.currentKey = ((this.currentKey-1)+keyframes.length)%keyframes.length;
 				this.frame = keyframes[this.currentKey].getStartTime();
 			}
+			/*if(this.frame > this.animation.getLength())
+				this.frame = 0;
+			else if(this.frame < 0) this.frame = this.animation.getLength();*/
 		}
 		else{
 			firstKeyFrame = keyframes[0];
@@ -350,7 +353,7 @@ public class SpriterPlayer{
 			this.currentKey = 0;
 			this.fixCounter = 0;
 			this.animationIndex = animationIndex;
-			this.animation = this.spriterData.getEntity().get(0).getAnimation().get(animationIndex);
+			this.animation = this.entity.getAnimation().get(animationIndex);
 		}
 	}
 	
@@ -360,7 +363,7 @@ public class SpriterPlayer{
 	 * @return index of the animation if the given name was found, otherwise it returns -1
 	 */
 	public int getAnimationIndexByName(String name){
-		List<Animation> anims = this.spriterData.getEntity().get(0).getAnimation();
+		List<Animation> anims = this.entity.getAnimation();
 		for(Animation anim: anims)
 			if(anim.getName().equals(name)) return anim.getId();
 		return -1;
@@ -465,15 +468,15 @@ public class SpriterPlayer{
 	/**
 	 * @return the spriterData
 	 */
-	public SpriterData getSpriterData() {
-		return spriterData;
+	public Entity getEntity() {
+		return entity;
 	}
 
 	/**
 	 * @param spriterData the spriterData to set
 	 */
-	public void setSpriterData(SpriterData spriterData) {
-		this.spriterData = spriterData;
+	public void setSpriterData(Entity entity) {
+		this.entity = entity;
 	}
 
 	/**
@@ -599,19 +602,27 @@ public class SpriterPlayer{
 		return this.rootParent.getY();
 	}
 	
-	/**
-	 * See {@link SpriterCalculator#calculateInterpolation(float, float, float, float, long)}
-	 * Can be inherited, to handle other interpolation techniques. Standard is linear interpolation.
-	 */
-	protected float interpolate(float a, float b, float timeA, float timeB, long currentTime){
-		return SpriterCalculator.calculateInterpolation(a, b, timeA, timeB, currentTime);
+	public void setInterpolator(Interpolator interpolator){
+		this.interpolator = interpolator;
+	}
+	
+	public Interpolator getInterpolator(){
+		return this.interpolator;
 	}
 	
 	/**
 	 * See {@link SpriterCalculator#calculateInterpolation(float, float, float, float, long)}
 	 * Can be inherited, to handle other interpolation techniques. Standard is linear interpolation.
 	 */
-	protected float interpolateAngle(float a, float b, float timeA, float timeB, long currentTime){
-		return SpriterCalculator.calculateAngleInterpolation(a, b, timeA, timeB, currentTime);
+	private float interpolate(float a, float b, float timeA, float timeB, long currentTime){
+		return this.interpolator.interpolate(a, b, timeA, timeB, currentTime);
+	}
+	
+	/**
+	 * See {@link SpriterCalculator#calculateInterpolation(float, float, float, float, long)}
+	 * Can be inherited, to handle other interpolation techniques. Standard is linear interpolation.
+	 */
+	private float interpolateAngle(float a, float b, float timeA, float timeB, long currentTime){
+		return this.interpolator.interpolateAngle(a, b, timeA, timeB, currentTime);
 	}
 }

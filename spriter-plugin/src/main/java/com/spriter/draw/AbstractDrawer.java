@@ -6,7 +6,7 @@ import com.spriter.file.Reference;
 
 public abstract class AbstractDrawer<L> {
 	
-	private final FileLoader<L> loader;
+	public FileLoader<L> loader;
 	
 	public AbstractDrawer(FileLoader<L> loader){
 		this.loader=loader;

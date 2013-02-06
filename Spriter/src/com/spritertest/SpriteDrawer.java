@@ -18,8 +18,8 @@ public class SpriteDrawer extends AbstractDrawer<Sprite> {
 	@Override
 	public void draw(DrawInstruction instruction) {
 
-		draw(getFile(instruction.getRef()), instruction.getX(), instruction.getY(), instruction.getPivot_x(),
-				instruction.getPivot_y(), instruction.getScale_x(), instruction.getScale_y(), instruction.getAngle(),
+		draw(getFile(instruction.getRef()), instruction.getX(), instruction.getY(), instruction.getPivotX(),
+				instruction.getPivotY(), instruction.getScaleX(), instruction.getScaleY(), instruction.getAngle(),
 				instruction.getAlpha());
 
 	}

@@ -39,11 +39,11 @@ public class DrawInstruction {
 		return y;
 	}
 
-	public float getPivot_x() {
+	public float getPivotX() {
 		return pivotX;
 	}
 
-	public float getPivot_y() {
+	public float getPivotY() {
 		return pivotY;
 	}
 
@@ -55,11 +55,11 @@ public class DrawInstruction {
 		return alpha;
 	}
 
-	public float getScale_x() {
+	public float getScaleX() {
 		return scaleX;
 	}
 
-	public float getScale_y() {
+	public float getScaleY() {
 		return scaleY;
 	}
 

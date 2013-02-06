@@ -59,11 +59,12 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		SpriteDrawer drawer = new SpriteDrawer(loader,batch);
 		
 		Gdx.input.setInputProcessor(this);
+
 		
-		spriter = GdxSpriter.getSpriter("data/monster/basic.scml", loader);
+		spriter = Spriter.getSpriter("data/monster/basic.scml", loader);
 		List<SpriterKeyFrame[]> keyframes = SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData());
 		this.players = new ArrayList<SpriterPlayer>();
-		int max = 10;
+		int max = 100;
 		for(int i = 0; i < max; i++){
 			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData().getEntity().get(0), drawer, keyframes);
 			this.players.add(sp);
@@ -76,7 +77,7 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		this.idleIndex = this.sp.getAnimationIndexByName("idle");
 		this.runIndex = this.sp.getAnimationIndexByName("run");
 		this.jumpIndex = this.sp.getAnimationIndexByName("jump");
-		this.fallIndex =this.sp.getAnimationIndexByName("fall");
+		this.fallIndex = this.sp.getAnimationIndexByName("fall");
 		
 		this.sp.setFrameSpeed(10);
 		this.sp.setAnimatioIndex(this.idleIndex, 0, 0);

@@ -40,7 +40,6 @@ public class Spriter {
 	}
 	
 	public Spriter(SpriterData spriterData, FileLoader<?> loader, File scmlFile){
-		System.out.println(scmlFile.getAbsolutePath());
 		this.scmlFile = scmlFile;
 		this.spriterData = spriterData;
 		this.loader = loader;

@@ -52,7 +52,7 @@ public class SpriterPlayer{
 	private SpriterBone rootParent;
 	private SpriterModObject[] moddedObjects,moddedBones;
 	private SpriterKeyFrame lastFrame, lastTempFrame, lastRealFrame;
-	private boolean transitionFixed = true;
+	private boolean transitionFixed = true, transitionTempFixed = true;
 	private int fixCounter = 0;
 	private int fixMaxSteps = 100;
 	private Interpolator interpolator;
@@ -142,7 +142,7 @@ public class SpriterPlayer{
 		SpriterKeyFrame[] keyframes = this.keyframes.get(animationIndex);
 		SpriterKeyFrame firstKeyFrame; 
 		SpriterKeyFrame secondKeyFrame;
-		if(this.transitionFixed){
+		if(this.transitionFixed && this.transitionTempFixed){
 			if(this.frameSpeed >= 0){
 				firstKeyFrame = keyframes[this.currentKey];
 				secondKeyFrame = keyframes[(this.currentKey+1)%keyframes.length];
@@ -172,7 +172,8 @@ public class SpriterPlayer{
 			if(this.fixCounter == this.fixMaxSteps){
 				this.frame = 0;
 				this.fixCounter = 0;
-				this.transitionFixed = true;
+				if(this.lastRealFrame.equals(this.lastFrame)) this.transitionFixed = true;
+				else this.transitionTempFixed = true;
 				firstKeyFrame.setStartTime(0);
 			}
 		}
@@ -370,9 +371,16 @@ public class SpriterPlayer{
 	 */
 	public void setAnimatioIndex(int animationIndex, int transitionSpeed, int transitionSteps){
 		if(this.animationIndex != animationIndex){
-			if(this.transitionFixed) this.lastRealFrame = this.lastFrame;
-			else this.lastRealFrame = this.lastTempFrame;
-			this.transitionFixed = false;
+			if(this.transitionFixed){
+				this.lastRealFrame = this.lastFrame;
+				this.transitionFixed = false;
+				this.transitionTempFixed = true;
+			}
+			else{
+				this.lastRealFrame = this.lastTempFrame;
+				this.transitionTempFixed = false;
+				this.transitionFixed = true;
+			}
 			this.transitionSpeed = transitionSpeed;
 			this.fixMaxSteps = transitionSteps;
 			this.lastRealFrame.setStartTime(this.frame+1);

@@ -1,3 +1,20 @@
+/**************************************************************************
+ * Copyright 2013 by Trixt0r
+ * (https://github.com/Trixt0r, Heinrich Reich, e-mail: trixter16@web.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+***************************************************************************/
+
 package com.spriter.player;
 
 import com.spriter.SpriterCalculator;
@@ -11,6 +28,7 @@ import com.spriter.objects.SpriterObject;
  * The idea is, to give an instance of this class two AbstractSpriterPlayer objects which hold and animate the same spriter entity.
  * This will interpolate the runtime transformations of the bones and objects with a weight between 0 and 1.
  * You will be also able to interpolate SpriterPlayerInterpolators with each other, since it extends  #SpriterAbstractPlayer.
+ * Note that this #SpriterAbstractPlayer needs 3 times more calculation effort than a normal #SpriterPlayer.
  * 
  * @author Trixt0r
  */
@@ -20,6 +38,11 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	private float weight;
 	private boolean interpolateSpeed = false;
 
+	/**
+	 * Returns an instance of this class, which will manage the interpolation between two #SpriterAbstractPlayer instances.
+	 * @param first player to interpolate with the second one.
+	 * @param second player to interpolate with the first one.
+	 */
 	public SpriterPlayerInterpolator(SpriterAbstractPlayer first, SpriterAbstractPlayer second){
 		super(first.drawer, first.keyframes);
 		this.weight = 0.5f;
@@ -27,9 +50,10 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	}
 	
 	/**
-	 * Note: Make sure, that both instances hold the
-	 * @param first First SpriterPlayer instance to interpolate.
-	 * @param second Second SpriterPlayer instance to interpolate.
+	 * Note: Make sure, that both instances hold the same bone and object structure.
+	 * Otherwise you will not get the interpolation you wish.
+	 * @param first SpriterPlayer instance to interpolate.
+	 * @param second SpriterPlayer instance to interpolate.
 	 */
 	public void setPlayers(SpriterAbstractPlayer first, SpriterAbstractPlayer second){
 		this.first = first;
@@ -40,18 +64,31 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 		this.second.setRootParent(this.rootParent);
 	}
 	
+	/**
+	 * @param weight to set. 0 means the animation of the first player will get played back.
+	 * 1 means the second player will get played back.
+	 */
 	public void setWeight(float weight){
 		this.weight = weight;
 	}
 	
+	/**
+	 * @return The current weight.
+	 */
 	public float getWeight(){
 		return this.weight;
 	}
 	
+	/**
+	 * @return The first player.
+	 */
 	public SpriterAbstractPlayer getFirst(){
 		return this.first;
 	}
 	
+	/**
+	 * @return The second player.
+	 */
 	public SpriterAbstractPlayer getSecond(){
 		return this.second;
 	}
@@ -113,6 +150,7 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	 * See {@link SpriterCalculator#calculateInterpolation(float, float, float, float, long)}
 	 * Can be inherited, to handle other interpolation techniques. Standard is linear interpolation.
 	 */
+	@Override
 	protected float interpolate(float a, float b, float timeA, float timeB, float currentTime){
 		return this.interpolator.interpolate(a, b, 0, 1, this.weight);
 	}
@@ -121,14 +159,22 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	 * See {@link SpriterCalculator#calculateInterpolation(float, float, float, float, long)}
 	 * Can be inherited, to handle other interpolation techniques. Standard is linear interpolation.
 	 */
+	@Override
 	protected float interpolateAngle(float a, float b, float timeA, float timeB, float currentTime){
 		return this.interpolator.interpolateAngle(a, b, 0, 1, this.weight);
 	}
 	
+	/**
+	 * @return true if this player also interpolates the speed of both players. false if not.
+	 */
 	public boolean interpolatesSpeed(){
 		return this.interpolateSpeed;
 	}
 	
+	/**
+	 * @param inter indicates whether this player has to interpolate the speed of bother players or not.
+	 * If it set to false, this player will set for both players the speed which this player has. See {@link #setFrameSpeed(int)}
+	 */
 	public void setInterpolateSpeed(boolean inter){
 		this.interpolateSpeed = inter;
 	}

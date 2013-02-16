@@ -1,9 +1,28 @@
+/**************************************************************************
+ * Copyright 2013 by Trixt0r
+ * (https://github.com/Trixt0r, Heinrich Reich, e-mail: trixter16@web.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+***************************************************************************/
+
 package com.spriter.player;
 
 import java.util.List;
 import java.util.LinkedList;
 
+import com.discobeard.spriter.dom.SpriterData;
 import com.spriter.SpriterCalculator;
+import com.spriter.SpriterKeyFrameProvider;
 import com.spriter.draw.AbstractDrawer;
 import com.spriter.draw.DrawInstruction;
 import com.spriter.interpolation.SpriterInterpolator;
@@ -38,6 +57,12 @@ public abstract class SpriterAbstractPlayer {
 	protected long frame;
 	protected List<SpriterAbstractPlayer> players;
 	
+	/**
+	 * Constructs a new SpriterAbstractPlayer object which is able to animate SpriterBone instances and SpriterObject instances.
+	 * @param drawer {@link AbstractDrawer} which you have to implement on your own.
+	 * @param keyframes A list of SpriterKeyFrame arrays. See {@link SpriterKeyFrameProvider#generateKeyFramePool(SpriterData)} to get the list.
+	 * Generate these keyframes once to save memory.
+	 */
 	public SpriterAbstractPlayer(AbstractDrawer<?> drawer, List<SpriterKeyFrame[]> keyframes){
 		this.drawer = drawer;
 		this.keyframes = keyframes;
@@ -268,7 +293,7 @@ public abstract class SpriterAbstractPlayer {
 
 	
 	/**
-	 * @return the moddedObjects
+	 * @return array of moddable objects.
 	 */
 	public SpriterModObject[] getModdedObjects() {
 		return moddedObjects;
@@ -276,18 +301,17 @@ public abstract class SpriterAbstractPlayer {
 
 	
 	/**
-	 * @return the moddedBones
+	 * @return array of moddable bones.
 	 */
 	public SpriterModObject[] getModdedBones() {
 		return moddedBones;
 	}
 	
 	/**
-	 * Searches for the right index for a given bone.
+	 * Searches for the right index for a given bone. Use {@link #getRuntimeObjects()} to acces an object at runtime.
 	 * @param bone bone to search at.
-	 * @param objectIndex index of the object in the object children list of the given bone.
-	 * 0 means first object.
-	 * @return right index for the ModObject you want access to. -1 if not found.
+	 * @param objectIndex index of the object in the object children list of the given bone. 0 means first object.
+	 * @return right index for the object you want access to. -1 if not found.
 	 */
 	public int findObjectIndexForBone(SpriterBone bone, int objectIndex){
 		for(int i = 0; i < this.tempObjects.length && objectIndex >= 0 && objectIndex < bone.getChildObjects().size(); i++)
@@ -296,20 +320,39 @@ public abstract class SpriterAbstractPlayer {
 		return -1;
 	}
 	
+	/**
+	 * Searches for the right object for a given bone.
+	 * @param bone bone to search at.
+	 * @param objectIndex index of the object in the object children list of the given bone. 0 means first object.
+	 * @return right object you want access to. Null if not found.
+	 */
 	public SpriterObject findObjectForBone(SpriterBone bone, int objectIndex){
-		return this.tempObjects[this.findObjectIndexForBone(bone, objectIndex)];
-	}
-	
-	public SpriterModObject findModObjectForBone(SpriterBone bone, int objectIndex){
-		return this.moddedObjects[this.findObjectIndexForBone(bone, objectIndex)];
+		try{
+			return this.tempObjects[this.findObjectIndexForBone(bone, objectIndex)];
+		} catch(ArrayIndexOutOfBoundsException e){
+			return null;
+		}
 	}
 	
 	/**
-	 * Searches for the right index for a given bone.
+	 * Searches for the right mod object for a given bone.
 	 * @param bone bone to search at.
-	 * @param objectIndex index of the object in the object children list of the given bone.
-	 * 0 means first object.
-	 * @return right index for the ModObject you want access to. -1 if not found.
+	 * @param objectIndex index of the object in the object children list of the given bone. 0 means first object.
+	 * @return right mod object you want access to. Null if not found.
+	 */
+	public SpriterModObject findModObjectForBone(SpriterBone bone, int objectIndex){
+		try{
+			return this.moddedObjects[this.findObjectIndexForBone(bone, objectIndex)];
+		} catch(ArrayIndexOutOfBoundsException e){
+			return null;
+		}
+	}
+	
+	/**
+	 * Searches for the right index for a given bone and index.
+	 * @param bone bone to search at.
+	 * @param boneIndex index of the bone in the object children list of the given bone. 0 means first object.
+	 * @return right index for the child bone you want access to. -1 if not found.
 	 */
 	public int findChildBoneIndexForBone(SpriterBone bone, int boneIndex){
 		for(int i = 0; i < this.tempObjects.length && boneIndex >= 0 && boneIndex < bone.getChildBones().size(); i++)
@@ -318,19 +361,38 @@ public abstract class SpriterAbstractPlayer {
 		return -1;
 	}
 	
+	/**
+	 * Searches for the right child bone for a given bone and index.
+	 * @param bone bone to search at.
+	 * @param boneIndex index of the bone in the object children list of the given bone. 0 means first object.
+	 * @return right bone you want access to. Null if not found.
+	 */
 	public SpriterBone findChildBoneForBone(SpriterBone bone, int boneIndex){
-		return this.tempBones[this.findChildBoneIndexForBone(bone, boneIndex)];
+		try{
+			return this.tempBones[this.findChildBoneIndexForBone(bone, boneIndex)];
+		} catch(ArrayIndexOutOfBoundsException e){
+			return null;
+		}
 	}
+	
+	/**
+	 * Searches for the right child bone for a given bone and index.
+	 * @param bone bone to search at.
+	 * @param boneIndex index of the bone in the object children list of the given bone. 0 means first object.
+	 * @return right mod bone you want access to. Null if not found.
+	 */
 	public SpriterModObject findChildModBoneForBone(SpriterBone bone, int boneIndex){
-		return this.moddedBones[this.findChildBoneIndexForBone(bone, boneIndex)];
+		try{
+			return this.moddedBones[this.findChildBoneIndexForBone(bone, boneIndex)];
+		} catch(ArrayIndexOutOfBoundsException e){
+			return null;
+		}
 	}
 	
 	/**
 	 * Searches for the right index for a given bone.
 	 * @param bone bone to search at.
-	 * @param objectIndex index of the object in the object children list of the given bone.
-	 * 0 means first object.
-	 * @return right index for the ModObject you want access to. -1 if not found.
+	 * @return right index for the mod bone you want access to. -1 if not found.
 	 */
 	public int findModBoneIndexForBone(SpriterBone bone){
 		for(int i = 0; i < this.tempObjects.length; i++)
@@ -339,8 +401,17 @@ public abstract class SpriterAbstractPlayer {
 		return -1;
 	}
 	
+	/**
+	 * Searches for the right mod bone for a given bone.
+	 * @param bone bone to search at.
+	 * @return right mod bone you want access to. Null if not found.
+	 */
 	public SpriterModObject findModBoneForBone(SpriterBone bone){
-		return this.moddedBones[this.findModBoneIndexForBone(bone)];
+		try{
+			return this.moddedBones[this.findModBoneIndexForBone(bone)];
+		} catch(ArrayIndexOutOfBoundsException e){
+			return null;
+		}
 	}
 	
 	/**
@@ -352,7 +423,7 @@ public abstract class SpriterAbstractPlayer {
 	}
 
 	/**
-	 * @return the frame
+	 * @return the current frame
 	 */
 	public long getFrame() {
 		return frame;
@@ -365,7 +436,7 @@ public abstract class SpriterAbstractPlayer {
 		this.frameSpeed = frameSpeed;
 	}
 	/**
-	 * @return the frameSpeed
+	 * @return the current frameSpeed
 	 */
 	public int getFrameSpeed() {
 		return frameSpeed;
@@ -379,7 +450,7 @@ public abstract class SpriterAbstractPlayer {
 	}
 	
 	/**
-	 * @return indicates whether this is flipped around the x-axis or not. 1 means is not flipped.
+	 * @return Indicates whether this is flipped around the x-axis or not. 1 means is not flipped, -1 is flipped.
 	 */
 	public int getFlipX(){
 		return this.flipX;
@@ -395,7 +466,7 @@ public abstract class SpriterAbstractPlayer {
 
 	
 	/**
-	 * @return indicates whether this is flipped around the y-axis or not. 1 means is not flipped.
+	 * @return Indicates whether this is flipped around the y-axis or not. 1 means is not flipped, -1 is flipped.
 	 */
 	public float getFlipY() {
 		return this.flipY;
@@ -403,19 +474,22 @@ public abstract class SpriterAbstractPlayer {
 	
 	/**
 	 * Changes the angle of this.
-	 * @param angle to rotate all objects , angle = 0 means no rotation
+	 * @param angle in degrees to rotate all objects , angle = 0 means no rotation.
 	 */
 	public void setAngle(float angle){
 		this.angle = angle;
 		this.rootParent.setAngle(this.angle);
 	}
 	
+	/**
+	 * @return The current angle in degrees.
+	 */
 	public float getAngle(){
 		return this.angle;
 	}
 
 	/**
-	 * @return the scaleX
+	 * @return the scale. 1 means not scale. 0.5 means half scale.
 	 */
 	public float getScale() {
 		return scale;
@@ -423,7 +497,7 @@ public abstract class SpriterAbstractPlayer {
 
 	/**
 	 * Scales this to the given value.
-	 * @param scale the scale to set, scale = 1.0f normal scale
+	 * @param scale the scale to set, scale = 1.0 normal scale.
 	 */
 	public void setScale(float scale) {
 		this.scale = scale;
@@ -432,7 +506,7 @@ public abstract class SpriterAbstractPlayer {
 	}
 	
 	/**
-	 * Sets the center point of this. pivotX = 0, pivotY = 0 means the same rotation point as in Spriter.
+	 * Sets the center point of this. pivotX = 0, pivotY = 0 means the same rotation point as in the Spriter editor.
 	 * @param pivotX
 	 * @param pivotY
 	 */
@@ -459,9 +533,7 @@ public abstract class SpriterAbstractPlayer {
 	}
 	
 	/**
-	 * Returns the current DrawInstruction array
-	 * @param animationIndex
-	 * @return
+	 * @return Returns the current DrawInstruction array
 	 */
 	public DrawInstruction[] getDrawInstructions(){
 		return this.instructions;
@@ -490,22 +562,31 @@ public abstract class SpriterAbstractPlayer {
 	}
 
 	/**
-	 * @return the interpolator
+	 * @return the current interpolator. See #SpriterInterpolator. You can implement your own one,
+	 * which interpolates the animations as you wish.
 	 */
 	public SpriterInterpolator getInterpolator() {
 		return interpolator;
 	}
 
 	/**
-	 * @param interpolator the interpolator to set
+	 * @param interpolator the interpolator to set. See #SpriterInterpolator. You can implement your own one,
+	 * which interpolates the animations as you wish.
 	 */
 	public void setInterpolator(SpriterInterpolator interpolator) {
 		this.interpolator = interpolator;
 	}
 	
+	/**
+	 * @return the current bones which where interpolated for the current animation. Bones are not flipped.
+	 */
 	public final SpriterBone[] getRuntimeBones(){
 		return this.tempBones;
 	}
+	
+	/**
+	 * @return the current objects which where interpolated for the current animation. Objects are flipped.
+	 */
 	public final SpriterObject[] getRuntimeObjects(){
 		return this.tempObjects;
 	}
@@ -531,6 +612,9 @@ public abstract class SpriterAbstractPlayer {
 		this.rootParent.setParent(rootParent);
 	}
 	
+	/**
+	 * @return the current z-index. This gets relevant if you attach a #SpriterAbstractPlayer to another.
+	 */
 	public int getZIndex(){
 		return this.zIndex;
 	}
@@ -543,13 +627,32 @@ public abstract class SpriterAbstractPlayer {
 		this.zIndex = zIndex;
 	}
 	
-	public void addPlayer(SpriterAbstractPlayer player, SpriterAbstractObject root){
+	/**
+	 * Attaches a given player to this.
+	 * @param player indicates the player which has to be attached.
+	 * @param root indicates the object the attached player has to follow.
+	 * Set to {@link #getRootParent()} to attach the player to the same position as this player.
+	 */
+	public void attachPlayer(SpriterAbstractPlayer player, SpriterAbstractObject root){
 		this.players.add(player);
 		player.changeRootParent(root);
 	}
 	
+	/**
+	 * Removes the given player from this one.
+	 * @param player indicates the player which has to be removed.
+	 */
 	public void removePlayer(SpriterAbstractPlayer player){
 		this.players.remove(player);
 		player.changeRootParent(null);
+	}
+	
+	/**
+	 * Indicates whether the given player is attached to this or not.
+	 * @param player the player to ask after.
+	 * @return true if player is attached or not.
+	 */
+	public boolean containsPlayer(SpriterAbstractPlayer player){
+		return this.players.contains(player);
 	}
 }

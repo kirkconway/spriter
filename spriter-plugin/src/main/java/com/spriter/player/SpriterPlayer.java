@@ -1,3 +1,20 @@
+/**************************************************************************
+ * Copyright 2013 by Trixt0r
+ * (https://github.com/Trixt0r, Heinrich Reich, e-mail: trixter16@web.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+***************************************************************************/
+
 package com.spriter.player;
 
 import com.discobeard.spriter.dom.Animation;
@@ -43,7 +60,7 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	
 	
 	/**
-	 * Constructs a new SpriterPlayer object which animates the given SpriterData.
+	 * Constructs a new SpriterPlayer object which animates the given Spriter entity.
 	 * @param entity {@link Spriter} which provides a method to load all needed data to animate. See {@link Spriter#getSpriter(String, com.spriter.file.FileLoader)} for mor information.
 	 * @param drawer {@link AbstractDrawer} which you have to implement on your own.
 	 * @param keyframes A list of SpriterKeyFrame arrays. See {@link SpriterKeyFrameProvider#generateKeyFramePool(SpriterData)} to get the list.
@@ -102,6 +119,15 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 		this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
 	}
 	
+	/**
+	 * Sets the animationIndex for this to the given animationIndex.
+	 * This method can make sure that the switching between to animations is smooth.
+	 * By setting transitionSpeed and transitionSteps to appropriate values, you can have nice transitions between two animations.
+	 * Setting transitionSpeed to 1 and transitionSteps to 20 means, that this player will need 20 steps to translate the current animation to the given one.
+	 * @param animationIndex Index of animation to set. Get the index with {@link #getAnimationIndexByName(String)}.
+	 * @param transitionSpeed Speed for the switch between the current animation and the one which has been set.
+	 * @param transitionSteps Steps needed for the transition
+	 */
 	public void setAnimatioIndex(int animationIndex, int transitionSpeed, int transitionSteps){
 		if(this.animationIndex != animationIndex){
 			if(this.transitionFixed){
@@ -137,6 +163,11 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 		else return anim.getId();
 	}
 	
+	/**
+	 * Searches for the animation with the given name and returns the right one
+	 * @param name of the animation.
+	 * @return nimation if the given name was found, otherwise it returns null.
+	 */
 	public Animation getAnimationByName(String name){
 		List<Animation> anims = this.entity.getAnimation();
 		for(Animation anim: anims)
@@ -145,21 +176,21 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	}
 	
 	/**
-	 * @return current animation index
+	 * @return current animation index, which has same numbering as in the scml file.
 	 */
 	public int getAnimationIndex(){
 		return this.animationIndex;
 	}
 
 	/**
-	 * @return the spriterData
+	 * @return the entity, which was read from the scml file you loaded before.
 	 */
 	public Entity getEntity() {
 		return entity;
 	}
 
 	/**
-	 * @param spriterData the spriterData to set
+	 * @param entity the entity to set
 	 */
 	public void setEntity(Entity entity) {
 		this.entity = entity;
@@ -167,7 +198,7 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 
 	
 	/**
-	 * @return the anim
+	 * @return the current animation with all its raw data which was read from the scml file.
 	 */
 	public Animation getAnimation() {
 		return animation;

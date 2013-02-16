@@ -1,9 +1,31 @@
+/**************************************************************************
+ * Copyright 2013 by Trixt0r
+ * (https://github.com/Trixt0r, Heinrich Reich, e-mail: trixter16@web.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+***************************************************************************/
+
 package com.spriter.objects;
 
 import com.spriter.draw.DrawInstruction;
 import com.spriter.file.FileLoader;
 import com.spriter.file.Reference;
 
+/**
+ * A SpriterObject is an object which holds the transformations for an object which was animated in the Spriter editor.
+ * It also holds information about things which will be drawn on the screen, such as sprite, depth and transparency.
+ * @author Trixt0r
+ */
 @SuppressWarnings("rawtypes")
 public class SpriterObject extends SpriterAbstractObject implements Comparable<SpriterObject>{
 	

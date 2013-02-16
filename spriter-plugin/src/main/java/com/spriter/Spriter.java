@@ -1,3 +1,20 @@
+/**************************************************************************
+ * Copyright 2013 by Trixt0r
+ * (https://github.com/Trixt0r, Heinrich Reich, e-mail: trixter16@web.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+***************************************************************************/
+
 package com.spriter;
 
 import java.io.File;
@@ -7,8 +24,9 @@ import com.spriter.file.FileLoader;
 import com.spriter.file.Reference;
 
 /**
+ * This class reads an scml file and loads all necessary resources.
  * 
- * @author Discobeard.com
+ * @author Discobeard.com, Trixt0r
  * 
  */
 public class Spriter {
@@ -16,7 +34,7 @@ public class Spriter {
 	/**
 	 * Creates a spriter object.
 	 * 
-	 * @param path
+	 * @param path Path to the scml file
 	 * @param drawer
 	 *            a drawer extended from the AbstractDrawer
 	 * @param loader
@@ -51,8 +69,6 @@ public class Spriter {
 			for (int file = 0; file < spriterData.getFolder().get(folder).getFile().size(); file++) {
 				String folderName = spriterData.getFolder().get(folder).getName();
 				String fileName = spriterData.getFolder().get(folder).getFile().get(file).getName();
-				//fileName = fileName.replaceAll(folderName+"/", "").replaceAll(".png", "");
-				//System.out.println(fileName);
 				loader.load(new Reference(folder, file,folderName, fileName),
 						scmlFile.getParent() + "/"
 								+ spriterData.getFolder().get(folder).getFile().get(file).getName());
@@ -60,6 +76,9 @@ public class Spriter {
 		}
 	}
 	
+	/**
+	 * @return Spriter data which has been read from the scml file before.
+	 */
 	public SpriterData getSpriterData(){
 		return this.spriterData;
 	}

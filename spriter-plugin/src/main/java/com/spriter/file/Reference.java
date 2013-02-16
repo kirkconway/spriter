@@ -2,19 +2,24 @@ package com.spriter.file;
 
 public class Reference {
 	
-	public int folder;
-	public int file;
+	public int folder, file;
+	public String folderName, fileName;
 	
-	public Reference(int folder,int file){
+	public Reference(int folder,int file, String folderName, String fileName){
 		this.folder = folder;
 		this.file = file;
+		this.folderName = folderName;
+		this.fileName = fileName;
+	}
+	public Reference(int folder,int file){
+		this(folder,file,null,null);
 	}
 
-	public int getFOLDER() {
+	public int getFolder() {
 		return folder;
 	}
 
-	public int getFILE() {
+	public int getFile() {
 		return file;
 	}
 	

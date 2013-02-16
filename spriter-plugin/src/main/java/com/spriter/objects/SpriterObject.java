@@ -1,49 +1,23 @@
 package com.spriter.objects;
 
-public class SpriterObject implements Comparable<SpriterObject>{
+import com.spriter.draw.DrawInstruction;
+import com.spriter.file.FileLoader;
+import com.spriter.file.Reference;
+
+@SuppressWarnings("rawtypes")
+public class SpriterObject extends SpriterAbstractObject implements Comparable<SpriterObject>{
 	
-	private int file;
-	private int folder;
-	private float x;
-	private float y;
-	private float pivotX;
-	private float pivotY;
-	private float scaleX;
-	private float scaleY;
-	private int zIndex;
-	private float angle;
-	private int spin;
-	private float alpha;
-	private int id;
-	private int timeline;
-	private Integer parent = null;
-	private boolean transientObject = false;
+	float pivotX, pivotY, alpha;
+	int zIndex, spin;
+	boolean transientObject = false, visible = true;
+	Reference ref;
+	FileLoader loader = null;
 	
-	
-	public int getFile() {
-		return file;
+	public void setReference(Reference ref){
+		this.ref = ref;
 	}
-	
-	public void setFile(int file) {
-		this.file = file;
-	}
-	public int getFolder() {
-		return folder;
-	}
-	public void setFolder(int folder) {
-		this.folder = folder;
-	}
-	public float getX() {
-		return x;
-	}
-	public void setX(float x) {
-		this.x = x;
-	}
-	public float getY() {
-		return y;
-	}
-	public void setY(float y) {
-		this.y = y;
+	public Reference getRef(){
+		return this.ref;
 	}
 	public float getPivotX() {
 		return pivotX;
@@ -63,9 +37,6 @@ public class SpriterObject implements Comparable<SpriterObject>{
 	public void setZIndex(int zIndex) {
 		this.zIndex = zIndex;
 	}
-	public float getAngle() {
-		return angle;
-	}
 	public void setAngle(float angle) {
 		this.angle = angle;
 	}
@@ -76,36 +47,12 @@ public class SpriterObject implements Comparable<SpriterObject>{
 		this.spin = spin;
 	}
 
-	public Integer getParent() {
-		return parent;
-	}
-
-	public void setParent(Integer parentId) {
-		this.parent = parentId;
-	}
-
 	public float getAlpha() {
 		return alpha;
 	}
 
 	public void setAlpha(float alpha) {
 		this.alpha = alpha;
-	}
-
-	public float getScaleX() {
-		return scaleX;
-	}
-
-	public void setScaleX(float scale_x) {
-		this.scaleX = scale_x;
-	}
-
-	public float getScaleY() {
-		return scaleY;
-	}
-
-	public void setScaleY(float scale_y) {
-		this.scaleY = scale_y;
 	}
 
 	public boolean isTransientObject() {
@@ -125,25 +72,51 @@ public class SpriterObject implements Comparable<SpriterObject>{
 		else if(this.zIndex > o.zIndex) return 1;
 		else return 0;
 	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getTimeline() {
-		return timeline;
-	}
-
-	public void setTimeline(int timeline) {
-		this.timeline = timeline;
+	
+	public void setLoader(FileLoader loader){
+		this.loader = loader;
 	}
 	
+	public FileLoader getLoader(){
+		return this.loader;
+	}
+	
+	public boolean isVisible() {
+		return visible;
+	}
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
 	public String toString(){
 		return "x: "+this.x+", y: "+this.y+", angle: "+this.alpha;
+	}
+	
+	public void copyValuesTo(SpriterObject object){
+		super.copyValuesTo(object);
+		object.setAlpha(alpha);
+		object.setReference(ref);
+		object.setPivotX(pivotX);
+		object.setPivotY(pivotY);
+		object.setSpin(spin);
+		object.setTimeline(timeline);
+		object.setTransientObject(transientObject);
+		object.setZIndex(zIndex);
+		object.setLoader(loader);
+		object.setVisible(visible);
+	}
+	
+	public void copyValuesTo(DrawInstruction instruction){
+		instruction.x =  this.x;
+		instruction.y =  this.y;
+		instruction.scaleX =  this.scaleX;
+		instruction.scaleY =  this.scaleY;
+		instruction.pivotX =  this.pivotX;
+		instruction.pivotY = this.pivotY;
+		instruction.angle = this.angle;
+		instruction.alpha = this.alpha;
+		instruction.ref = this.ref;
+		instruction.loader = this.loader;
+		instruction.obj = this;
 	}
 	
 }

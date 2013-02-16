@@ -1,6 +1,7 @@
 package com.spriter.converters;
 
 import com.discobeard.spriter.dom.AnimationObject;
+import com.spriter.file.Reference;
 import com.spriter.objects.SpriterObject;
 
 public class SpriterObjectConverter implements Converter<AnimationObject, SpriterObject>{
@@ -10,8 +11,7 @@ public class SpriterObjectConverter implements Converter<AnimationObject, Sprite
 		SpriterObject object = new SpriterObject();
 		object.setAlpha(from.getA().floatValue());
 		object.setAngle(from.getAngle().floatValue());
-		object.setFile(from.getFile());
-		object.setFolder(from.getFolder());
+		object.setReference(new Reference(from.getFolder(), from.getFile()));
 		object.setPivotX(from.getPivotX().floatValue());
 		object.setPivotY(from.getPivotY().floatValue());
 		object.setScaleX(from.getScaleX().floatValue());

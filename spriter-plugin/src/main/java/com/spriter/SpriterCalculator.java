@@ -1,6 +1,6 @@
 package com.spriter;
 
-import com.spriter.objects.SpriterBone;
+import com.spriter.objects.SpriterAbstractObject;
 
 /**
  * A class which provides methods to calculate Spriter specific issues,
@@ -22,7 +22,7 @@ public class SpriterCalculator {
 	 * @param currentTime
 	 * @return interpolated value between a and b.
 	 */
-	public static float calculateInterpolation(float a, float b, float timeA, float timeB, long currentTime) {
+	public static float calculateInterpolation(float a, float b, float timeA, float timeB, float currentTime) {
 		return a + ((b - a) * ((currentTime - timeA) / (timeB - timeA)));
 	}
 
@@ -35,7 +35,7 @@ public class SpriterCalculator {
 	 * @param currentTime
 	 * @return interpolated angle
 	 */
-	public static float calculateAngleInterpolation(float a, float b, float timeA, float timeB, long currentTime) {
+	public static float calculateAngleInterpolation(float a, float b, float timeA, float timeB, float currentTime) {
 		return a + (angleDifference(b, a) * ((currentTime - timeA) / (timeB - timeA)));
 	}
 	
@@ -56,10 +56,10 @@ public class SpriterCalculator {
 	 * @param childY
 	 * @return float array with two elemts, new x and y coordinates.
 	 */
-	public static float[] rotatePoint(SpriterBone parent, float childX, float childY) {
+	public static void rotatePoint(SpriterAbstractObject parent, SpriterAbstractObject child) {
 
-		float px = childX * (parent.getScaleX());
-		float py = childY * (parent.getScaleY());
+		float px = child.getX() * (parent.getScaleX());
+		float py = child.getY() * (parent.getScaleY());
 
 		float s = (float) Math.sin(Math.toRadians(parent.getAngle()));
 		float c = (float) Math.cos(Math.toRadians(parent.getAngle()));
@@ -67,7 +67,8 @@ public class SpriterCalculator {
 		float ynew = (px * s) + (py * c);
 		xnew += parent.getX();
 		ynew += parent.getY();
-
-		return new float[] { xnew, ynew };
+		
+		child.setX(xnew);
+		child.setY(ynew);
 	}
 }

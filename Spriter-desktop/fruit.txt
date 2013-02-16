@@ -1,0 +1,8 @@
+Vector2f[] points = new Vector2f[7];
+points[0] = new Vector2f(0.0f,0.0100001525f);
+points[1] = new Vector2f(1.7300003f,-0.67f);
+points[2] = new Vector2f(1.4099998f,2.3200004f);
+points[3] = new Vector2f(0.009999847f,1.7100003f);
+points[4] = new Vector2f(0.009999847f,1.7100003f);
+points[5] = new Vector2f(0.009999847f,1.7100003f);
+points[6] = new Vector2f(0.009999847f,1.7100003f);

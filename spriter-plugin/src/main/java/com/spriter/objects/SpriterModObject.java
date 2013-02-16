@@ -1,33 +1,23 @@
 package com.spriter.objects;
 
-public class SpriterModObject {
+import com.spriter.file.FileLoader;
+import com.spriter.file.Reference;
+
+
+@SuppressWarnings("rawtypes")
+public class SpriterModObject extends SpriterAbstractObject{
 	
-	private float angle,scaleX=1f,scaleY=1f,alpha=1f,x,y;
-	private int timeline;
+	private float alpha;
 	private String name;
-
-	public float getAngle() {
-		return angle;
-	}
-
-	public void setAngle(float angle) {
-		this.angle = angle;
-	}
-
-	public float getScaleX() {
-		return scaleX;
-	}
-
-	public void setScaleX(float scaleX) {
-		this.scaleX = scaleX;
-	}
-
-	public float getScaleY() {
-		return scaleY;
-	}
-
-	public void setScaleY(float scaleY) {
-		this.scaleY = scaleY;
+	private Reference ref;
+	private FileLoader loader;
+	private boolean active;
+	
+	public SpriterModObject(){
+		super();
+		this.alpha = 1f;
+		this.ref = null;
+		this.loader = null;
 	}
 
 	public float getAlpha() {
@@ -38,14 +28,6 @@ public class SpriterModObject {
 		this.alpha = alpha;
 	}
 
-	public int getTimeline() {
-		return timeline;
-	}
-
-	public void setTimeline(int timeline) {
-		this.timeline = timeline;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -54,20 +36,45 @@ public class SpriterModObject {
 		this.name = name;
 	}
 
-	public float getX() {
-		return x;
+	public Reference getRef() {
+		return ref;
 	}
 
-	public void setX(float x) {
-		this.x = x;
+	public void setRef(Reference ref) {
+		this.ref = ref;
 	}
 
-	public float getY() {
-		return y;
+	public FileLoader getLoader() {
+		return loader;
 	}
 
-	public void setY(float y) {
-		this.y = y;
+	public void setLoader(FileLoader loader) {
+		this.loader = loader;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+	
+	private void modObject(SpriterAbstractObject object){
+		object.setAngle(object.getAngle()+this.angle);
+		object.setScaleX(object.getScaleX()*this.scaleX);
+		object.setScaleY(object.getScaleY()*this.scaleY);
+		object.setX(object.getX()+this.x);
+		object.setY(object.getY()+this.y);
+	}
+	
+	public void modSpriterObject(SpriterObject object){
+		this.modObject(object);
+		object.setAlpha(object.getAlpha()*this.alpha);
+	}
+	
+	public void modSpriterBone(SpriterBone bone){
+		this.modObject(bone);
 	}
 
 }

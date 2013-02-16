@@ -7,7 +7,10 @@ import java.util.List;
 import com.discobeard.spriter.dom.Animation;
 import com.discobeard.spriter.dom.SpriterData;
 import com.spriter.mergers.SpriterKeyFrameBuilder;
+import com.spriter.objects.SpriterBone;
 import com.spriter.objects.SpriterKeyFrame;
+import com.spriter.objects.SpriterObject;
+import com.spriter.player.SpriterPlayer;
 
 /**
  * This class provides the {@link #generateKeyFramePool(SpriterData)} method to generate all necessary data which {@link SpriterPlayer} needs to animate.
@@ -34,6 +37,16 @@ public class SpriterKeyFrameProvider {
 				Arrays.sort(key.getObjects());
 				for(int i = 0; i < key.getBones().length; i++)
 					key.getBones()[i].setName(anim.getTimeline().get(key.getBones()[i].getTimeline()).getName());
+				for(SpriterBone bone: key.getBones()){
+					for(SpriterBone bone2: key.getBones()){
+						if(bone2.getParentId() != null)
+							if(!bone2.equals(bone) && bone2.getParentId() == bone.getId())
+								bone.addChildBone(bone2);
+					}
+					for(SpriterObject object: key.getObjects())
+						if(bone.getId()== object.getParentId())
+							bone.addChildObject(object);
+				}
 			}
 			keyframeList.add(keyframes);
 		}

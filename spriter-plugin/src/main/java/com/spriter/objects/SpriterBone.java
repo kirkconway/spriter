@@ -1,65 +1,36 @@
 package com.spriter.objects;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public class SpriterBone {
+public class SpriterBone extends SpriterAbstractObject{
 	
-	private int id;
-	private float x;
-	private float y;
-	private float angle;
-	private float scaleX;
-	private float scaleY;
-	private List<Integer> childIds;
-	private Integer parent = null;
-	private int spin;
-	private int timeline;
-	private String name;
+	List<SpriterBone> childBones;
+	List<SpriterObject> childObjects;
+	int spin;
+	String name;
 	
-	public void addChildId(int childId){
-		childIds.add(childId);
+	public SpriterBone(){
+		this.childBones = new LinkedList<SpriterBone>();
+		this.childObjects = new LinkedList<SpriterObject>();
 	}
 	
-	public List<Integer> getChildIds(){
-		return childIds;
-	}
-
-	public int getId() {
-		return id;
+	public void addChildBone(SpriterBone bone){
+		bone.setParent(this);
+		childBones.add(bone);
 	}
 	
-	public void setId(int id) {
-		this.id = id;
+	public List<SpriterBone> getChildBones(){
+		return childBones;
 	}
-	public float getX() {
-		return x;
+	
+	public void addChildObject(SpriterObject object){
+		object.setParent(this);
+		childObjects.add(object);
 	}
-	public void setX(float x) {
-		this.x = x;
-	}
-	public float getY() {
-		return y;
-	}
-	public void setY(float y) {
-		this.y = y;
-	}
-	public float getAngle() {
-		return angle;
-	}
-	public void setAngle(float angle) {
-		this.angle = angle;
-	}
-	public float getScaleX() {
-		return scaleX;
-	}
-	public void setScaleX(float scaleX) {
-		this.scaleX = scaleX;
-	}
-	public float getScaleY() {
-		return scaleY;
-	}
-	public void setScaleY(float scaleY) {
-		this.scaleY = scaleY;
+	
+	public List<SpriterObject> getChildObjects(){
+		return childObjects;
 	}
 
 	public int getSpin() {
@@ -69,26 +40,10 @@ public class SpriterBone {
 	public void setSpin(int spin) {
 		this.spin = spin;
 	}
-
-	public Integer getParent() {
-		return parent;
-	}
-
-	public void setParent(Integer parent) {
-		this.parent = parent;
-	}
 	
 	@Override
 	public String toString(){
 		return "x: "+this.x+", y: "+this.y+", angle:"+ this.angle+", ";
-	}
-
-	public int getTimeline() {
-		return this.timeline;
-	}
-
-	public void setTimeline(int timeline) {
-		this.timeline = timeline;
 	}
 
 	public String getName() {
@@ -100,16 +55,12 @@ public class SpriterBone {
 	}
 	
 	public void copyValuesTo(SpriterBone bone){
-		bone.setX(x);
-		bone.setY(y);
-		bone.setScaleX(getScaleX());
-		bone.setScaleY(getScaleY());
-		bone.setParent(getParent());
-		bone.setAngle(getAngle());
-		bone.setId(getId());
+		super.copyValuesTo(bone);
 		bone.setTimeline(getTimeline());
 		bone.setName(getName());
 		bone.setSpin(getSpin());
+		bone.childBones = this.childBones;
+		bone.childObjects = this.childObjects;
 	}
 	
 }

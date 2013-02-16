@@ -49,7 +49,11 @@ public class Spriter {
 	private void loadResources() {
 		for (int folder = 0; folder < spriterData.getFolder().size(); folder++) {
 			for (int file = 0; file < spriterData.getFolder().get(folder).getFile().size(); file++) {
-				loader.load(new Reference(folder, file),
+				String folderName = spriterData.getFolder().get(folder).getName();
+				String fileName = spriterData.getFolder().get(folder).getFile().get(file).getName();
+				//fileName = fileName.replaceAll(folderName+"/", "").replaceAll(".png", "");
+				//System.out.println(fileName);
+				loader.load(new Reference(folder, file,folderName, fileName),
 						scmlFile.getParent() + "/"
 								+ spriterData.getFolder().get(folder).getFile().get(file).getName());
 			}

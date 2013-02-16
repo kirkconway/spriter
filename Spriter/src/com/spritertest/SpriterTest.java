@@ -12,15 +12,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 
 import com.spriter.Spriter;
 import com.spriter.SpriterCalculator;
 import com.spriter.SpriterKeyFrameProvider;
-import com.spriter.SpriterPlayer;
 import com.spriter.file.FileLoader;
 import com.spriter.objects.SpriterKeyFrame;
+import com.spriter.player.SpriterPlayer;
 
 
 /**
@@ -55,16 +53,16 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		batch = new SpriteBatch();
 		bitmap = new SpriteBatch();
 		
-		FileLoader<Sprite> loader = new SpriteLoader();
-		SpriteDrawer drawer = new SpriteDrawer(loader,batch);
+		FileLoader<Sprite> loader = new SpriterLoader();
+		SpriterDrawer drawer = new SpriterDrawer(loader,batch);
 		
-		Gdx.input.setInputProcessor(this);
+		//Gdx.input.setInputProcessor(this);
 
 		
 		spriter = Spriter.getSpriter("data/monster/basic.scml", loader);
 		List<SpriterKeyFrame[]> keyframes = SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData());
 		this.players = new ArrayList<SpriterPlayer>();
-		int max = 100;
+		int max = 422;
 		for(int i = 0; i < max; i++){
 			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData().getEntity().get(0), drawer, keyframes);
 			this.players.add(sp);
@@ -135,8 +133,8 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		if(this.rotateBack){
 			float diff;
 			for(SpriterPlayer sp: this.players){
-				diff = SpriterCalculator.angleDifference(0, sp.getBoneAngle(this.head));
-				sp.setBoneAngle(this.head, sp.getBoneAngle(this.head)+Math.signum(diff)*Math.min(Math.abs(diff), 10f));
+				diff = SpriterCalculator.angleDifference(0, sp.getModdedBones()[head].getAngle());
+				sp.getModdedBones()[head].setAngle(sp.getModdedBones()[head].getAngle()+Math.signum(diff)*Math.min(Math.abs(diff), 10f));
 			}
 		}
 		else this.roatateToMouse(Gdx.input.getX(), Gdx.input.getY());
@@ -242,14 +240,14 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 	}
 	
 	private void roatateToMouse(int screenX, int screenY){
-		Vector3 vec = new Vector3();
-		this.camera.unproject(vec.set(screenX, screenY, 0));//Translate mouse coordinates to world
-		for(SpriterPlayer sp: this.players){
-			Vector2 v = new Vector2(vec.x,vec.y);
-			Vector2 p = new Vector2(sp.getBoneX(this.head), sp.getBoneY(this.head));
+		//Vector3 vec = new Vector3();
+		//this.camera.unproject(vec.set(screenX, screenY, 0));//Translate mouse coordinates to world
+		/*for(SpriterPlayer sp: this.players){
+			/*Vector2 v = new Vector2(vec.x,vec.y);
+			Vector2 p = new Vector2(sp.getRuntimeObjects()[sp.] sp.getBoneX(this.head), sp.getBoneY(this.head));
 			v.sub(p);
 			sp.setBoneAngle(this.head,(sp.getFlipX() == 1) ? v.angle()*sp.getFlipY() : -(v.angle()*sp.getFlipY())+180);
-		}
+		}*/
 	}
 
 	@Override

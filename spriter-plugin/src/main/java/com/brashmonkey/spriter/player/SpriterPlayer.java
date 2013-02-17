@@ -67,6 +67,7 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	 */
 	public SpriterPlayer(Entity entity, AbstractDrawer<?> drawer,List<SpriterKeyFrame[]> keyframes){
 		super(drawer, keyframes);
+		this.animation = entity.getAnimation().get(0);
 		this.entity = entity;
 		this.update(0, 0);
 		this.frame = 0;

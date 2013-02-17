@@ -35,7 +35,7 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 	Reference ref;
 	FileLoader loader = null;
 	
-	public void setReference(Reference ref){
+	public void setRef(Reference ref){
 		this.ref = ref;
 	}
 	public Reference getRef(){
@@ -116,7 +116,7 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 	public void copyValuesTo(SpriterObject object){
 		super.copyValuesTo(object);
 		object.setAlpha(alpha);
-		object.setReference(ref);
+		object.setRef(ref);
 		object.setPivotX(pivotX);
 		object.setPivotY(pivotY);
 		object.setSpin(spin);

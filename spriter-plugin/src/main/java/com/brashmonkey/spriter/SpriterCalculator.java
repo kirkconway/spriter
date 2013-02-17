@@ -88,4 +88,26 @@ public class SpriterCalculator {
 		child.setX(xnew);
 		child.setY(ynew);
 	}
+	
+	/**
+	 * @param x1 x coordinate of first point.
+	 * @param y1 y coordinate of first point.
+	 * @param x2 x coordinate of second point.
+	 * @param y2 y coordinate of second point.
+	 * @return Angle between the two given points.
+	 */
+	public static float angleBetween(float x1, float y1, float x2, float y2){
+	    return (float)Math.toDegrees(Math.atan2(y2-y1,x2-x1));
+	}
+
+	/**
+	 * @param x1 x coordinate of first point.
+	 * @param y1 y coordinate of first point.
+	 * @param x2 x coordinate of second point.
+	 * @param y2 y coordinate of second point.
+	 * @return Distance between the two given points.
+	 */
+	public static float distanceBetween(float x1, float y1, float x2, float y2){
+	    return (float)Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+	}
 }

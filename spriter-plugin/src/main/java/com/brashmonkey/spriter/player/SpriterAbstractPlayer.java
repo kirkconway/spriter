@@ -88,7 +88,7 @@ public abstract class SpriterAbstractPlayer {
 				maxObjects = Math.max(k.getObjects().length, maxObjects);
 				for(SpriterObject o: k.getObjects()){
 					o.setLoader(this.drawer.loader);
-					o.setReference(drawer.loader.findReference(o.getRef()));
+					o.setRef(drawer.loader.findReference(o.getRef()));
 				}
 			}
 		}
@@ -185,7 +185,7 @@ public abstract class SpriterAbstractPlayer {
 			this.tempObjects[i].setX(this.tempObjects[i].getX()*this.flipX);
 			this.tempObjects[i].setY(this.tempObjects[i].getY()*this.flipY);
 			
-			if(this.moddedObjects[obj1.getId()].getRef() != null)	this.tempObjects[i].setReference(this.moddedObjects[obj1.getId()].getRef());
+			if(this.moddedObjects[obj1.getId()].getRef() != null)	this.tempObjects[i].setRef(this.moddedObjects[obj1.getId()].getRef());
 			if(this.moddedObjects[obj1.getId()].getLoader() != null) this.tempObjects[i].setLoader(this.moddedObjects[obj1.getId()].getLoader());
 			this.tempObjects[i].copyValuesTo(dI);
 			this.setInstructionRef(dI, this.tempObjects[i], obj2);
@@ -221,10 +221,9 @@ public abstract class SpriterAbstractPlayer {
 			SpriterBone bone1 = firstFrame.getBones()[i];
 			bone1.copyValuesTo(this.tempBones[i]);
 			SpriterBone bone2 = (SpriterBone) this.findTimelineObject(bone1, secondFrame.getBones());
+			this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
 			
 			this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, firstFrame.getStartTime(), secondFrame.getStartTime());
-			
-			this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
 			this.moddedBones[bone1.getId()].modSpriterBone(this.tempBones[i]);
 			
 			if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);

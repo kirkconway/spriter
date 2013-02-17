@@ -50,7 +50,9 @@ public class SpriterKeyFrameProvider {
 		List<Animation> animations = spriterData.getEntity().get(0).getAnimation();
 		for(Animation anim: animations){
 			SpriterKeyFrame[] keyframes = new SpriterKeyFrameBuilder().buildKeyFrameArray(anim);
+			boolean found = false;
 			for(SpriterKeyFrame key: keyframes){
+				if(!found) found = key.getStartTime() == anim.getLength();
 				Arrays.sort(key.getObjects());
 				for(int i = 0; i < key.getBones().length; i++)
 					key.getBones()[i].setName(anim.getTimeline().get(key.getBones()[i].getTimeline()).getName());
@@ -65,7 +67,18 @@ public class SpriterKeyFrameProvider {
 							bone.addChildObject(object);
 				}
 			}
-			keyframeList.add(keyframes);
+			SpriterKeyFrame[] keys;
+			if(!found){
+				keys = new SpriterKeyFrame[keyframes.length+1];
+				for(int i = 0; i < keyframes.length; i++) keys[i] = keyframes[i];
+				keys[keys.length-1] = new SpriterKeyFrame();
+				keys[keys.length-1].setBones(keys[0].getBones());
+				keys[keys.length-1].setObjects(keys[0].getObjects());
+				keys[keys.length-1].setStartTime(anim.getLength());
+				keys[keys.length-1].setEndTime(anim.getLength());
+			}
+			else keys = keyframes;
+			keyframeList.add(keys);
 		}
 		return keyframeList;
 	}

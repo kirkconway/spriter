@@ -68,8 +68,8 @@ public abstract class SpriterAbstractPlayer {
 		this.keyframes = keyframes;
 		this.rootParent = new SpriterBone();
 		this.tempParent = new SpriterBone();
-		this.rootParent.setScaleX(1);
-		this.rootParent.setScaleY(1);
+		//this.rootParent.setScaleX(1);
+		//this.rootParent.setScaleY(1);
 		this.lastFrame = new SpriterKeyFrame();
 		this.lastTempFrame = new SpriterKeyFrame();
 		this.interpolator = SpriterLinearInterpolator.interpolator;
@@ -178,13 +178,14 @@ public abstract class SpriterAbstractPlayer {
 				if(this.transitionFixed) this.tempObjects[i].copyValuesTo(this.lastFrame.getObjects()[i]);
 				else this.tempObjects[i].copyValuesTo(this.lastTempFrame.getObjects()[i]);
 				
-				parent = (obj1.hasParent()) ? this.tempBones[obj1.getParentId()] : this.rootParent;
+				parent = (obj1.hasParent()) ? this.tempBones[obj1.getParentId()] : this.tempParent;
 			}
 			else parent = this.rootParent;
-			this.translateRelative(this.tempObjects[i], parent, this.flipX, this.flipY);
-			this.tempObjects[i].setX(this.tempObjects[i].getX()*this.flipX);
-			this.tempObjects[i].setY(this.tempObjects[i].getY()*this.flipY);
-			
+			if(!this.tempObjects[i].hasParent()){
+				this.tempObjects[i].setX(this.tempObjects[i].getX()+this.pivotX);
+				this.tempObjects[i].setY(this.tempObjects[i].getY()+this.pivotY);
+			}
+			this.translateRelative(this.tempObjects[i], parent);
 			if(this.moddedObjects[obj1.getId()].getRef() != null)	this.tempObjects[i].setRef(this.moddedObjects[obj1.getId()].getRef());
 			if(this.moddedObjects[obj1.getId()].getLoader() != null) this.tempObjects[i].setLoader(this.moddedObjects[obj1.getId()].getLoader());
 			this.tempObjects[i].copyValuesTo(dI);
@@ -209,12 +210,16 @@ public abstract class SpriterAbstractPlayer {
 	 */
 	protected void transformBones(SpriterKeyFrame firstFrame, SpriterKeyFrame secondFrame, float xOffset, float yOffset){
 		this.rootParent.setX(this.pivotX); this.rootParent.setY(this.pivotY);
-		this.rootParent.setAngle(this.angle);
 		if(this.rootParent.getParent() != null) this.translateRoot();
 		else{
-			this.tempParent.setX(xOffset*this.flipX); this.tempParent.setY(yOffset*this.flipY);
+			this.tempParent.setX(xOffset); this.tempParent.setY(yOffset);
 			this.tempParent.setAngle(this.angle);
-			SpriterCalculator.rotatePoint(this.tempParent, this.rootParent);
+			this.tempParent.setScaleX(this.flipX);
+			this.tempParent.setScaleY(this.flipY);
+			/*this.rootParent.setAngle(this.angle);
+			this.rootParent.setScaleX(this.flipX);
+			this.rootParent.setScaleY(this.flipY);
+			SpriterCalculator.rotatePoint(this.tempParent, this.rootParent);*/
 		}
 		this.setScale(this.scale);
 		for (int i = 0; i < firstFrame.getBones().length; i++) {
@@ -229,19 +234,21 @@ public abstract class SpriterAbstractPlayer {
 			if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
 			else this.tempBones[i].copyValuesTo(this.lastTempFrame.getBones()[i]);
 			
-			SpriterAbstractObject parent = (this.tempBones[i].hasParent()) ?  this.tempBones[this.tempBones[i].getParentId()]: this.rootParent;
-			this.translateRelative(this.tempBones[i], parent, 1, 1);
+			SpriterAbstractObject parent = (this.tempBones[i].hasParent()) ?  this.tempBones[this.tempBones[i].getParentId()]: this.tempParent;
+			if(!this.tempBones[i].hasParent()){
+				this.tempBones[i].setX(this.tempBones[i].getX()+this.pivotX);
+				this.tempBones[i].setY(this.tempBones[i].getY()+this.pivotY);
+			}
+			this.translateRelative(this.tempBones[i], parent);
 		}
 	}
 	
 	private void translateRoot(){
 		this.rootParent.copyValuesTo(tempParent);
 		this.tempParent.setAngle(this.tempParent.getAngle() + this.rootParent.getParent().getAngle());
-		this.tempParent.setScaleX(this.tempParent.getScaleX() * this.rootParent.getParent().getScaleX() *this.flipX);
-		this.tempParent.setScaleY(this.tempParent.getScaleY() * this.rootParent.getParent().getScaleY() *this.flipY);
+		this.tempParent.setScaleX(this.tempParent.getScaleX() * this.rootParent.getParent().getScaleX());
+		this.tempParent.setScaleY(this.tempParent.getScaleY() * this.rootParent.getParent().getScaleY());
 		SpriterCalculator.rotatePoint(this.rootParent.getParent(), this.tempParent);
-		this.rootParent.setX(this.tempParent.getX()*this.flipX); this.rootParent.setY(this.tempParent.getY()*this.flipY);
-		this.rootParent.setAngle(this.tempParent.getAngle()*this.flipX*this.flipY);
 	}
 	
 	private SpriterAbstractObject findTimelineObject(SpriterAbstractObject object, SpriterAbstractObject[] objects){
@@ -266,10 +273,10 @@ public abstract class SpriterAbstractPlayer {
 		target.setAlpha(this.interpolateAngle(obj1.getAlpha(), obj2.getAlpha(), startTime, endTime, this.frame));
 	}
 	
-	private void translateRelative(SpriterAbstractObject object, SpriterAbstractObject parent, int flipX, int flipY){
-		object.setAngle((object.getAngle() + parent.getAngle()) * flipX * flipY);
-		object.setScaleX(object.getScaleX() * parent.getScaleX() * flipX);
-		object.setScaleY(object.getScaleY() * parent.getScaleY() * flipY);
+	private void translateRelative(SpriterAbstractObject object, SpriterAbstractObject parent){
+		object.setAngle(object.getAngle()*this.flipX*this.flipY + parent.getAngle());
+		object.setScaleX(object.getScaleX() * parent.getScaleX());
+		object.setScaleY(object.getScaleY() * parent.getScaleY());
 		SpriterCalculator.rotatePoint(parent, object);
 	}
 
@@ -446,6 +453,8 @@ public abstract class SpriterAbstractPlayer {
 	 */
 	public void flipX(){
 		this.flipX *=-1;
+		for(SpriterAbstractPlayer player: this.players)
+			player.flipX = this.flipX;
 	}
 	
 	/**
@@ -461,6 +470,8 @@ public abstract class SpriterAbstractPlayer {
 	 */
 	public void flipY(){
 		this.flipY *=-1;
+		for(SpriterAbstractPlayer player: this.players)
+			player.flipY = this.flipY;
 	}
 
 	

@@ -30,7 +30,6 @@ public class SpriterPlayerIK extends SpriterPlayer {
 	
 	private boolean resovling;
 	private SpriterBone[] bones;
-	private SpriterBone tempBone;
 	private SpriterIKObject[] objects;
 	private float tolerance;
 
@@ -39,44 +38,47 @@ public class SpriterPlayerIK extends SpriterPlayer {
 		super(entity, drawer, keyframes);
 		this.resovling = false;
 		this.tolerance = 0.5f;
-		this.tempBone = new SpriterBone();
 		super.update(0, 0);
 	}
 	
 	@Override
 	public void update(float xOffset, float yOffset){
 		this.frameSpeed = 0;
-		if(this.resovling) this.resolve(xOffset,yOffset);
 		super.update(xOffset, yOffset);
+		if(this.resovling) this.resolve(xOffset,yOffset);
 	}
 	
 	private void resolve(float xOffset, float yOffset){
+		float xx, yy;
 		SpriterBone bone = null;
 		SpriterBone parent = null;
 		SpriterIKObject object = null;
 		float angle, angleDiff;
 		for(int i = 0; i < this.bones.length; i++){
 			bone = this.bones[i];
-			parent = bone;
 			object = this.objects[i];
-			System.out.println(SpriterCalculator.distanceBetween(bone.getX(), bone.getY(), object.getX(), object.getY()));
-			while(SpriterCalculator.distanceBetween(bone.getX(), bone.getY(), object.getX(), object.getY()) > 10){
-				this.tempBone.setX(object.xOffset);
-				this.tempBone.setY(object.yOffset);
-				angle = SpriterCalculator.angleBetween(bone.getX(), bone.getY(), object.getX(), object.getY());
-				this.moddedBones[bone.getId()].setAngle(angle);
-				super.update(xOffset, yOffset);
-				SpriterCalculator.rotatePoint(bone, this.tempBone);
-				for(int j = 0; j < object.chainLength; j++){
-					parent = this.tempBones[parent.getParentId()];
-					angle = SpriterCalculator.angleBetween(parent.getX(), parent.getY(), object.getX(), object.getY());
-					angleDiff = SpriterCalculator.angleBetween(parent.getX(), parent.getY(), this.tempBone.getX(), this.tempBone.getY());
-					this.moddedBones[parent.getId()].setAngle(SpriterCalculator.angleDifference(angle, angleDiff));
-					super.update(xOffset, yOffset);
-				}
+			parent = this.tempBones[bone.getParentId()];
+			//System.out.println(SpriterCalculator.distanceBetween(bone.getX(), bone.getY(), object.getX(), object.getY()));
+			//while(SpriterCalculator.distanceBetween(bone.getX(), bone.getY(), object.getX(), object.getY()) > 10){
+			angle = SpriterCalculator.angleBetween(bone.getX(), bone.getY(), object.getX(), object.getY());
+			bone.setAngle(angle % 360);
+			for(int j = 0; j < object.chainLength && parent != null; j++){
+				xx= bone.getX()+(float)Math.cos(Math.toRadians(bone.getAngle()))*200;
+				yy= bone.getY()+ (float)Math.sin(Math.toRadians(bone.getAngle()))*200;
+				
+				angle = SpriterCalculator.angleBetween(parent.getX(), parent.getY(), object.getX(), object.getY());
+				angleDiff = SpriterCalculator.angleBetween(parent.getX(), parent.getY(), xx, yy);
+				parent.setAngle(SpriterCalculator.angleDifference(angleDiff,angle));
+				
+				for(SpriterBone b: parent.getChildBones())
+					SpriterCalculator.rotatePoint(parent, this.tempBones[b.getId()]);
+				
+				if(parent.hasParent()) parent = this.tempBones[bone.getParentId()];
+				else parent = null;
 			}
+			//}
 		}
-		this.resovling = false;
+		//this.resovling = false;
 	}
 
 	/**

@@ -25,6 +25,7 @@ import com.discobeard.spriter.dom.Animation;
 import com.discobeard.spriter.dom.Entity;
 import com.discobeard.spriter.dom.SpriterData;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -48,6 +49,7 @@ import java.util.List;
 
 public class SpriterPlayer extends SpriterAbstractPlayer{
 
+	private static HashMap<Entity, SpriterPlayer> loaded = new HashMap<Entity, SpriterPlayer>();
 	protected Entity entity;
 	private Animation animation;
 	private int transitionSpeed = 30;
@@ -65,16 +67,22 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	 * @param drawer {@link AbstractDrawer} which you have to implement on your own.
 	 * @param keyframes A list of SpriterKeyFrame arrays. See {@link SpriterKeyFrameProvider#generateKeyFramePool(SpriterData)} to get the list.
 	 */
-	public SpriterPlayer(Entity entity, AbstractDrawer<?> drawer,List<SpriterKeyFrame[]> keyframes){
-		super(drawer, keyframes);
+	public SpriterPlayer(Entity entity, AbstractDrawer<?> drawer){
+		super(drawer, null);
 		this.animation = entity.getAnimation().get(0);
 		this.entity = entity;
-		this.update(0, 0);
 		this.frame = 0;
+		if(!alreadyLoaded(entity)){
+			this.keyframes = SpriterKeyFrameProvider.generateKeyFramePool(entity);
+			loaded.put(entity, this);
+		}
+		else this.keyframes = loaded.get(entity).keyframes;
+		this.generateData();
+		this.update(0, 0);
 	}
 	
-	
-	public void update(float xOffset, float yOffset){
+	@Override
+	protected void step(float xOffset, float yOffset){
 		//Fetch information
 		SpriterKeyFrame[] keyframes = this.keyframes.get(animationIndex);
 		SpriterKeyFrame firstKeyFrame; 
@@ -203,5 +211,9 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	 */
 	public Animation getAnimation() {
 		return animation;
-	}	
+	}
+	
+	private static boolean alreadyLoaded(Entity entity){
+		return loaded.containsKey(entity);
+	}
 }

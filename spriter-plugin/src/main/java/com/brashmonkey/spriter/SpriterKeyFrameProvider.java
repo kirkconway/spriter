@@ -27,6 +27,7 @@ import com.brashmonkey.spriter.objects.SpriterKeyFrame;
 import com.brashmonkey.spriter.objects.SpriterObject;
 import com.brashmonkey.spriter.player.SpriterPlayer;
 import com.discobeard.spriter.dom.Animation;
+import com.discobeard.spriter.dom.Entity;
 import com.discobeard.spriter.dom.SpriterData;
 
 /**
@@ -45,9 +46,9 @@ public class SpriterKeyFrameProvider {
 	 * @param spriterData SpriterData to generate from.
 	 * @return generated keyframe list.
 	 */
-	public static List<SpriterKeyFrame[]> generateKeyFramePool(SpriterData spriterData){
+	public static List<SpriterKeyFrame[]> generateKeyFramePool(Entity entity){
 		List<SpriterKeyFrame[]> keyframeList = new ArrayList<SpriterKeyFrame[]>();
-		List<Animation> animations = spriterData.getEntity().get(0).getAnimation();
+		List<Animation> animations = entity.getAnimation();
 		for(Animation anim: animations){
 			SpriterKeyFrame[] keyframes = new SpriterKeyFrameBuilder().buildKeyFrameArray(anim);
 			boolean found = false;

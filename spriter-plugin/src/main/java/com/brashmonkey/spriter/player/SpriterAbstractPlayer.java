@@ -56,6 +56,7 @@ public abstract class SpriterAbstractPlayer {
 	protected float angle = 0f, scale = 1f, pivotX = 0f, pivotY = 0f;
 	protected long frame;
 	protected List<SpriterAbstractPlayer> players;
+	private boolean generated = false;
 	
 	/**
 	 * Constructs a new SpriterAbstractPlayer object which is able to animate SpriterBone instances and SpriterObject instances.
@@ -68,19 +69,17 @@ public abstract class SpriterAbstractPlayer {
 		this.keyframes = keyframes;
 		this.rootParent = new SpriterBone();
 		this.tempParent = new SpriterBone();
-		//this.rootParent.setScaleX(1);
-		//this.rootParent.setScaleY(1);
 		this.lastFrame = new SpriterKeyFrame();
 		this.lastTempFrame = new SpriterKeyFrame();
 		this.interpolator = SpriterLinearInterpolator.interpolator;
 		this.players = new LinkedList<SpriterAbstractPlayer>();
-		this.generateData();
 	}
 	
 	/**
 	 * Generates data which is necessary to animate all animations as intended.
+	 * This method has to called inside the specific constructor.
 	 */
-	private void generateData(){
+	protected final void generateData(){
 		int maxObjects = 0, maxBones = 0;
 		for(SpriterKeyFrame[] key: this.keyframes){
 			for(SpriterKeyFrame k: key){
@@ -124,6 +123,7 @@ public abstract class SpriterAbstractPlayer {
 		this.lastFrame.setObjects(tmpObjs1);
 		this.lastTempFrame.setBones(tmpBones2);
 		this.lastTempFrame.setObjects(tmpObjs2);
+		this.generated = true;
 	}
 	
 	/**
@@ -153,7 +153,18 @@ public abstract class SpriterAbstractPlayer {
 	 * @param xOffset
 	 * @param yOffset
 	 */
-	public abstract void update(float xOffset, float yOffset);
+	public final void update(float xOffset, float yOffset){
+		if(!this.generated) 
+			System.out.println("Warning! You can not update this player, since necessary data has not been initialized!");
+		else this.step(xOffset, yOffset);
+	}
+	
+	/**
+	 * Has to be implemented by the specific player.
+	 * @param xOffset
+	 * @param yOffset
+	 */
+	protected abstract void step(float xOffset, float yOffset);
 	
 	/**
 	 * Interpolates the objects of firstFrame and secondFrame.
@@ -209,19 +220,14 @@ public abstract class SpriterAbstractPlayer {
 	 * @return interpolated SpriterBone array
 	 */
 	protected void transformBones(SpriterKeyFrame firstFrame, SpriterKeyFrame secondFrame, float xOffset, float yOffset){
-		this.rootParent.setX(this.pivotX); this.rootParent.setY(this.pivotY);
 		if(this.rootParent.getParent() != null) this.translateRoot();
 		else{
 			this.tempParent.setX(xOffset); this.tempParent.setY(yOffset);
 			this.tempParent.setAngle(this.angle);
 			this.tempParent.setScaleX(this.flipX);
 			this.tempParent.setScaleY(this.flipY);
-			/*this.rootParent.setAngle(this.angle);
-			this.rootParent.setScaleX(this.flipX);
-			this.rootParent.setScaleY(this.flipY);
-			SpriterCalculator.rotatePoint(this.tempParent, this.rootParent);*/
 		}
-		this.setScale(this.scale);
+		//this.setScale(this.scale);
 		for (int i = 0; i < firstFrame.getBones().length; i++) {
 			SpriterBone bone1 = firstFrame.getBones()[i];
 			bone1.copyValuesTo(this.tempBones[i]);
@@ -245,7 +251,7 @@ public abstract class SpriterAbstractPlayer {
 	
 	private void translateRoot(){
 		this.rootParent.copyValuesTo(tempParent);
-		this.tempParent.setAngle(this.tempParent.getAngle() + this.rootParent.getParent().getAngle());
+		this.tempParent.setAngle(this.tempParent.getAngle()*this.flipX*this.flipY + this.rootParent.getParent().getAngle());
 		this.tempParent.setScaleX(this.tempParent.getScaleX() * this.rootParent.getParent().getScaleX());
 		this.tempParent.setScaleY(this.tempParent.getScaleY() * this.rootParent.getParent().getScaleY());
 		SpriterCalculator.rotatePoint(this.rootParent.getParent(), this.tempParent);

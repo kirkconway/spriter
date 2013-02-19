@@ -47,6 +47,8 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 		super(first.drawer, first.keyframes);
 		this.weight = 0.5f;
 		setPlayers(first, second);
+		this.generateData();
+		this.update(0, 0);
 	}
 	
 	/**
@@ -94,7 +96,7 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	}
 	
 	@Override
-	public void update(float xOffset, float yOffset){
+	protected void step(float xOffset, float yOffset){
 		int fristLastSpeed = first.frameSpeed, secondLastSpeed = second.frameSpeed;
 		int speed;
 		if(this.interpolateSpeed)
@@ -124,8 +126,8 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 		}
 		else{
 			this.currenObjectsToDraw = first.currenObjectsToDraw;
-			this.first.update(xOffset,yOffset);
-			this.second.update(xOffset,yOffset);
+			this.first.update(0,0);
+			this.second.update(0,0);
 		
 			SpriterKeyFrame key1 = (first.transitionFixed) ? first.lastFrame: first.lastTempFrame;
 			SpriterKeyFrame key2 = (second.transitionFixed) ? second.lastFrame: second.lastTempFrame;

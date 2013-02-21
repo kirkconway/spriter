@@ -67,16 +67,25 @@ public class SpriterCalculator {
 	}
 	
 	/**
-	 * Rotates the given point around the given parent.
+	 * Rotates the given child around the given parent.
 	 * @param parent
-	 * @param childX
-	 * @param childY
-	 * @return float array with two elemts, new x and y coordinates.
+	 * @param child
 	 */
 	public static void rotatePoint(SpriterAbstractObject parent, SpriterAbstractObject child) {
+		rotatePoint(parent, child.getX(), child.getY(), child);
+	}
+	
+	/**
+	 * Rotates the given point around the given parent.
+	 * @param parent
+	 * @param x
+	 * @param y
+	 * @param target save new position in
+	 */
+	public static void rotatePoint(SpriterAbstractObject parent, float x, float y, SpriterAbstractObject target) {
 
-		float px = child.getX() * (parent.getScaleX());
-		float py = child.getY() * (parent.getScaleY());
+		float px = x * (parent.getScaleX());
+		float py = y * (parent.getScaleY());
 
 		float s = (float) Math.sin(Math.toRadians(parent.getAngle()));
 		float c = (float) Math.cos(Math.toRadians(parent.getAngle()));
@@ -85,8 +94,8 @@ public class SpriterCalculator {
 		xnew += parent.getX();
 		ynew += parent.getY();
 		
-		child.setX(xnew);
-		child.setY(ynew);
+		target.setX(xnew);
+		target.setY(ynew);
 	}
 	
 	/**

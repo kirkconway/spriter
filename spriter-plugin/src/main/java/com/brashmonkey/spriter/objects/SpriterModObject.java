@@ -38,6 +38,7 @@ public class SpriterModObject extends SpriterAbstractObject{
 		this.alpha = 1f;
 		this.ref = null;
 		this.loader = null;
+		this.active = true;
 	}
 
 	public float getAlpha() {

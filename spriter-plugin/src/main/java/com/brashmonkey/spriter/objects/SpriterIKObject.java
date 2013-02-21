@@ -19,7 +19,22 @@ package com.brashmonkey.spriter.objects;
 
 public class SpriterIKObject extends SpriterAbstractObject {
 	
-	public int chainLength;
-	public float xOffset, yOffset;
+	public int chainLength, iterations;
+	
+	public SpriterIKObject(){
+		this(0, 1);
+	}
+	
+	public SpriterIKObject(int length, int iterations){
+		this.chainLength = length;
+		this.iterations = iterations;
+	}
+	
+	public SpriterIKObject(int length, int iterations, float x, float y){
+		this.chainLength = length;
+		this.iterations = iterations;
+		this.x = x;
+		this.y = y;
+	}
 
 }

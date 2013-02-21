@@ -55,10 +55,11 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	private int transitionSpeed = 30;
 	private int animationIndex = 0;
 	private int currentKey = 0;
-	SpriterKeyFrame lastRealFrame;
+	SpriterKeyFrame lastRealFrame, firstKeyFrame, secondKeyFrame;
 	boolean transitionTempFixed = true;
 	private int fixCounter = 0;
 	private int fixMaxSteps = 100;
+	protected boolean updateObjects = true, updateBones = true;
 	
 	
 	/**
@@ -85,8 +86,6 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	protected void step(float xOffset, float yOffset){
 		//Fetch information
 		SpriterKeyFrame[] keyframes = this.keyframes.get(animationIndex);
-		SpriterKeyFrame firstKeyFrame; 
-		SpriterKeyFrame secondKeyFrame;
 		if(this.transitionFixed && this.transitionTempFixed){
 			if(this.frameSpeed >= 0){
 				firstKeyFrame = keyframes[this.currentKey];
@@ -124,8 +123,8 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 		}
 		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		//Interpolate
-		this.transformBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);		
-		this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
+		if(this.updateBones) this.transformBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);		
+		if(this.updateObjects) this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
 	}
 	
 	/**

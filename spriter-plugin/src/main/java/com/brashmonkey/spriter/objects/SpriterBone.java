@@ -20,6 +20,8 @@ package com.brashmonkey.spriter.objects;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.brashmonkey.spriter.SpriterCalculator;
+
 /**
  * A SpriterBone is a bone like in the Spriter editor. It can hold children (#SpriterObject and #SpriterBone) which get manipulated relative to this object.
  * @author Trixt0r
@@ -78,6 +80,17 @@ public class SpriterBone extends SpriterAbstractObject{
 		bone.setSpin(getSpin());
 		bone.childBones = this.childBones;
 		bone.childObjects = this.childObjects;
+	}
+	
+	public void update(){
+		if(this.parent != null)
+			SpriterCalculator.rotatePoint(parent, this);
+	}
+	
+	public void updateRecursively(){
+		this.update();
+		for(SpriterBone child: this.childBones)
+			child.updateRecursively();
 	}
 	
 }

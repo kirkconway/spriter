@@ -29,24 +29,30 @@ public class SpriterPlayerIK extends SpriterPlayer {
 	private SpriterBone[] bones;
 	private SpriterIKObject[] objects;
 	private float tolerance;
+	private ISpriterIKResolver resolver;
 
 	public SpriterPlayerIK(Entity entity, AbstractDrawer<?> drawer) {
 		super(entity, drawer);
 		this.resovling = false;
 		this.tolerance = 0.5f;
+		this.resolver = new SpriterCCDResolver(this);
 		super.step(0, 0);
+		this.updateObjects = false;
 	}
 	
 	@Override
 	protected void step(float xOffset, float yOffset){
-		//this.frameSpeed = 0;
 		super.step(xOffset, yOffset);
-		if(this.resovling) this.resolve(xOffset,yOffset);
+		if(this.resovling) this.resolve();
+		this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
+		for(int i = 0; i < this.currenObjectsToDraw; i++)
+			this.tempObjects[i].copyValuesTo(this.instructions[i]);
 	}
 	
-	private void resolve(float xOffset, float yOffset){
-		for(int i = 0; i < this.bones.length; i++){
-		}
+	private void resolve(){
+		for(int i = 0; i < this.bones.length; i++)
+			for(int j = 0; j < this.objects[i].iterations; j++)
+				this.resolver.resolve(this.objects[i].getX(), this.objects[i].getY(), this.objects[i].chainLength, this.tempBones[this.bones[i].getId()]);
 	}
 
 	/**
@@ -98,38 +104,46 @@ public class SpriterPlayerIK extends SpriterPlayer {
 	public void setTolerance(float tolerance) {
 		this.tolerance = tolerance;
 	}
+	
+	/**
+	 * Changes the state of each effector to unactive. The effect results in non animated bodyparts.
+	 * @param parents indicates whether parents of the effectors have to be deactivated or not.
+	 */
+	public void deactivateEffectors(boolean parents){
+		for(int i = 0; i < this.bones.length; i++){
+			this.moddedBones[this.bones[i].getId()].setActive(false);
+			if(!parents) continue;
+			SpriterBone par = (SpriterBone) this.bones[i].getParent();
+			for(int j = 0; j < this.objects[i].chainLength && par != null; j++){
+				this.moddedBones[par.getId()].setActive(false);
+				par = (SpriterBone) par.getParent();
+			}
+		}
+	}
+	
+	public void activateEffectors(){
+		for(int i = 0; i < this.bones.length; i++){
+			this.moddedBones[this.bones[i].getId()].setActive(true);
+			SpriterBone par = (SpriterBone) this.bones[i].getParent();
+			for(int j = 0; j < this.objects[i].chainLength && par != null; j++){
+				this.moddedBones[par.getId()].setActive(true);
+				par = (SpriterBone) par.getParent();
+			}
+		}
+	}
+
+	/**
+	 * @return the resolver
+	 */
+	public ISpriterIKResolver getResolver() {
+		return resolver;
+	}
+
+	/**
+	 * @param resolver the resolver to set
+	 */
+	public void setResolver(ISpriterIKResolver resolver) {
+		this.resolver = resolver;
+	}
 
 }
-/*
-		float xx, yy;
-		SpriterBone bone = null;
-		SpriterBone parent = null;
-		SpriterIKObject object = null;
-		float angle, angleDiff;
-		for(int i = 0; i < this.bones.length; i++){
-			bone = this.bones[i];
-			object = this.objects[i];
-			parent = this.tempBones[bone.getParentId()];
-			//System.out.println(SpriterCalculator.distanceBetween(bone.getX(), bone.getY(), object.getX(), object.getY()));
-			//while(SpriterCalculator.distanceBetween(bone.getX(), bone.getY(), object.getX(), object.getY()) > 10){
-			angle = SpriterCalculator.angleBetween(bone.getX(), bone.getY(), object.getX(), object.getY());
-			bone.setAngle(angle);
-			for(int j = 0; j < object.chainLength && parent != null; j++){
-				xx= bone.getX() + (float)Math.cos(Math.toRadians(bone.getAngle()))*200;
-				yy= bone.getY() + (float)Math.sin(Math.toRadians(bone.getAngle()))*200;
-				
-				angle = SpriterCalculator.angleBetween(parent.getX(), parent.getY(), object.getX(), object.getY());
-				angleDiff = SpriterCalculator.angleBetween(parent.getX(), parent.getY(), xx, yy);
-				parent.setAngle(parent.getAngle()+SpriterCalculator.angleDifference(angle,angleDiff));
-				
-				for(SpriterBone b: parent.getChildBones())
-					SpriterCalculator.rotatePoint(parent, this.tempBones[b.getId()]);
-				parent.setAngle(parent.getAngle()+90);
-				if(parent.hasParent()) parent = this.tempBones[bone.getParentId()];
-				else parent = null;
-				angle = SpriterCalculator.angleBetween(bone.getX(), bone.getY(), object.getX(), object.getY());
-				bone.setAngle(angle);
-			}
-			//}
-		}
-		//this.resovling = false;*/

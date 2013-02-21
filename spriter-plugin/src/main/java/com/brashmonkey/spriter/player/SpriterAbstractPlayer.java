@@ -230,22 +230,24 @@ public abstract class SpriterAbstractPlayer {
 		//this.setScale(this.scale);
 		for (int i = 0; i < firstFrame.getBones().length; i++) {
 			SpriterBone bone1 = firstFrame.getBones()[i];
-			bone1.copyValuesTo(this.tempBones[i]);
-			SpriterBone bone2 = (SpriterBone) this.findTimelineObject(bone1, secondFrame.getBones());
-			this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
-			
-			this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, firstFrame.getStartTime(), secondFrame.getStartTime());
-			this.moddedBones[bone1.getId()].modSpriterBone(this.tempBones[i]);
-			
-			if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
-			else this.tempBones[i].copyValuesTo(this.lastTempFrame.getBones()[i]);
-			
-			SpriterAbstractObject parent = (this.tempBones[i].hasParent()) ?  this.tempBones[this.tempBones[i].getParentId()]: this.tempParent;
-			if(!this.tempBones[i].hasParent()){
-				this.tempBones[i].setX(this.tempBones[i].getX()+this.pivotX);
-				this.tempBones[i].setY(this.tempBones[i].getY()+this.pivotY);
+			if(this.moddedBones[bone1.getId()].isActive()){
+				bone1.copyValuesTo(this.tempBones[i]);
+				SpriterBone bone2 = (SpriterBone) this.findTimelineObject(bone1, secondFrame.getBones());
+				this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
+				
+				this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, firstFrame.getStartTime(), secondFrame.getStartTime());
+				this.moddedBones[bone1.getId()].modSpriterBone(this.tempBones[i]);
+				
+				if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
+				else this.tempBones[i].copyValuesTo(this.lastTempFrame.getBones()[i]);
+				
+				SpriterAbstractObject parent = (this.tempBones[i].hasParent()) ?  this.tempBones[this.tempBones[i].getParentId()]: this.tempParent;
+				if(!this.tempBones[i].hasParent()){
+					this.tempBones[i].setX(this.tempBones[i].getX()+this.pivotX);
+					this.tempBones[i].setY(this.tempBones[i].getY()+this.pivotY);
+				}
+				this.translateRelative(this.tempBones[i], parent);
 			}
-			this.translateRelative(this.tempBones[i], parent);
 		}
 	}
 	
@@ -670,5 +672,19 @@ public abstract class SpriterAbstractPlayer {
 	 */
 	public boolean containsPlayer(SpriterAbstractPlayer player){
 		return this.players.contains(player);
+	}
+	
+	public void updateBone(SpriterBone bone){
+		if(bone.hasParent()){
+			//if(this.moddedBones[bone.getId()].isActive()) bone.setAngle(this.lastFrame.getBones()[bone.getId()].getAngle()+this.tempBones[bone.getParentId()].getAngle());
+			SpriterCalculator.rotatePoint(this.tempBones[bone.getParentId()], this.lastFrame.getBones()[bone.getId()].getX(),
+					this.lastFrame.getBones()[bone.getId()].getY(), bone);
+		}
+	}
+	
+	public void updateRecursively(SpriterBone bone){
+		this.updateBone(bone);
+		for(SpriterBone child: bone.getChildBones())
+			this.updateRecursively(this.tempBones[child.getId()]);
 	}
 }

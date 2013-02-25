@@ -12,13 +12,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.brashmonkey.spriter.Spriter;
+import com.brashmonkey.spriter.SpriterCalculator;
+import com.brashmonkey.spriter.SpriterKeyFrameProvider;
+import com.brashmonkey.spriter.file.FileLoader;
+import com.brashmonkey.spriter.objects.SpriterKeyFrame;
+import com.brashmonkey.spriter.player.SpriterPlayer;
 
-import com.spriter.Spriter;
-import com.spriter.SpriterCalculator;
-import com.spriter.SpriterKeyFrameProvider;
-import com.spriter.file.FileLoader;
-import com.spriter.objects.SpriterKeyFrame;
-import com.spriter.player.SpriterPlayer;
 
 
 /**
@@ -53,18 +53,19 @@ public class SpriterTest implements ApplicationListener, InputProcessor {
 		batch = new SpriteBatch();
 		bitmap = new SpriteBatch();
 		
-		FileLoader<Sprite> loader = new SpriterLoader();
+		SpriterLoader loader = new SpriterLoader(true);
 		SpriterDrawer drawer = new SpriterDrawer(loader,batch);
 		
 		//Gdx.input.setInputProcessor(this);
 
 		
 		spriter = Spriter.getSpriter("data/monster/basic.scml", loader);
-		List<SpriterKeyFrame[]> keyframes = SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData());
+		loader.generatePackedSprites();
+		//List<SpriterKeyFrame[]> keyframes = SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData());
 		this.players = new ArrayList<SpriterPlayer>();
 		int max = 422;
 		for(int i = 0; i < max; i++){
-			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData().getEntity().get(0), drawer, keyframes);
+			SpriterPlayer sp = new SpriterPlayer(spriter.getSpriterData().getEntity().get(0), drawer);
 			this.players.add(sp);
 			sp.setFrameSpeed(10);
 		}

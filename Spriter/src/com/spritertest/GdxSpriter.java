@@ -1,3 +1,20 @@
+/**************************************************************************
+ * Copyright 2013 by Trixt0r
+ * (https://github.com/Trixt0r, Heinrich Reich, e-mail: trixter16@web.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+***************************************************************************/
+
 package com.spritertest;
 
 import java.io.IOException;
@@ -9,17 +26,33 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
+import com.brashmonkey.spriter.Spriter;
+import com.brashmonkey.spriter.file.FileLoader;
 import com.discobeard.spriter.dom.*;
-import com.spriter.Spriter;
-import com.spriter.file.FileLoader;
 
+/**
+ * This class was implemented to give you the chance loading scml files on android with libGDX since JAXB does not run on android devices.
+ * If you are using libGDX, you should use this class to load scml files.
+ * @author Trixt0r
+ */
 public class GdxSpriter {
 	
+	/**
+	 * Loads a whole spriter file.
+	 * @param filename Path to the scml file.
+	 * @param loader The concrete loader you have implemented.
+	 * @return Spriter instance which holds the read spriter structure.
+	 */
 	public static Spriter getSpriter(String filename, FileLoader<?> loader){
 		FileHandle fh = Gdx.files.internal(filename);
 		return new Spriter(load(fh),loader, fh.file());
 	}
 	
+	/**
+	 * Reads the whole given scml file.
+	 * @param filename Path to scml file.
+	 * @return Spriter data in form of lists.
+	 */
 	public static SpriterData load(String filename){
 		return load(Gdx.files.internal(filename));
 	}

@@ -227,7 +227,7 @@ public abstract class SpriterAbstractPlayer {
 			this.tempParent.setScaleX(this.flipX);
 			this.tempParent.setScaleY(this.flipY);
 		}
-		//this.setScale(this.scale);
+		this.setScale(this.scale);
 		for (int i = 0; i < firstFrame.getBones().length; i++) {
 			SpriterBone bone1 = firstFrame.getBones()[i];
 				bone1.copyValuesTo(this.tempBones[i]);
@@ -235,7 +235,7 @@ public abstract class SpriterAbstractPlayer {
 				this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
 
 				//if(this.moddedBones[bone1.getId()].isActive())
-					this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, firstFrame.getStartTime(), secondFrame.getStartTime());
+				this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, firstFrame.getStartTime(), secondFrame.getStartTime());
 				this.moddedBones[bone1.getId()].modSpriterBone(this.tempBones[i]);
 				
 				if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
@@ -518,8 +518,10 @@ public abstract class SpriterAbstractPlayer {
 	 */
 	public void setScale(float scale) {
 		this.scale = scale;
-		this.rootParent.setScaleX(this.scale);
-		this.rootParent.setScaleY(this.scale);
+		this.rootParent.setScaleX(this.scale*this.flipX);
+		this.rootParent.setScaleY(this.scale*this.flipY);
+		this.tempParent.setScaleX(this.scale*this.flipX);
+		this.tempParent.setScaleY(this.scale*this.flipY);
 	}
 	
 	/**

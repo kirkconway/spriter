@@ -16,9 +16,11 @@ public class SpriterCCDResolver implements ISpriterIKResolver {
 		float xx = effector.getX()+(float)Math.cos(Math.toRadians(effector.getAngle()))*200*effector.getScaleX(),
 				yy = effector.getY()+(float)Math.sin(Math.toRadians(effector.getAngle()))*200*effector.getScaleX();
 		effector.setAngle(SpriterCalculator.angleBetween(effector.getX(), effector.getY(), x, y));
+		if(this.player.getFlipX() == -1) effector.setAngle(effector.getAngle()+180f);
 		SpriterBone parent = null;
 		if(effector.hasParent()) parent = player.getRuntimeBones()[effector.getParentId()];
 		for(int i = 0; i < chainLength && parent != null; i++){
+			if(SpriterCalculator.distanceBetween(xx, yy, x, y) <= 1) return;
 			parent.setAngle(parent.getAngle()+ Math.min(SpriterCalculator.angleDifference(SpriterCalculator.angleBetween(parent.getX(), parent.getY(), x, y),
 					SpriterCalculator.angleBetween(parent.getX(), parent.getY(), xx, yy)), 5));
 			this.player.updateRecursively(parent);

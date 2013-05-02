@@ -277,6 +277,8 @@ public abstract class SpriterAbstractPlayer {
 	private void interpolateSpriterObject(SpriterObject target, SpriterObject obj1, SpriterObject obj2, float startTime, float endTime){
 		if(obj2 == null) return;
 		this.interpolateAbstractObject(target, obj1, obj2, startTime, endTime);
+		target.setPivotX(this.interpolate(obj1.getPivotX(), obj2.getPivotX(), startTime, endTime, this.frame));
+		target.setPivotY(this.interpolate(obj1.getPivotY(), obj2.getPivotY(), startTime, endTime, this.frame));
 		target.setAlpha(this.interpolateAngle(obj1.getAlpha(), obj2.getAlpha(), startTime, endTime, this.frame));
 	}
 	

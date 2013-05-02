@@ -26,7 +26,6 @@ import com.discobeard.spriter.dom.Key;
 public class SpriterObjectMerger implements ISpriterMerger<AnimationObjectRef, Key, SpriterObject> {
 
 	public SpriterObject merge(AnimationObjectRef ref, Key key) {
-
 		AnimationObject obj = key.getObject().get(0); 
 		
 		SpriterObject spriterObject = new SpriterObject();

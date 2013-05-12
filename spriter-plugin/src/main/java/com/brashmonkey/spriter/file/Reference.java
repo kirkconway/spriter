@@ -17,6 +17,8 @@
 
 package com.brashmonkey.spriter.file;
 
+import com.brashmonkey.spriter.SpriterRectangle;
+
 /**
  * A Reference is an object which holds a loaded sprite.
  * @author Trixt0r
@@ -25,6 +27,7 @@ public class Reference {
 	
 	public int folder, file;
 	public String folderName, fileName;
+	public SpriterRectangle dimensions;
 	
 	public Reference(int folder,int file, String folderName, String fileName){
 		this.folder = folder;
@@ -46,7 +49,7 @@ public class Reference {
 	
 	@Override
 	public int hashCode(){
-		return (folder+","+file).hashCode(); 
+		return (folder+","+file).hashCode();
 	}
 	
 	@Override

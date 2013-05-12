@@ -68,13 +68,13 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	 * @param drawer {@link AbstractDrawer} which you have to implement on your own.
 	 * @param keyframes A list of SpriterKeyFrame arrays. See {@link SpriterKeyFrameProvider#generateKeyFramePool(SpriterData)} to get the list.
 	 */
-	public SpriterPlayer(Entity entity, AbstractDrawer<?> drawer){
+	public SpriterPlayer(SpriterData data, Entity entity, AbstractDrawer<?> drawer){
 		super(drawer, null);
 		this.animation = entity.getAnimation().get(0);
 		this.entity = entity;
 		this.frame = 0;
 		if(!alreadyLoaded(entity)){
-			this.keyframes = SpriterKeyFrameProvider.generateKeyFramePool(entity);
+			this.keyframes = SpriterKeyFrameProvider.generateKeyFramePool(data, entity);
 			loaded.put(entity, this);
 		}
 		else this.keyframes = loaded.get(entity).keyframes;

@@ -69,7 +69,10 @@ public class Spriter {
 			for (int file = 0; file < spriterData.getFolder().get(folder).getFile().size(); file++) {
 				String folderName = spriterData.getFolder().get(folder).getName();
 				String fileName = spriterData.getFolder().get(folder).getFile().get(file).getName();
-				loader.load(new Reference(folder, file,folderName, fileName),
+				Reference ref = new Reference(folder, file,folderName, fileName);
+				ref.dimensions = new SpriterRectangle(0,spriterData.getFolder().get(folder).getFile().get(file).getHeight() ,spriterData.getFolder().get(folder).getFile().get(file).getWidth(),0);
+				
+				loader.load(ref,
 						scmlFile.getParent() + "/"
 								+ spriterData.getFolder().get(folder).getFile().get(file).getName());
 			}

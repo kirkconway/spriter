@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.brashmonkey.spriter.file.Reference;
 import com.brashmonkey.spriter.mergers.SpriterKeyFrameBuilder;
 import com.brashmonkey.spriter.objects.SpriterBone;
 import com.brashmonkey.spriter.objects.SpriterKeyFrame;
@@ -28,6 +29,7 @@ import com.brashmonkey.spriter.objects.SpriterObject;
 import com.brashmonkey.spriter.player.SpriterPlayer;
 import com.discobeard.spriter.dom.Animation;
 import com.discobeard.spriter.dom.Entity;
+import com.discobeard.spriter.dom.File;
 import com.discobeard.spriter.dom.SpriterData;
 
 /**
@@ -46,7 +48,7 @@ public class SpriterKeyFrameProvider {
 	 * @param spriterData SpriterData to generate from.
 	 * @return generated keyframe list.
 	 */
-	public static List<SpriterKeyFrame[]> generateKeyFramePool(Entity entity){
+	public static List<SpriterKeyFrame[]> generateKeyFramePool(SpriterData data, Entity entity){
 		List<SpriterKeyFrame[]> keyframeList = new ArrayList<SpriterKeyFrame[]>();
 		List<Animation> animations = entity.getAnimation();
 		for(Animation anim: animations){
@@ -63,9 +65,13 @@ public class SpriterKeyFrameProvider {
 							if(!bone2.equals(bone) && bone2.getParentId() == bone.getId())
 								bone.addChildBone(bone2);
 					}
-					for(SpriterObject object: key.getObjects())
+					for(SpriterObject object: key.getObjects()){
+						Reference ref = object.getRef();
+						File f = data.getFolder().get(ref.folder).getFile().get(ref.file);
+						ref.dimensions = new SpriterRectangle(0, f.getHeight(), f.getWidth(), 0f);
 						if(bone.getId()== object.getParentId())
 							bone.addChildObject(object);
+					}
 				}
 			}
 			SpriterKeyFrame[] keys;

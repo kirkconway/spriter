@@ -20,7 +20,9 @@ package com.brashmonkey.spriter.objects;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.brashmonkey.spriter.Point;
 import com.brashmonkey.spriter.SpriterCalculator;
+import com.brashmonkey.spriter.SpriterRectangle;
 
 /**
  * A SpriterBone is a bone like in the Spriter editor. It can hold children (#SpriterObject and #SpriterBone) which get manipulated relative to this object.
@@ -32,10 +34,12 @@ public class SpriterBone extends SpriterAbstractObject{
 	List<SpriterObject> childObjects;
 	int spin;
 	String name;
+	public SpriterRectangle boundingBox;
 	
 	public SpriterBone(){
 		this.childBones = new LinkedList<SpriterBone>();
 		this.childObjects = new LinkedList<SpriterObject>();
+		this.boundingBox = new SpriterRectangle(0,0,0,0);
 	}
 	
 	public void addChildBone(SpriterBone bone){
@@ -91,6 +95,21 @@ public class SpriterBone extends SpriterAbstractObject{
 		this.update();
 		for(SpriterBone child: this.childBones)
 			child.updateRecursively();
+	}
+	
+	public void calcBoundingBox(SpriterRectangle base){
+		this.boundingBox.set(base);
+		for(SpriterObject object: this.childObjects){
+			Point[] points = object.getBoundingBox();
+			this.boundingBox.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), this.boundingBox.left);
+			this.boundingBox.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), this.boundingBox.right);
+			this.boundingBox.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), this.boundingBox.top);
+			this.boundingBox.bottom = Math.min(Math.min(Math.min(Math.min(points[0].y, points[1].y),points[2].y),points[3].y), this.boundingBox.bottom);
+		}
+		for(SpriterBone child: this.childBones){
+			child.calcBoundingBox(boundingBox);
+			this.boundingBox.set(child.boundingBox);
+		}
 	}
 	
 }

@@ -17,6 +17,8 @@
 
 package com.brashmonkey.spriter.objects;
 
+import com.brashmonkey.spriter.Point;
+import com.brashmonkey.spriter.SpriterRectangle;
 import com.brashmonkey.spriter.draw.DrawInstruction;
 import com.brashmonkey.spriter.file.FileLoader;
 import com.brashmonkey.spriter.file.Reference;
@@ -34,9 +36,18 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 	boolean transientObject = false, visible = true;
 	Reference ref;
 	FileLoader loader = null;
+	SpriterRectangle rect = new SpriterRectangle(0,0,0,0);
+	private Point[] boundingPoints; 
+	
+	public SpriterObject(){
+		boundingPoints = new Point[4];
+		for(int i = 0; i < this.boundingPoints.length; i++)
+			this.boundingPoints[i] = new Point(0,0);
+	}
 	
 	public void setRef(Reference ref){
 		this.ref = ref;
+		this.rect.set(ref.dimensions);
 	}
 	public Reference getRef(){
 		return this.ref;
@@ -125,6 +136,7 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 		object.setZIndex(zIndex);
 		object.setLoader(loader);
 		object.setVisible(visible);
+		object.rect.set(this.rect);
 	}
 	
 	public void copyValuesTo(DrawInstruction instruction){
@@ -139,6 +151,27 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 		instruction.ref = this.ref;
 		instruction.loader = this.loader;
 		instruction.obj = this;
+	}
+	
+	public Point[] getBoundingBox(){
+		float width = this.ref.dimensions.width*this.scaleX,
+		height = this.ref.dimensions.height*this.scaleY;
+		
+		float pivotX = width*this.pivotX;
+		float pivotY = height*this.pivotY;
+		
+		this.boundingPoints[0].set(-pivotX,-pivotY);
+		this.boundingPoints[1].set(width-pivotX, -pivotY);
+		this.boundingPoints[2].set(-pivotX,height-pivotY);
+		this.boundingPoints[3].set(width-pivotX,height-pivotY);
+		
+		this.boundingPoints[0].rotate(angle); this.boundingPoints[1].rotate(angle);
+		this.boundingPoints[2].rotate(angle); this.boundingPoints[3].rotate(angle);
+		
+		for(int i = 0; i < this.boundingPoints.length; i++)
+			this.boundingPoints[i].translate(x, y);
+		
+		return this.boundingPoints;
 	}
 	
 }

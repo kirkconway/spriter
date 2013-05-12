@@ -17,6 +17,7 @@
 
 package com.brashmonkey.spriter.draw;
 
+import com.brashmonkey.spriter.SpriterRectangle;
 import com.brashmonkey.spriter.file.FileLoader;
 import com.brashmonkey.spriter.file.Reference;
 import com.brashmonkey.spriter.objects.SpriterObject;
@@ -39,10 +40,12 @@ public class DrawInstruction {
 	public float scaleY;
 	public SpriterObject obj = null;
 	public FileLoader loader = null;
+	public SpriterRectangle rect = null;
 	
 	public DrawInstruction(Reference ref, float x, float y, float pivotX,
 			float pivotY,float scaleX, float scaleY, float angle,float alpha) {
 		this.ref = ref;
+		//rect = new SpriterRectangle(ref.dimensions);
 		this.x = x;
 		this.y = y;
 		this.pivotX = pivotX;

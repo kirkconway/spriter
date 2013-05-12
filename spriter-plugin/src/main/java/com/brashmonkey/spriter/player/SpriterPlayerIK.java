@@ -22,6 +22,7 @@ import com.brashmonkey.spriter.draw.AbstractDrawer;
 import com.brashmonkey.spriter.objects.SpriterBone;
 import com.brashmonkey.spriter.objects.SpriterIKObject;
 import com.discobeard.spriter.dom.Entity;
+import com.discobeard.spriter.dom.SpriterData;
 
 public class SpriterPlayerIK extends SpriterPlayer {
 	
@@ -31,8 +32,8 @@ public class SpriterPlayerIK extends SpriterPlayer {
 	private float tolerance;
 	private ISpriterIKResolver resolver;
 
-	public SpriterPlayerIK(Entity entity, AbstractDrawer<?> drawer) {
-		super(entity, drawer);
+	public SpriterPlayerIK(SpriterData data, Entity entity, AbstractDrawer<?> drawer) {
+		super(data, entity, drawer);
 		this.resovling = false;
 		this.tolerance = 0.5f;
 		this.resolver = new SpriterCCDResolver(this);

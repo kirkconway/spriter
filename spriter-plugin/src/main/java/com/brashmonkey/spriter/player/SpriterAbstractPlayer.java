@@ -20,8 +20,10 @@ package com.brashmonkey.spriter.player;
 import java.util.List;
 import java.util.LinkedList;
 
+import com.brashmonkey.spriter.Point;
 import com.brashmonkey.spriter.SpriterCalculator;
 import com.brashmonkey.spriter.SpriterKeyFrameProvider;
+import com.brashmonkey.spriter.SpriterRectangle;
 import com.brashmonkey.spriter.draw.AbstractDrawer;
 import com.brashmonkey.spriter.draw.DrawInstruction;
 import com.brashmonkey.spriter.interpolation.SpriterInterpolator;
@@ -57,6 +59,7 @@ public abstract class SpriterAbstractPlayer {
 	protected long frame;
 	protected List<SpriterAbstractPlayer> players;
 	private boolean generated = false;
+	SpriterRectangle rect;
 	
 	/**
 	 * Constructs a new SpriterAbstractPlayer object which is able to animate SpriterBone instances and SpriterObject instances.
@@ -73,6 +76,7 @@ public abstract class SpriterAbstractPlayer {
 		this.lastTempFrame = new SpriterKeyFrame();
 		this.interpolator = SpriterLinearInterpolator.interpolator;
 		this.players = new LinkedList<SpriterAbstractPlayer>();
+		rect = new SpriterRectangle(0,0,0,0);
 	}
 	
 	/**
@@ -174,6 +178,7 @@ public abstract class SpriterAbstractPlayer {
 	 * @param yOffset
 	 */
 	protected void transformObjects(SpriterKeyFrame firstFrame, SpriterKeyFrame secondFrame, float xOffset, float yOffset) {
+		this.rect.set(xOffset, yOffset, xOffset, yOffset);
 		for (int i = 0; i < this.currenObjectsToDraw; i++) {
 			SpriterObject obj1 = firstFrame.getObjects()[i];
 			DrawInstruction dI = this.instructions[i];
@@ -200,7 +205,44 @@ public abstract class SpriterAbstractPlayer {
 			if(this.moddedObjects[obj1.getId()].getRef() != null)	this.tempObjects[i].setRef(this.moddedObjects[obj1.getId()].getRef());
 			if(this.moddedObjects[obj1.getId()].getLoader() != null) this.tempObjects[i].setLoader(this.moddedObjects[obj1.getId()].getLoader());
 			this.tempObjects[i].copyValuesTo(dI);
+			
 			this.setInstructionRef(dI, this.tempObjects[i], obj2);
+		}
+	}
+	
+	/**
+	 * Calculates the bounding box for the current running animation.
+	 * Call this method after updating the spriter player.
+	 * @param bone root to start at. Set null, to iterate through all objects.
+	 */
+	public void calcBoundingBox(SpriterBone bone){
+		if(bone == null) this.calcBoundingBoxForAll();
+		else{
+			bone.boundingBox.set(this.rect);
+			for(SpriterObject object: bone.getChildObjects()){
+				Point[] points = this.tempObjects[object.getId()].getBoundingBox();
+				bone.boundingBox.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), bone.boundingBox.left);
+				bone.boundingBox.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), bone.boundingBox.right);
+				bone.boundingBox.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), bone.boundingBox.top);
+				bone.boundingBox.bottom = Math.min(Math.min(Math.min(Math.min(points[0].y, points[1].y),points[2].y),points[3].y), bone.boundingBox.bottom);
+			}
+			this.rect.set(bone.boundingBox);
+			for(SpriterBone child: bone.getChildBones()){
+				calcBoundingBox(child);
+				bone.boundingBox.set(child.boundingBox);
+			}
+			this.rect.set(bone.boundingBox);
+		}
+		this.rect.calculateSize();
+	}
+	
+	private void calcBoundingBoxForAll(){
+		for(int i = 0; i < this.currenObjectsToDraw; i++){
+			Point[] points = this.tempObjects[i].getBoundingBox();
+			this.rect.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), this.rect.left);
+			this.rect.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), this.rect.right);
+			this.rect.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), this.rect.top);
+			this.rect.bottom = Math.min(Math.min(Math.min(Math.min(points[0].y, points[1].y),points[2].y),points[3].y), this.rect.bottom);
 		}
 	}
 	
@@ -230,23 +272,22 @@ public abstract class SpriterAbstractPlayer {
 		this.setScale(this.scale);
 		for (int i = 0; i < firstFrame.getBones().length; i++) {
 			SpriterBone bone1 = firstFrame.getBones()[i];
-				bone1.copyValuesTo(this.tempBones[i]);
-				SpriterBone bone2 = (SpriterBone) this.findTimelineObject(bone1, secondFrame.getBones());
-				this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
+			bone1.copyValuesTo(this.tempBones[i]);
+			SpriterBone bone2 = (SpriterBone) this.findTimelineObject(bone1, secondFrame.getBones());
+			this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
 
-				//if(this.moddedBones[bone1.getId()].isActive())
-				this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, firstFrame.getStartTime(), secondFrame.getStartTime());
-				this.moddedBones[bone1.getId()].modSpriterBone(this.tempBones[i]);
-				
-				if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
-				else this.tempBones[i].copyValuesTo(this.lastTempFrame.getBones()[i]);
-				
-				SpriterAbstractObject parent = (this.tempBones[i].hasParent()) ?  this.tempBones[this.tempBones[i].getParentId()]: this.tempParent;
-				if(!this.tempBones[i].hasParent() || !this.moddedBones[bone1.getId()].isActive()){
-					this.tempBones[i].setX(this.tempBones[i].getX()+this.pivotX);
-					this.tempBones[i].setY(this.tempBones[i].getY()+this.pivotY);
-				}
-				this.translateRelative(this.tempBones[i], parent);
+			this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, firstFrame.getStartTime(), secondFrame.getStartTime());
+			this.moddedBones[bone1.getId()].modSpriterBone(this.tempBones[i]);
+			
+			if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
+			else this.tempBones[i].copyValuesTo(this.lastTempFrame.getBones()[i]);
+			
+			SpriterAbstractObject parent = (this.tempBones[i].hasParent()) ?  this.tempBones[this.tempBones[i].getParentId()]: this.tempParent;
+			if(!this.tempBones[i].hasParent() || !this.moddedBones[bone1.getId()].isActive()){
+				this.tempBones[i].setX(this.tempBones[i].getX()+this.pivotX);
+				this.tempBones[i].setY(this.tempBones[i].getY()+this.pivotY);
+			}
+			this.translateRelative(this.tempBones[i], parent);
 		}
 	}
 	
@@ -689,5 +730,9 @@ public abstract class SpriterAbstractPlayer {
 		this.updateBone(bone);
 		for(SpriterBone child: bone.getChildBones())
 			this.updateRecursively(this.tempBones[child.getId()]);
+	}
+	
+	public SpriterRectangle getBoundingBox(){
+		return this.rect;
 	}
 }

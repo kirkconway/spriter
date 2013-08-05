@@ -44,7 +44,7 @@ public class SpriterDrawer extends AbstractDrawer<Sprite> {
 
 	private void draw(Sprite sprite, float x, float y, float pivotX, float pivotY, float scaleX, float scaleY,
 			float angle, float alpha) {
-
+		if(sprite == null) return;
 		float newPivotX = (sprite.getWidth() * (pivotX));
 		float newX = x - newPivotX;
 		float newPivotY = (sprite.getHeight() * (pivotY));

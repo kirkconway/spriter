@@ -51,6 +51,16 @@ public class GdxSpriter {
 	}
 	
 	/**
+	 * Loads a whole spriter file.
+	 * @param filename Path to the scml file.
+	 * @param loader The concrete loader you have implemented.
+	 * @return Spriter instance which holds the read spriter structure.
+	 */
+	public static Spriter getSpriter(FileHandle file, FileLoader<?> loader){
+		return new Spriter(load(file),loader, file.file());
+	}
+	
+	/**
 	 * Reads the whole given scml file.
 	 * @param filename Path to scml file.
 	 * @return Spriter data in form of lists.

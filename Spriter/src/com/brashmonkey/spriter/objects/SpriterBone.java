@@ -20,7 +20,7 @@ package com.brashmonkey.spriter.objects;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.brashmonkey.spriter.Point;
+import com.brashmonkey.spriter.SpriterPoint;
 import com.brashmonkey.spriter.SpriterCalculator;
 import com.brashmonkey.spriter.SpriterRectangle;
 
@@ -100,7 +100,7 @@ public class SpriterBone extends SpriterAbstractObject{
 	public void calcBoundingBox(SpriterRectangle base){
 		this.boundingBox.set(base);
 		for(SpriterObject object: this.childObjects){
-			Point[] points = object.getBoundingBox();
+			SpriterPoint[] points = object.getBoundingBox();
 			this.boundingBox.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), this.boundingBox.left);
 			this.boundingBox.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), this.boundingBox.right);
 			this.boundingBox.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), this.boundingBox.top);

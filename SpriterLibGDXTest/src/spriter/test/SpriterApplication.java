@@ -1,6 +1,5 @@
 package spriter.test;
 
-import spriter.utils.GdxSpriter;
 import spriter.utils.SpriterDrawer;
 import spriter.utils.SpriterLoader;
 
@@ -43,7 +42,7 @@ public class SpriterApplication implements ApplicationListener{
 		this.drawer = new SpriterDrawer(this.batch); //A drawer needs a batch to draw
 		//You can change the batch at runtime
 		
-		this.loadSCML(Gdx.files.internal("monster/basic.scml")); //Loads the scml file
+		this.loadSCML(Gdx.files.classpath("assets/anmition/test3.scml")); //Loads the scml file
 		Gdx.input.setInputProcessor(inputHandler);
 		inputHandler.app = this;
 	}
@@ -104,7 +103,7 @@ public class SpriterApplication implements ApplicationListener{
 	 * @param file the file handle of the scml file
 	 */
 	public void loadSCML(FileHandle file){
-		this.spriter = GdxSpriter.getSpriter(file, loader);
+		this.spriter = Spriter.getSpriter(file.file().getAbsolutePath(), loader);
 		this.player = new SpriterPlayer(this.spriter,0, loader);//Creates a new SpriterPlayer object which is responsible for tweening all animations in the loaded entity.
 		this.player.setFrameSpeed(20);//Changes the frame speed
 		Gdx.app.postRunnable(new Runnable(){

@@ -17,7 +17,7 @@
 
 package com.brashmonkey.spriter.objects;
 
-import com.brashmonkey.spriter.Point;
+import com.brashmonkey.spriter.SpriterPoint;
 import com.brashmonkey.spriter.SpriterRectangle;
 import com.brashmonkey.spriter.draw.DrawInstruction;
 import com.brashmonkey.spriter.file.FileLoader;
@@ -37,12 +37,12 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 	Reference ref;
 	FileLoader loader = null;
 	SpriterRectangle rect = new SpriterRectangle(0,0,0,0);
-	private Point[] boundingPoints; 
+	private SpriterPoint[] boundingPoints; 
 	
 	public SpriterObject(){
-		boundingPoints = new Point[4];
+		boundingPoints = new SpriterPoint[4];
 		for(int i = 0; i < this.boundingPoints.length; i++)
-			this.boundingPoints[i] = new Point(0,0);
+			this.boundingPoints[i] = new SpriterPoint(0,0);
 	}
 	
 	public void setRef(Reference ref){
@@ -153,7 +153,7 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 		instruction.obj = this;
 	}
 	
-	public Point[] getBoundingBox(){
+	public SpriterPoint[] getBoundingBox(){
 		float width = this.ref.dimensions.width*this.scaleX,
 		height = this.ref.dimensions.height*this.scaleY;
 		

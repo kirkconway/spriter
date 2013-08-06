@@ -52,7 +52,7 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 
 	@Override
 	public void load(final Reference ref, String path) {
-		FileHandle f = Gdx.files.internal(path);
+		FileHandle f = Gdx.files.absolute(path);
 		if(!f.exists()) return;
 		if(packer == null && this.pack)
 			packer = new PixmapPacker(2048, 2048, Pixmap.Format.RGBA8888, 2, true);

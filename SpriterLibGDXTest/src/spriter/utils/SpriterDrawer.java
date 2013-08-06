@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.brashmonkey.spriter.Point;
+import com.brashmonkey.spriter.SpriterPoint;
 import com.brashmonkey.spriter.draw.AbstractDrawer;
 import com.brashmonkey.spriter.draw.DrawInstruction;
 import com.brashmonkey.spriter.file.FileLoader;
@@ -94,7 +94,7 @@ public class SpriterDrawer extends AbstractDrawer<Sprite> {
 		for(int j = 0; j< player.getObjectsToDraw(); j++){
 			SpriterObject object = player.getRuntimeObjects()[j];
 			int i = 0;
-			Point[] points = object.getBoundingBox();
+			SpriterPoint[] points = object.getBoundingBox();
 			
 			vertices[i++] = points[0].x;
 			vertices[i++] = points[0].y;

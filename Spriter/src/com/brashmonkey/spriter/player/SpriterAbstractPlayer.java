@@ -20,7 +20,7 @@ package com.brashmonkey.spriter.player;
 import java.util.List;
 import java.util.LinkedList;
 
-import com.brashmonkey.spriter.Point;
+import com.brashmonkey.spriter.SpriterPoint;
 import com.brashmonkey.spriter.SpriterCalculator;
 import com.brashmonkey.spriter.SpriterKeyFrameProvider;
 import com.brashmonkey.spriter.SpriterRectangle;
@@ -220,7 +220,7 @@ public abstract class SpriterAbstractPlayer {
 		else{
 			bone.boundingBox.set(this.rect);
 			for(SpriterObject object: bone.getChildObjects()){
-				Point[] points = this.tempObjects[object.getId()].getBoundingBox();
+				SpriterPoint[] points = this.tempObjects[object.getId()].getBoundingBox();
 				bone.boundingBox.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), bone.boundingBox.left);
 				bone.boundingBox.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), bone.boundingBox.right);
 				bone.boundingBox.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), bone.boundingBox.top);
@@ -238,7 +238,7 @@ public abstract class SpriterAbstractPlayer {
 	
 	private void calcBoundingBoxForAll(){
 		for(int i = 0; i < this.currenObjectsToDraw; i++){
-			Point[] points = this.tempObjects[i].getBoundingBox();
+			SpriterPoint[] points = this.tempObjects[i].getBoundingBox();
 			this.rect.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), this.rect.left);
 			this.rect.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), this.rect.right);
 			this.rect.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), this.rect.top);

@@ -19,6 +19,7 @@ package com.brashmonkey.spriter;
 
 import java.io.File;
 
+import com.brahsmonkey.spriter.xml.SCMLReader;
 import com.brashmonkey.spriter.file.FileLoader;
 import com.brashmonkey.spriter.file.Reference;
 import com.discobeard.spriter.dom.SpriterData;
@@ -50,9 +51,9 @@ public class Spriter {
 	public final File scmlFile;
 	public final SpriterData spriterData;
 
-	private Spriter(String scmlPath, FileLoader<?> loader) {
-		this.scmlFile = new File(getClass().getResource("/" + scmlPath).getPath());
-		this.spriterData = new SCMLParser(scmlFile).parse();
+	public Spriter(String scmlPath, FileLoader<?> loader) {
+		this.scmlFile = new File(scmlPath);
+		this.spriterData = SCMLReader.load(scmlPath);
 		this.loader = loader;
 		loadResources();
 	}

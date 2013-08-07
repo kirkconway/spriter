@@ -54,11 +54,33 @@ public class SpriterKeyFrameBuilder {
 			List<SpriterBone> tempBones = new ArrayList<SpriterBone>();
 			
 			for(BoneRef boneRef : key.getBoneRef()){
-				tempBones.add(boneMerger.merge(boneRef, timeLines.get(boneRef.getTimeline()).getKey().get(boneRef.getKey())));
+				if(key.getTime() == timeLines.get(boneRef.getTimeline()).getKey().get(boneRef.getKey()).getTime()){
+					SpriterBone bone = boneMerger.merge(boneRef, timeLines.get(boneRef.getTimeline()).getKey().get(boneRef.getKey()));
+					bone.setName(timeLines.get(boneRef.getTimeline()).getName());
+					if(bone.hasParent()){
+						SpriterBone parent = null;
+						for(int i = 0; i< spriterKeyFrames.length && parent == null; i++){
+							parent = this.searchForParentBone(spriterKeyFrames[i], bone.getParentId());
+							bone.setParent(parent);
+						}
+					}
+					tempBones.add(bone);
+				}
 			}
 			
 			for(AnimationObjectRef objectRef : key.getObjectRef()){
-				tempObjects.add(objectMerger.merge(objectRef, timeLines.get(objectRef.getTimeline()).getKey().get(objectRef.getKey())));
+				if(key.getTime() == timeLines.get(objectRef.getTimeline()).getKey().get(objectRef.getKey()).getTime()){
+					SpriterObject object = objectMerger.merge(objectRef, timeLines.get(objectRef.getTimeline()).getKey().get(objectRef.getKey()));
+					object.setName(timeLines.get(objectRef.getTimeline()).getName());
+					if(object.hasParent()){
+						SpriterBone parent = null;
+						for(int i = 0; i< spriterKeyFrames.length && parent == null; i++){
+							parent = this.searchForParentBone(spriterKeyFrames[i], object.getParentId());
+							object.setParent(parent);
+						}
+					}
+					tempObjects.add(object);
+				}
 			}
 			
 			for(AnimationObject object : key.getObject()){
@@ -71,8 +93,16 @@ public class SpriterKeyFrameBuilder {
 			
 			spriterKeyFrames[k].setStartTime(key.getTime());
 			spriterKeyFrames[k].setEndTime(k<keyFrames.size()-1 ? keyFrames.get(k+1).getTime()-1 : animation.getLength());
+			spriterKeyFrames[k].setId(key.getId());
 		}
 		
 		return spriterKeyFrames;
+	}
+	
+	private SpriterBone searchForParentBone(SpriterKeyFrame frame, Integer parentId){
+		if(frame == null) return null;
+		for(SpriterBone bone: frame.getBones())
+			if(bone.getParentId().equals(parentId)) return bone;
+		return null;
 	}
 }

@@ -170,95 +170,79 @@ public abstract class SpriterAbstractPlayer {
 	 * @param yOffset
 	 */
 	protected void transformObjects(SpriterKeyFrame currentFrame, SpriterKeyFrame nextFrame, float xOffset, float yOffset) {
-		this.rect.set(xOffset, yOffset, xOffset, yOffset);		
-		for(int i = 0; i< nextFrame.getObjects().length; i++){
-			SpriterObject obj = nextFrame.getObjects()[i];
-			obj.copyValuesTo(this.tempObjects2[i]);
-			if(!this.tempObjects2[i].hasParent()){
-				this.tempObjects2[i].setX(this.tempObjects2[i].getX()+this.pivotX);
-				this.tempObjects2[i].setY(this.tempObjects2[i].getY()+this.pivotY);
-			}
-			this.translateRelative(this.tempObjects2[i], (this.tempObjects2[i].hasParent()) ?  this.tempBones2[this.tempObjects2[i].getParentId()]: this.tempParent);
-		}
+		this.rect.set(xOffset, yOffset, xOffset, yOffset);
+		this.updateTransformedTempObjects(nextFrame.getObjects(), this.tempObjects2);
+		this.updateTempObjects(currentFrame.getObjects(), this.nonTransformedTempObjects);
+		
+		for (int i = 0; i < this.currenObjectsToDraw; i++) this.tweenObject(this.nonTransformedTempObjects[i], nextFrame, i, currentFrame.getStartTime());
+	}
+
+	protected void transformObjects(SpriterKeyFrame currentFrame, SpriterKeyFrame[] nextFrames, float xOffset, float yOffset) {
+		this.rect.set(xOffset, yOffset, xOffset, yOffset);
 		this.updateTempObjects(currentFrame.getObjects(), this.nonTransformedTempObjects);
 		
 		for (int i = 0; i < this.currenObjectsToDraw; i++) {
-			SpriterObject obj1 = this.nonTransformedTempObjects[i];
-			DrawInstruction dI = this.instructions[i];
-			SpriterObject obj2 = null;
-			obj1.copyValuesTo(this.tempObjects[i]);
-			SpriterAbstractObject parent = null;
-			if(!obj1.isTransientObject()) {
-				obj2 = (SpriterObject) this.findTimelineObject(obj1, nextFrame.getObjects());
-				this.tempObjects[i].setTimeline((obj2 != null) ? obj1.getTimeline() : -1);
-				parent = (obj1.hasParent()) ? this.tempBones[obj1.getParentId()] : this.tempParent;
-
-				if(obj2 != null){
-					if(parent != this.tempParent || (obj2.hasParent() && parent == this.tempParent)){
-						if(!obj1.getParent().equals(obj2.getParent())){
-							obj2 = (SpriterObject) this.findTimelineObject(obj1, this.tempObjects2);
-							SpriterCalculator.setRelative(parent, obj2);
+			SpriterKeyFrame nextFrame = null;
+			int cnt = 0;
+			for(int j = (currentFrame.getId()+(int)Math.signum(frameSpeed) + nextFrames.length)%nextFrames.length; nextFrame == null && cnt < nextFrames.length;
+					j = (j+(int)Math.signum(frameSpeed) + nextFrames.length)%nextFrames.length, cnt++){
+				for(SpriterObject object: nextFrames[j].getObjects()){
+					if(this.nonTransformedTempObjects[i].equals(object)){
+						nextFrame = nextFrames[j];
+						object.copyValuesTo(this.tempObjects2[object.getId()]);
+						if(!this.tempObjects2[object.getId()].hasParent()){
+							this.tempObjects2[object.getId()].setX(this.tempObjects2[object.getId()].getX()+this.pivotX);
+							this.tempObjects2[object.getId()].setY(this.tempObjects2[object.getId()].getY()+this.pivotY);
 						}
-					} else if(obj2.hasParent()){
+						this.translateRelative(this.tempObjects2[object.getId()], (this.tempObjects2[object.getId()].hasParent()) ?
+								this.tempBones2[this.tempObjects2[object.getId()].getParentId()]: this.tempParent);
+					}
+				}
+			}
+			if(this.nonTransformedTempObjects[i].getName().equals("legUpperRight")) System.out.println("current frame: "+this.frame+", found frame at "+nextFrame.getStartTime()+"\nfor "+this.nonTransformedTempObjects[i]);
+			this.tweenObject(this.nonTransformedTempObjects[i], nextFrame, i, currentFrame.getStartTime());
+		}
+	}
+	
+	private void tweenObject(SpriterObject obj1, SpriterKeyFrame nextFrame, int i, long startTime){
+		DrawInstruction dI = this.instructions[i];
+		SpriterObject obj2 = null;
+		obj1.copyValuesTo(this.tempObjects[i]);
+		SpriterAbstractObject parent = null;
+		if(!obj1.isTransientObject()) {
+			obj2 = (SpriterObject) this.findTimelineObject(obj1, nextFrame.getObjects());
+			this.tempObjects[i].setTimeline((obj2 != null) ? obj1.getTimeline() : -1);
+			parent = (obj1.hasParent()) ? this.tempBones[obj1.getParentId()] : this.tempParent;
+
+			if(obj2 != null){
+				if(parent != this.tempParent || (obj2.hasParent() && parent == this.tempParent)){
+					if(!obj1.getParent().equals(obj2.getParent())){
 						obj2 = (SpriterObject) this.findTimelineObject(obj1, this.tempObjects2);
 						SpriterCalculator.setRelative(parent, obj2);
-					}					
-					this.interpolateSpriterObject(this.tempObjects[i], obj1, obj2, currentFrame.getStartTime(), nextFrame.getStartTime());
-				}
-				
-				this.moddedObjects[obj1.getId()].modSpriterObject(this.tempObjects[i]);
-				
-				if(this.transitionFixed) this.tempObjects[i].copyValuesTo(this.lastFrame.getObjects()[i]);
-				else this.tempObjects[i].copyValuesTo(this.lastTempFrame.getObjects()[i]);
+					}
+				} else if(obj2.hasParent()){
+					obj2 = (SpriterObject) this.findTimelineObject(obj1, this.tempObjects2);
+					SpriterCalculator.setRelative(parent, obj2);
+				}					
+				this.interpolateSpriterObject(this.tempObjects[i], obj1, obj2, startTime, nextFrame.getStartTime());
 			}
-			else parent = this.tempParent;
-			if(!this.tempObjects[i].hasParent()){
-				this.tempObjects[i].setX(this.tempObjects[i].getX()+this.pivotX);
-				this.tempObjects[i].setY(this.tempObjects[i].getY()+this.pivotY);
-			}
-			this.translateRelative(this.tempObjects[i], parent);
-			if(this.moddedObjects[obj1.getId()].getRef() != null)	this.tempObjects[i].setRef(this.moddedObjects[obj1.getId()].getRef());
-			if(this.moddedObjects[obj1.getId()].getLoader() != null) this.tempObjects[i].setLoader(this.moddedObjects[obj1.getId()].getLoader());
-			this.tempObjects[i].copyValuesTo(dI);
 			
-			this.setInstructionRef(dI, this.tempObjects[i], obj2);
+			this.moddedObjects[obj1.getId()].modSpriterObject(this.tempObjects[i]);
+			
+			if(this.transitionFixed) this.tempObjects[i].copyValuesTo(this.lastFrame.getObjects()[i]);
+			else this.tempObjects[i].copyValuesTo(this.lastTempFrame.getObjects()[i]);
 		}
-	}
-	
-	/**
-	 * Calculates the bounding box for the current running animation.
-	 * Call this method after updating the spriter player.
-	 * @param bone root to start at. Set null, to iterate through all objects.
-	 */
-	public void calcBoundingBox(SpriterBone bone){
-		if(bone == null) this.calcBoundingBoxForAll();
-		else{
-			bone.boundingBox.set(this.rect);
-			for(SpriterObject object: bone.getChildObjects()){
-				SpriterPoint[] points = this.tempObjects[object.getId()].getBoundingBox();
-				bone.boundingBox.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), bone.boundingBox.left);
-				bone.boundingBox.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), bone.boundingBox.right);
-				bone.boundingBox.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), bone.boundingBox.top);
-				bone.boundingBox.bottom = Math.min(Math.min(Math.min(Math.min(points[0].y, points[1].y),points[2].y),points[3].y), bone.boundingBox.bottom);
-			}
-			this.rect.set(bone.boundingBox);
-			for(SpriterBone child: bone.getChildBones()){
-				calcBoundingBox(child);
-				bone.boundingBox.set(child.boundingBox);
-			}
-			this.rect.set(bone.boundingBox);
+		else parent = this.tempParent;
+		if(!this.tempObjects[i].hasParent()){
+			this.tempObjects[i].setX(this.tempObjects[i].getX()+this.pivotX);
+			this.tempObjects[i].setY(this.tempObjects[i].getY()+this.pivotY);
 		}
-		this.rect.calculateSize();
-	}
-	
-	private void calcBoundingBoxForAll(){
-		for(int i = 0; i < this.currenObjectsToDraw; i++){
-			SpriterPoint[] points = this.tempObjects[i].getBoundingBox();
-			this.rect.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), this.rect.left);
-			this.rect.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), this.rect.right);
-			this.rect.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), this.rect.top);
-			this.rect.bottom = Math.min(Math.min(Math.min(Math.min(points[0].y, points[1].y),points[2].y),points[3].y), this.rect.bottom);
-		}
+		this.translateRelative(this.tempObjects[i], parent);
+		if(this.moddedObjects[obj1.getId()].getRef() != null)	this.tempObjects[i].setRef(this.moddedObjects[obj1.getId()].getRef());
+		if(this.moddedObjects[obj1.getId()].getLoader() != null) this.tempObjects[i].setLoader(this.moddedObjects[obj1.getId()].getLoader());
+		this.tempObjects[i].copyValuesTo(dI);
+		
+		this.setInstructionRef(dI, this.tempObjects[i], obj2);
 	}
 	
 	protected void setInstructionRef(DrawInstruction dI, SpriterObject obj1, SpriterObject obj2){
@@ -286,52 +270,96 @@ public abstract class SpriterAbstractPlayer {
 		}
 		this.setScale(this.scale);
 		
-		for(int i = 0; i< nextFrame.getBones().length; i++){
-			SpriterBone bone = nextFrame.getBones()[i];
-			bone.copyValuesTo(this.tempBones2[i]);
-			if(!this.tempBones2[i].hasParent()){
-				this.tempBones2[i].setX(this.tempBones2[i].getX()+this.pivotX);
-				this.tempBones2[i].setY(this.tempBones2[i].getY()+this.pivotY);
-			}
-			this.translateRelative(this.tempBones2[i], (this.tempBones2[i].hasParent()) ?  this.tempBones2[this.tempBones2[i].getParentId()]: this.tempParent);
-		}
+		this.updateTransformedTempObjects(nextFrame.getBones(), this.tempBones2);
 		this.updateTempObjects(currentFrame.getBones(), this.nonTransformedTempBones);
 		
 		for (int i = 0; i < this.nonTransformedTempBones.length; i++) {
-			SpriterBone bone1 = this.nonTransformedTempBones[i];
-			bone1.copyValuesTo(this.tempBones[i]);
-			SpriterBone bone2 = (SpriterBone) this.findTimelineObject(bone1, nextFrame.getBones());
-			this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
-			SpriterAbstractObject parent = (this.tempBones[i].hasParent()) ?  this.tempBones[this.tempBones[i].getParentId()]: this.tempParent;
-			
-			if(bone2 != null){
-				if(parent != this.tempParent){
-					if(!bone1.getParent().equals(bone2.getParent())){
-						bone2 = (SpriterBone) this.findTimelineObject(bone1, this.tempBones2);
-						SpriterCalculator.setRelative(parent, bone2);
-					}
-				} else if(bone2.hasParent()){
-					bone2 = (SpriterBone) this.findTimelineObject(bone1, this.tempBones2);
-					SpriterCalculator.setRelative(parent, bone2);
-				}
-				this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, currentFrame.getStartTime(), nextFrame.getStartTime());
-			} else
-				System.err.println("Could not find second bone to tween");
-			
-			this.moddedBones[bone1.getId()].modSpriterBone(this.tempBones[i]);
-			
-			if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
-			else this.tempBones[i].copyValuesTo(this.lastTempFrame.getBones()[i]);
-			if(!this.tempBones[i].hasParent() || !this.moddedBones[bone1.getId()].isActive()){
-				this.tempBones[i].setX(this.tempBones[i].getX()+this.pivotX);
-				this.tempBones[i].setY(this.tempBones[i].getY()+this.pivotY);
-			}
-			this.translateRelative(this.tempBones[i], parent);
-			
+			this.tweenBone(this.nonTransformedTempBones[i], nextFrame, i, currentFrame.getStartTime());
 		}
 	}
 	
-	private <T> void updateTempObjects(SpriterAbstractObject[] source, SpriterAbstractObject[] target){
+	protected void transformBones(SpriterKeyFrame currentFrame, SpriterKeyFrame[] nextFrames, float xOffset, float yOffset){	
+		if(this.rootParent.getParent() != null) this.translateRoot();
+		else{
+			this.tempParent.setX(xOffset); this.tempParent.setY(yOffset);
+			this.tempParent.setAngle(this.angle);
+			this.tempParent.setScaleX(this.flipX);
+			this.tempParent.setScaleY(this.flipY);
+		}
+		this.setScale(this.scale);
+		this.updateTempObjects(currentFrame.getBones(), this.nonTransformedTempBones);	
+		for (int i = 0; i < this.nonTransformedTempBones.length; i++) {
+			SpriterKeyFrame nextFrame = null;
+			int cnt = 0;
+			for(int j = (currentFrame.getId()+(int)Math.signum(frameSpeed) + nextFrames.length)%nextFrames.length; nextFrame == null && cnt < nextFrames.length;
+					j = (j+(int)Math.signum(frameSpeed) + nextFrames.length)%nextFrames.length, cnt++){
+				/*if(this.nonTransformedTempBones[i].getName().equals("leftUpperLeg"))
+					System.out.println("searching at: "+j);*/
+				for(SpriterBone bone: nextFrames[j].getBones()){
+					if(this.nonTransformedTempBones[i].equals(bone)){
+						nextFrame = nextFrames[j];
+						bone.copyValuesTo(this.tempBones2[bone.getId()]);
+						if(!this.tempBones2[bone.getId()].hasParent()){
+							this.tempBones2[bone.getId()].setX(this.tempBones2[bone.getId()].getX()+this.pivotX);
+							this.tempBones2[bone.getId()].setY(this.tempBones2[bone.getId()].getY()+this.pivotY);
+						}
+						this.translateRelative(this.tempBones2[bone.getId()], (this.tempBones2[bone.getId()].hasParent()) ?
+								this.tempBones2[this.tempBones2[bone.getId()].getParentId()]: this.tempParent);
+					}
+				}
+			}
+			this.tweenBone(this.nonTransformedTempBones[i], nextFrame, i, currentFrame.getStartTime());
+			//if(this.nonTransformedTempBones[i].getName().equals("leftUpperLeg")) System.out.println("frame: "+this.frame+", found next frame at: "+nextFrame.getStartTime()+", bone: "+this.nonTransformedTempBones[i]);
+			/*else{
+				System.err.println("Did not find next frame for bone \""+this.nonTransformedTempBones[i].getName()+"\"");
+				//throw new RuntimeException("Did not find next frame for bone \""+this.nonTransformedTempBones[i].getName()+"\"");
+			}*/
+			//System.out.println("Found frame at "+nextFrame.getStartTime()+", for "+this.nonTransformedTempBones[i]);
+		}
+	}
+	
+	private void tweenBone(SpriterBone bone1, SpriterKeyFrame nextFrame, int i, long firstTime){
+		bone1.copyValuesTo(this.tempBones[i]);
+		SpriterBone bone2 = (SpriterBone) this.findTimelineObject(bone1, nextFrame.getBones());
+		this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
+		SpriterAbstractObject parent = (this.tempBones[i].hasParent()) ?  this.tempBones[this.tempBones[i].getParentId()]: this.tempParent;
+		if(bone2 != null){
+			if(parent != this.tempParent){
+				if(!bone1.getParent().equals(bone2.getParent())){
+					bone2 = (SpriterBone) this.findTimelineObject(bone1, this.tempBones2);
+					SpriterCalculator.setRelative(parent, bone2);
+				}
+			} else if(bone2.hasParent()){
+				bone2 = (SpriterBone) this.findTimelineObject(bone1, this.tempBones2);
+				SpriterCalculator.setRelative(parent, bone2);
+			}
+			this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, firstTime, nextFrame.getStartTime());
+		} /*else
+			System.err.println("Could not find second bone to tween");*/
+		
+		this.moddedBones[bone1.getId()].modSpriterBone(this.tempBones[i]);
+		
+		if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
+		else this.tempBones[i].copyValuesTo(this.lastTempFrame.getBones()[i]);
+		if(!this.tempBones[i].hasParent() || !this.moddedBones[bone1.getId()].isActive()){
+			this.tempBones[i].setX(this.tempBones[i].getX()+this.pivotX);
+			this.tempBones[i].setY(this.tempBones[i].getY()+this.pivotY);
+		}
+		this.translateRelative(this.tempBones[i], parent);
+	}
+	
+	private void updateTransformedTempObjects(SpriterAbstractObject[] source, SpriterAbstractObject[] target){
+		for(int i = 0; i< source.length; i++){
+			source[i].copyValuesTo(target[i]);
+			if(!target[i].hasParent()){
+				target[i].setX(target[i].getX()+this.pivotX);
+				target[i].setY(target[i].getY()+this.pivotY);
+			}
+			this.translateRelative(target[i], (target[i].hasParent()) ?  this.tempBones2[target[i].getParentId()]: this.tempParent);
+		}
+	}
+	
+	private void updateTempObjects(SpriterAbstractObject[] source, SpriterAbstractObject[] target){
 		for (int i = 0; i < source.length; i++) {
 			SpriterAbstractObject object = source[i];
 			boolean found = false;
@@ -344,7 +372,7 @@ public abstract class SpriterAbstractPlayer {
 		}
 	}
 	
-	float angleLinear(float angleA,float angleB,int spin, float startTime, float endTime)
+	/*float angleLinear(float angleA,float angleB,int spin, float startTime, float endTime)
 	{   
 		switch(spin){
 		case 1: if((angleB-angleA)<0) angleB+=360; break;
@@ -352,7 +380,7 @@ public abstract class SpriterAbstractPlayer {
 		default: return angleA;
 		}
 		return this.interpolate(angleA, angleB, startTime, endTime, this.frame);
-	}
+	}*/
 	private void translateRoot(){
 		this.rootParent.copyValuesTo(tempParent);
 		this.tempParent.setAngle(this.tempParent.getAngle()*this.flipX*this.flipY + this.rootParent.getParent().getAngle());
@@ -407,6 +435,44 @@ public abstract class SpriterAbstractPlayer {
 	 */
 	protected float interpolateAngle(float a, float b, float timeA, float timeB, float currentTime){
 		return this.interpolator.interpolateAngle(a, b, timeA, timeB, currentTime);
+	}
+	
+
+	
+	/**
+	 * Calculates the bounding box for the current running animation.
+	 * Call this method after updating the spriter player.
+	 * @param bone root to start at. Set null, to iterate through all objects.
+	 */
+	public void calcBoundingBox(SpriterBone bone){
+		if(bone == null) this.calcBoundingBoxForAll();
+		else{
+			bone.boundingBox.set(this.rect);
+			for(SpriterObject object: bone.getChildObjects()){
+				SpriterPoint[] points = this.tempObjects[object.getId()].getBoundingBox();
+				bone.boundingBox.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), bone.boundingBox.left);
+				bone.boundingBox.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), bone.boundingBox.right);
+				bone.boundingBox.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), bone.boundingBox.top);
+				bone.boundingBox.bottom = Math.min(Math.min(Math.min(Math.min(points[0].y, points[1].y),points[2].y),points[3].y), bone.boundingBox.bottom);
+			}
+			this.rect.set(bone.boundingBox);
+			for(SpriterBone child: bone.getChildBones()){
+				calcBoundingBox(child);
+				bone.boundingBox.set(child.boundingBox);
+			}
+			this.rect.set(bone.boundingBox);
+		}
+		this.rect.calculateSize();
+	}
+	
+	private void calcBoundingBoxForAll(){
+		for(int i = 0; i < this.currenObjectsToDraw; i++){
+			SpriterPoint[] points = this.tempObjects[i].getBoundingBox();
+			this.rect.left = Math.min(Math.min(Math.min(Math.min(points[0].x, points[1].x),points[2].x),points[3].x), this.rect.left);
+			this.rect.right = Math.max(Math.max(Math.max(Math.max(points[0].x, points[1].x),points[2].x),points[3].x), this.rect.right);
+			this.rect.top = Math.max(Math.max(Math.max(Math.max(points[0].y, points[1].y),points[2].y),points[3].y), this.rect.top);
+			this.rect.bottom = Math.min(Math.min(Math.min(Math.min(points[0].y, points[1].y),points[2].y),points[3].y), this.rect.bottom);
+		}
 	}
 
 	

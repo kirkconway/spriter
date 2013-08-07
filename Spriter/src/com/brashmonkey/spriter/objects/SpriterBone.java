@@ -61,8 +61,6 @@ public class SpriterBone extends SpriterAbstractObject{
 	public void copyValuesTo(SpriterAbstractObject bone){
 		super.copyValuesTo(bone);
 		if(!(bone instanceof SpriterBone)) return;
-		((SpriterBone)bone).setName(getName());
-		((SpriterBone)bone).setSpin(getSpin());
 		((SpriterBone)bone).childBones = this.childBones;
 		((SpriterBone)bone).childObjects = this.childObjects;
 	}

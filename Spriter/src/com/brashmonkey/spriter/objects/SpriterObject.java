@@ -126,7 +126,6 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 		((SpriterObject)object).setRef(ref);
 		((SpriterObject)object).setPivotX(pivotX);
 		((SpriterObject)object).setPivotY(pivotY);
-		((SpriterObject)object).setTimeline(timeline);
 		((SpriterObject)object).setTransientObject(transientObject);
 		((SpriterObject)object).setZIndex(zIndex);
 		((SpriterObject)object).setLoader(loader);

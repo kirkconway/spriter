@@ -28,6 +28,7 @@ public class SpriterKeyFrame {
 	private SpriterObject[] objects;
 	private long startTime;
 	private long endTime;
+	private int id;
 
 	/**
 	 * @return array of bones, this keyframe holds.
@@ -83,6 +84,20 @@ public class SpriterKeyFrame {
 	 */
 	public void setStartTime(long startTime) {
 		this.startTime = startTime;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
 	}
 
 }

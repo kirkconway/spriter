@@ -144,8 +144,8 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 		}
 		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		//Interpolate
-		if(this.updateBones) this.transformBones(this.firstKeyFrame, this.secondKeyFrame, xOffset, yOffset);		
-		if(this.updateObjects) this.transformObjects(this.firstKeyFrame, this.secondKeyFrame, xOffset, yOffset);
+		if(this.updateBones) this.transformBones(this.firstKeyFrame, keyframes, xOffset, yOffset);
+		if(this.updateObjects) this.transformObjects(this.firstKeyFrame, keyframes, xOffset, yOffset);
 	}
 	
 	/**

@@ -200,6 +200,8 @@ public abstract class SpriterAbstractObject {
 		object.setParentId(parentId);
 		object.setParent(parent);
 		object.setTimeline(timeline);
+		object.setSpin(spin);
+		object.setName(name);
 	}
 	
 	/**

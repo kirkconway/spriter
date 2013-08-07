@@ -42,7 +42,7 @@ public class SpriterApplication implements ApplicationListener{
 		this.drawer = new SpriterDrawer(this.batch); //A drawer needs a batch to draw
 		//You can change the batch at runtime
 		
-		this.loadSCML(Gdx.files.classpath("assets/anmition/test3.scml")); //Loads the scml file
+		this.loadSCML(Gdx.files.classpath("assets/monster/basic.scml")); //Loads the scml file
 		Gdx.input.setInputProcessor(inputHandler);
 		inputHandler.app = this;
 	}
@@ -105,7 +105,7 @@ public class SpriterApplication implements ApplicationListener{
 	public void loadSCML(FileHandle file){
 		this.spriter = Spriter.getSpriter(file.file().getAbsolutePath(), loader);
 		this.player = new SpriterPlayer(this.spriter,0, loader);//Creates a new SpriterPlayer object which is responsible for tweening all animations in the loaded entity.
-		this.player.setFrameSpeed(20);//Changes the frame speed
+		this.player.setFrameSpeed(10);//Changes the frame speed
 		Gdx.app.postRunnable(new Runnable(){
 			public void run(){
 				loader.generatePackedSprites();//Create the atlas as mentioned before. Has to be called on the rendering thread after all OpenGL textures are loaded

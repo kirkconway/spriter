@@ -37,6 +37,7 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	private SpriterAbstractPlayer first, second;
 	private float weight;
 	private boolean interpolateSpeed = false;
+	private SpriterKeyFrame[] frame;
 
 	/**
 	 * Returns an instance of this class, which will manage the interpolation between two #SpriterAbstractPlayer instances.
@@ -47,6 +48,7 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 		super(first.loader, first.keyframes);
 		this.weight = 0.5f;
 		setPlayers(first, second);
+		this.frame = new SpriterKeyFrame[1];
 		this.generateData();
 		this.update(0, 0);
 	}
@@ -130,10 +132,9 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 			this.second.update(0,0);
 		
 			SpriterKeyFrame key1 = (first.transitionFixed) ? first.lastFrame: first.lastTempFrame;
-			SpriterKeyFrame key2 = (second.transitionFixed) ? second.lastFrame: second.lastTempFrame;
-		
-			this.transformBones(key1, key2, xOffset, yOffset);
-			this.transformObjects(first.lastFrame, second.lastFrame, xOffset, yOffset);
+			this.frame[0] = (second.transitionFixed) ? second.lastFrame: second.lastTempFrame;
+			this.transformBones(key1, this.frame[0], xOffset, yOffset);
+			this.transformObjects(first.lastFrame, this.frame[0], xOffset, yOffset);
 		}
 		this.tempBones = tempBones;
 		this.tempObjects = tempObjects;

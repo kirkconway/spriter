@@ -82,6 +82,7 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 	 * Packs all loaded sprites into an atlas. Has to called after loading all sprites.
 	 */
 	public void generatePackedSprites(){
+		if(this.packer == null) return;
 		TextureAtlas diffuseAtlas = this.packer.generateTextureAtlas(TextureFilter.Linear, TextureFilter.Linear, false);
 		Set<Reference> keys = this.files.keySet();
 		this.disposeNonPackedTextures();

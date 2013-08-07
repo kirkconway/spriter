@@ -181,9 +181,9 @@ public class SCMLReader {
 			Key key = new Key();
 			key.setId(k.getInt("id")); key.setSpin(k.getInt("spin", 1));
 			key.setTime(new Long(k.getInt("time", 0)));
+			String name = k.getParent().getAttribute("name");
+			timeline.setName(name);
 			if(obj != null){
-				String name = k.getParent().getAttribute("name");
-				timeline.setName(name);
 				Bone bone = new Bone();
 				bone.setAngle(new BigDecimal(obj.getFloat("angle", 0f)));
 				bone.setX(new BigDecimal(obj.getFloat("x", 0f)));

@@ -32,7 +32,7 @@ import com.brashmonkey.spriter.file.Reference;
 public class SpriterObject extends SpriterAbstractObject implements Comparable<SpriterObject>{
 	
 	float pivotX, pivotY, alpha;
-	int zIndex, spin;
+	int zIndex;
 	boolean transientObject = false, visible = true;
 	Reference ref;
 	FileLoader loader = null;
@@ -72,12 +72,6 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 	}
 	public void setAngle(float angle) {
 		this.angle = angle;
-	}
-	public int getSpin() {
-		return spin;
-	}
-	public void setSpin(int spin) {
-		this.spin = spin;
 	}
 
 	public float getAlpha() {
@@ -120,23 +114,24 @@ public class SpriterObject extends SpriterAbstractObject implements Comparable<S
 	public void setVisible(boolean visible) {
 		this.visible = visible;
 	}
-	public String toString(){
+	/*public String toString(){
 		return "x: "+this.x+", y: "+this.y+", angle: "+this.alpha;
-	}
+	}*/
 	
-	public void copyValuesTo(SpriterObject object){
+	@Override
+	public void copyValuesTo(SpriterAbstractObject object){
 		super.copyValuesTo(object);
-		object.setAlpha(alpha);
-		object.setRef(ref);
-		object.setPivotX(pivotX);
-		object.setPivotY(pivotY);
-		object.setSpin(spin);
-		object.setTimeline(timeline);
-		object.setTransientObject(transientObject);
-		object.setZIndex(zIndex);
-		object.setLoader(loader);
-		object.setVisible(visible);
-		object.rect.set(this.rect);
+		if(!(object instanceof SpriterObject)) return;
+		((SpriterObject)object).setAlpha(alpha);
+		((SpriterObject)object).setRef(ref);
+		((SpriterObject)object).setPivotX(pivotX);
+		((SpriterObject)object).setPivotY(pivotY);
+		((SpriterObject)object).setTimeline(timeline);
+		((SpriterObject)object).setTransientObject(transientObject);
+		((SpriterObject)object).setZIndex(zIndex);
+		((SpriterObject)object).setLoader(loader);
+		((SpriterObject)object).setVisible(visible);
+		((SpriterObject)object).rect.set(this.rect);
 	}
 	
 	public void copyValuesTo(DrawInstruction instruction){

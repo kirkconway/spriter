@@ -71,8 +71,8 @@ public class SpriterCalculator {
 	 * @param parent
 	 * @param child
 	 */
-	public static void rotatePoint(SpriterAbstractObject parent, SpriterAbstractObject child) {
-		rotatePoint(parent, child.getX(), child.getY(), child);
+	public static void translateRelative(SpriterAbstractObject parent, SpriterAbstractObject child) {
+		translateRelative(parent, child.getX(), child.getY(), child);
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public class SpriterCalculator {
 	 * @param y
 	 * @param target save new position in
 	 */
-	public static void rotatePoint(SpriterAbstractObject parent, float x, float y, SpriterAbstractObject target) {
+	public static void translateRelative(SpriterAbstractObject parent, float x, float y, SpriterAbstractObject target) {
 
 		float px = x * (parent.getScaleX());
 		float py = y * (parent.getScaleY());
@@ -96,6 +96,23 @@ public class SpriterCalculator {
 		
 		target.setX(xnew);
 		target.setY(ynew);
+	}
+	
+	public static void setRelative(SpriterAbstractObject parent, SpriterAbstractObject child){
+		setRelative(parent, child.getX(), child.getY(), child);
+	}
+	
+	public static void setRelative(SpriterAbstractObject parent, float x, float y, SpriterAbstractObject target){
+		target.setAngle(target.getAngle()-parent.getAngle());
+		target.setScaleX(target.getScaleX()/parent.getScaleX());
+		target.setScaleY(target.getScaleY()/parent.getScaleY());
+		float xx = x - parent.getX(), yy = y - parent.getY();
+		double angle = Math.toRadians(parent.getAngle()); 
+		float cos = (float) Math.cos(angle);
+		float sin = (float) Math.sin(angle);
+		float newX = yy * sin + xx * cos;
+		float newY = yy * cos - xx * sin;
+		target.setX(newX/parent.getScaleX()); target.setY(newY/parent.getScaleY());
 	}
 	
 	/**

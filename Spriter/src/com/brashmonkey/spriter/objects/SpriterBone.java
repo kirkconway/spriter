@@ -32,8 +32,6 @@ public class SpriterBone extends SpriterAbstractObject{
 	
 	List<SpriterBone> childBones;
 	List<SpriterObject> childObjects;
-	int spin;
-	String name;
 	public SpriterRectangle boundingBox;
 	
 	public SpriterBone(){
@@ -59,36 +57,19 @@ public class SpriterBone extends SpriterAbstractObject{
 	public List<SpriterObject> getChildObjects(){
 		return childObjects;
 	}
-
-	public int getSpin() {
-		return spin;
-	}
-
-	public void setSpin(int spin) {
-		this.spin = spin;
-	}
 	
-	
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public void copyValuesTo(SpriterBone bone){
+	public void copyValuesTo(SpriterAbstractObject bone){
 		super.copyValuesTo(bone);
-		bone.setName(getName());
-		bone.setSpin(getSpin());
-		bone.childBones = this.childBones;
-		bone.childObjects = this.childObjects;
+		if(!(bone instanceof SpriterBone)) return;
+		((SpriterBone)bone).setName(getName());
+		((SpriterBone)bone).setSpin(getSpin());
+		((SpriterBone)bone).childBones = this.childBones;
+		((SpriterBone)bone).childObjects = this.childObjects;
 	}
 	
 	public void update(){
 		if(this.parent != null)
-			SpriterCalculator.rotatePoint(parent, this);
+			SpriterCalculator.translateRelative(parent, this);
 	}
 	
 	public void updateRecursively(){

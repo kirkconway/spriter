@@ -24,8 +24,9 @@ package com.brashmonkey.spriter.objects;
  */
 public abstract class SpriterAbstractObject {
 	protected float x, y, angle, scaleX, scaleY;
-	protected int id, parentId, timeline;
+	protected int id, parentId, timeline, spin;
 	protected SpriterAbstractObject parent;
+	protected String name;
 
 	public SpriterAbstractObject(){
 		this.x = 0;
@@ -35,7 +36,22 @@ public abstract class SpriterAbstractObject {
 		this.scaleY = 1f;
 		this.id = -1;
 		this.parentId = -1;
+		this.name = "";
 		this.parent = null;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	/**
@@ -106,6 +122,12 @@ public abstract class SpriterAbstractObject {
 	 */
 	public void setScaleY(float scaleY) {
 		this.scaleY = scaleY;
+	}
+	public int getSpin() {
+		return spin;
+	}
+	public void setSpin(int spin) {
+		this.spin = spin;
 	}
 	
 	/**
@@ -185,7 +207,8 @@ public abstract class SpriterAbstractObject {
 	 * @return true if both objects have the same id.
 	 */
 	public boolean equals(SpriterAbstractObject object){
-		return this.id == object.getId();
+		if(object == null) return false;
+		return this.timeline == object.getTimeline();
 	}
 	
 	/**
@@ -197,6 +220,6 @@ public abstract class SpriterAbstractObject {
 	
 	@Override
 	public String toString(){
-		return "id: "+ this.id+", parent: "+ this.parentId +", x: "+this.x+", y: "+this.y+", angle:"+ this.angle;
+		return "id: "+ this.id+", name: "+this.name+", parent: "+ this.parentId +", x: "+this.x+", y: "+this.y+", angle:"+ this.angle+" timeline: "+this.timeline;
 	}
 }

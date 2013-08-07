@@ -45,7 +45,7 @@ public class SpriterPlayerIK extends SpriterPlayer {
 	protected void step(float xOffset, float yOffset){
 		super.step(xOffset, yOffset);
 		if(this.resovling) this.resolve();
-		this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
+		this.transformObjects(firstKeyFrame, this.secondKeyFrame, xOffset, yOffset);
 		for(int i = 0; i < this.currenObjectsToDraw; i++)
 			this.tempObjects[i].copyValuesTo(this.instructions[i]);
 	}

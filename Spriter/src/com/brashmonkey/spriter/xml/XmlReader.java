@@ -1,4 +1,4 @@
-package com.brahsmonkey.spriter.xml;
+package com.brashmonkey.spriter.xml;
 
 import java.io.IOException;
 import java.io.InputStream;

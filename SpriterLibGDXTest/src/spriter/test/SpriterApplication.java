@@ -60,7 +60,7 @@ public class SpriterApplication implements ApplicationListener{
 			this.drawer.draw(this.player); //The drawer is responsible for drawing the player
 			//this.font.draw(batch, "Press left/right arrow keys to change animation. Press space to debug draw the animation.", cam.viewportWidth/2, 100);
 			this.font.drawMultiLine(batch, "Press left/right arrow keys to change animation, up/down to change entity. Press space to debug draw the animation. Current entity: \""+
-			this.player.getEntity().getName()+"\"", cam.viewportWidth/2, 100, 0, BitmapFont.HAlignment.CENTER);
+			this.player.getEntity().getName()+"\", animation: "+this.player.getAnimation().name, cam.viewportWidth/2, 100, 0, BitmapFont.HAlignment.CENTER);
 			
 		this.batch.end();
 		
@@ -105,7 +105,7 @@ public class SpriterApplication implements ApplicationListener{
 	public void loadSCML(FileHandle file){
 		this.spriter = Spriter.getSpriter(file.file().getAbsolutePath(), loader);
 		this.player = new SpriterPlayer(this.spriter,0, loader);//Creates a new SpriterPlayer object which is responsible for tweening all animations in the loaded entity.
-		this.player.setFrameSpeed(20);//Changes the frame speed
+		this.player.setFrameSpeed(10);//Changes the frame speed
 		Gdx.app.postRunnable(new Runnable(){
 			public void run(){
 				loader.generatePackedSprites();//Create the atlas as mentioned before. Has to be called on the rendering thread after all OpenGL textures are loaded

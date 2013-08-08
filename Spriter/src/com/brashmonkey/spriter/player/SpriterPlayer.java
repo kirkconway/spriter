@@ -19,8 +19,9 @@ package com.brashmonkey.spriter.player;
 
 import com.brashmonkey.spriter.Spriter;
 import com.brashmonkey.spriter.SpriterKeyFrameProvider;
+import com.brashmonkey.spriter.animation.SpriterAnimation;
+import com.brashmonkey.spriter.animation.SpriterKeyFrame;
 import com.brashmonkey.spriter.file.FileLoader;
-import com.brashmonkey.spriter.objects.SpriterKeyFrame;
 import com.discobeard.spriter.dom.Animation;
 import com.discobeard.spriter.dom.Entity;
 import com.discobeard.spriter.dom.SpriterData;
@@ -51,7 +52,7 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 
 	private static HashMap<Entity, SpriterPlayer> loaded = new HashMap<Entity, SpriterPlayer>();
 	protected Entity entity;
-	private Animation animation;
+	private SpriterAnimation animation;
 	private int transitionSpeed = 30;
 	private int animationIndex = 0;
 	private int currentKey = 0;
@@ -70,16 +71,16 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	 */
 	public SpriterPlayer(SpriterData data, Entity entity, FileLoader<?> loader){
 		super(loader, null);
-		this.animation = entity.getAnimation().get(0);
 		this.entity = entity;
 		this.frame = 0;
 		if(!alreadyLoaded(entity)){
-			this.keyframes = SpriterKeyFrameProvider.generateKeyFramePool(data, entity);
+			this.animations = SpriterKeyFrameProvider.generateKeyFramePool(data, entity);
 			loaded.put(entity, this);
 		}
-		else this.keyframes = loaded.get(entity).keyframes;
+		else this.animations = loaded.get(entity).animations;
 		this.generateData();
-		this.firstKeyFrame =  this.keyframes.get(animationIndex)[this.currentKey];
+		this.animation = this.animations.get(0);
+		this.firstKeyFrame = this.animation.frames.get(0);
 		this.update(0, 0);
 	}
 	
@@ -106,32 +107,42 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	@Override
 	protected void step(float xOffset, float yOffset){
 		//Fetch information
-		SpriterKeyFrame[] keyframes = this.keyframes.get(animationIndex);
+		//SpriterAnimation anim = this.animation;
+		List<SpriterKeyFrame> frameList = this.animation.frames;
 		if(this.transitionFixed && this.transitionTempFixed){
-			if(this.frameSpeed >= 0){
-				firstKeyFrame = keyframes[this.currentKey];
-				secondKeyFrame = keyframes[(this.currentKey+1)%keyframes.length];
+			//anim = this.animation;
+			/*if(this.frameSpeed >= 0){
+				firstKeyFrame = frameList.get(this.currentKey);
+				secondKeyFrame = frameList.get((this.currentKey+1)%frameList.size());
 			}
 			else{
-				secondKeyFrame = keyframes[this.currentKey];
-				firstKeyFrame = keyframes[((this.currentKey-1)+keyframes.length)%keyframes.length];
+				secondKeyFrame = frameList.get(this.currentKey);
+				firstKeyFrame = frameList.get((this.currentKey+1)%frameList.size());
 			}
 			//Update
 			this.frame += this.frameSpeed;
-			if (this.frame > firstKeyFrame.getEndTime() && this.frameSpeed >= 0){
-				this.currentKey = (this.currentKey+1)%keyframes.length;
-				this.frame = keyframes[this.currentKey].getStartTime();
+			if (this.frame > secondKeyFrame.getTime() && this.frameSpeed >= 0){
+				this.currentKey = (this.currentKey+1)%frameList.size();
+				this.frame = frameList.get(this.currentKey).getTime();
 			}
-			else if(this.frame < firstKeyFrame.getStartTime()){
-				this.currentKey = ((this.currentKey-1)+keyframes.length)%keyframes.length;
-				this.frame = keyframes[this.currentKey].getStartTime();
+			else if(this.frame < firstKeyFrame.getTime()){
+				this.currentKey = ((this.currentKey-1)+frameList.size())%frameList.size();
+				this.frame = frameList.get(this.currentKey).getTime();
 			}
+			this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
+			if(this.updateBones) this.transformBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
+			if(this.updateObjects) this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);*/
+			
+			if(this.updateBones) this.transformBones(this.animation,  xOffset, yOffset);
+			if(this.updateObjects) this.transformObjects(this.animation,  xOffset, yOffset);
 		}
 		else{
-			firstKeyFrame = keyframes[0];
+			//this.transitionAnimation.frames.remove(0);
+			//this.transitionAnimation.frames.remove(1);
+			firstKeyFrame = frameList.get(0);
 			secondKeyFrame = this.lastRealFrame;
 			float temp =(float)(this.fixCounter)/(float)this.fixMaxSteps;
-			this.frame = this.lastRealFrame.getStartTime()+(long)(this.fixMaxSteps*temp);
+			this.frame = this.lastRealFrame.getTime()+(long)(this.fixMaxSteps*temp);
 			this.fixCounter= Math.min(this.fixCounter+this.transitionSpeed,this.fixMaxSteps);
 			//Update
 			if(this.fixCounter == this.fixMaxSteps){
@@ -139,13 +150,16 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 				this.fixCounter = 0;
 				if(this.lastRealFrame.equals(this.lastFrame)) this.transitionFixed = true;
 				else this.transitionTempFixed = true;
-				firstKeyFrame.setStartTime(0);
+				firstKeyFrame.setTime(0);
 			}
+			this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
+			if(this.updateBones) this.transformBones(firstKeyFrame, secondKeyFrame,  xOffset, yOffset);
+			if(this.updateObjects) this.transformObjects(firstKeyFrame, secondKeyFrame,  xOffset, yOffset);
 		}
-		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
+		//this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		//Interpolate
-		if(this.updateBones) this.transformBones(this.firstKeyFrame, keyframes, xOffset, yOffset);
-		if(this.updateObjects) this.transformObjects(this.firstKeyFrame, keyframes, xOffset, yOffset);
+		//if(this.updateBones) this.transformBones(anim, xOffset, yOffset);
+		//if(this.updateObjects) this.transformObjects(this.animation, xOffset, yOffset);
 	}
 	
 	/**
@@ -173,13 +187,12 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 			}
 			this.transitionSpeed = transitionSpeed;
 			this.fixMaxSteps = transitionSteps;
-			this.lastRealFrame.setStartTime(this.frame+1);
-			this.lastRealFrame.setEndTime(this.frame+this.fixMaxSteps-1);
-			this.keyframes.get(animationIndex)[0].setStartTime(this.frame+1+this.fixMaxSteps);
-			this.currentKey = 0;
+			this.lastRealFrame.setTime(this.frame+1);
+			this.animation = this.animations.get(animationIndex);
+			this.animation.frames.get(0).setTime(this.frame+1+this.fixMaxSteps);
+			//this.currentKey = 0;
 			this.fixCounter = 0;
 			this.animationIndex = animationIndex;
-			this.animation = this.entity.getAnimation().get(animationIndex);
 		}
 	}
 	
@@ -241,7 +254,7 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	/**
 	 * @return the current animation with all its raw data which was read from the scml file.
 	 */
-	public Animation getAnimation() {
+	public SpriterAnimation getAnimation() {
 		return animation;
 	}
 	

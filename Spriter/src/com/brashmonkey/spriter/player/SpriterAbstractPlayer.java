@@ -24,13 +24,14 @@ import com.brashmonkey.spriter.SpriterPoint;
 import com.brashmonkey.spriter.SpriterCalculator;
 import com.brashmonkey.spriter.SpriterKeyFrameProvider;
 import com.brashmonkey.spriter.SpriterRectangle;
+import com.brashmonkey.spriter.animation.SpriterAnimation;
+import com.brashmonkey.spriter.animation.SpriterKeyFrame;
 import com.brashmonkey.spriter.draw.DrawInstruction;
 import com.brashmonkey.spriter.file.FileLoader;
 import com.brashmonkey.spriter.interpolation.SpriterInterpolator;
 import com.brashmonkey.spriter.interpolation.SpriterLinearInterpolator;
 import com.brashmonkey.spriter.objects.SpriterAbstractObject;
 import com.brashmonkey.spriter.objects.SpriterBone;
-import com.brashmonkey.spriter.objects.SpriterKeyFrame;
 import com.brashmonkey.spriter.objects.SpriterModObject;
 import com.brashmonkey.spriter.objects.SpriterObject;
 import com.discobeard.spriter.dom.SpriterData;
@@ -52,7 +53,7 @@ public abstract class SpriterAbstractPlayer {
 	protected SpriterModObject[] moddedObjects,moddedBones;
 	protected SpriterObject[] tempObjects, tempObjects2, nonTransformedTempObjects;
 	protected SpriterBone[] tempBones, tempBones2, nonTransformedTempBones;
-	protected List<SpriterKeyFrame[]> keyframes;
+	protected List<SpriterAnimation> animations;
 	protected SpriterAbstractObject rootParent, tempParent;
 	protected float angle = 0f, scale = 1f, pivotX = 0f, pivotY = 0f;
 	protected long frame;
@@ -67,9 +68,9 @@ public abstract class SpriterAbstractPlayer {
 	 * @param keyframes A list of SpriterKeyFrame arrays. See {@link SpriterKeyFrameProvider#generateKeyFramePool(SpriterData)} to get the list.
 	 * Generate these keyframes once to save memory.
 	 */
-	public SpriterAbstractPlayer(FileLoader<?> loader, List<SpriterKeyFrame[]> keyframes){
+	public SpriterAbstractPlayer(FileLoader<?> loader, List<SpriterAnimation> animations){
 		this.loader = loader;
-		this.keyframes = keyframes;
+		this.animations = animations;
 		this.rootParent = new SpriterBone();
 		this.tempParent = new SpriterBone();
 		this.rootParent.setName("playerRoot");
@@ -87,11 +88,20 @@ public abstract class SpriterAbstractPlayer {
 	 */
 	protected final void generateData(){
 		int maxObjects = 0, maxBones = 0;
-		for(SpriterKeyFrame[] key: this.keyframes){
-			for(SpriterKeyFrame k: key){
-				maxBones = Math.max(k.getBones().length, maxBones);
-				maxObjects = Math.max(k.getObjects().length, maxObjects);
-				for(SpriterObject o: k.getObjects()){
+		int maxBonesFrameIndex = 0, maxObjectsFrameIndex=0, maxBonesAnimationIndex = 0, maxObjectsAnimationIndex = 0;
+		for(SpriterAnimation animation: this.animations){
+			for(SpriterKeyFrame frame: animation.frames){
+				maxBones = Math.max(frame.getBones().length, maxBones);
+				if(maxBones == frame.getBones().length){
+					maxBonesFrameIndex = frame.getId();
+					maxBonesAnimationIndex = animation.id;
+				}
+				maxObjects = Math.max(frame.getObjects().length, maxObjects);
+				if(maxObjects == frame.getObjects().length){
+					maxObjectsFrameIndex = frame.getId();
+					maxObjectsAnimationIndex = animation.id;
+				}
+				for(SpriterObject o: frame.getObjects()){
 					o.setLoader(this.loader);
 					o.setRef(this.loader.findReference(o.getRef()));
 				}
@@ -139,6 +149,17 @@ public abstract class SpriterAbstractPlayer {
 		this.lastFrame.setObjects(tmpObjs1);
 		this.lastTempFrame.setBones(tmpBones2);
 		this.lastTempFrame.setObjects(tmpObjs2);
+		
+		for(SpriterObject object: this.animations.get(maxObjectsAnimationIndex).frames.get(maxObjectsFrameIndex).getObjects()){
+			for(int i = 0; i< this.nonTransformedTempObjects.length; i++)
+				if(this.nonTransformedTempObjects[i].getId() == object.getId()) object.copyValuesTo(this.nonTransformedTempObjects[i]);
+		}
+		
+		for(SpriterBone bone: this.animations.get(maxBonesAnimationIndex).frames.get(maxBonesFrameIndex).getBones()){
+			for(int i = 0; i< this.nonTransformedTempBones.length; i++)
+				if(this.nonTransformedTempBones[i].getId() == bone.getId()) bone.copyValuesTo(this.nonTransformedTempBones[i]);
+		}
+		
 		this.generated = true;
 	}
 	
@@ -174,14 +195,26 @@ public abstract class SpriterAbstractPlayer {
 		this.updateTransformedTempObjects(nextFrame.getObjects(), this.tempObjects2);
 		this.updateTempObjects(currentFrame.getObjects(), this.nonTransformedTempObjects);
 		
-		for (int i = 0; i < this.currenObjectsToDraw; i++) this.tweenObject(this.nonTransformedTempObjects[i], nextFrame, i, currentFrame.getStartTime());
+		for (int i = 0; i < this.currenObjectsToDraw; i++)
+			this.tweenObject(this.nonTransformedTempObjects[i], nextFrame.getObjectFor(this.nonTransformedTempObjects[i]), i, currentFrame.getTime(), nextFrame.getTime());
 	}
 
-	protected void transformObjects(SpriterKeyFrame currentFrame, SpriterKeyFrame[] nextFrames, float xOffset, float yOffset) {
+	protected void transformObjects(SpriterAnimation animation, float xOffset, float yOffset) {
 		this.rect.set(xOffset, yOffset, xOffset, yOffset);
-		this.updateTempObjects(currentFrame.getObjects(), this.nonTransformedTempObjects);
-		
-		for (int i = 0; i < this.currenObjectsToDraw; i++) {
+		for (int i = 0; i < this.nonTransformedTempObjects.length; i++){
+			SpriterObject object = this.nonTransformedTempObjects[i];
+			SpriterKeyFrame currentFrame = animation.getPreviousFrameForObject(object, this.frame);
+			SpriterKeyFrame nextFrame = animation.getNextFrameFor(object, currentFrame, (int)Math.signum(this.frameSpeed));
+			this.currenObjectsToDraw = Math.max(currentFrame.getObjects().length, this.currenObjectsToDraw);
+			nextFrame = animation.getNextFrameFor(object, currentFrame, (int)Math.signum(this.frameSpeed));
+			this.updateTransformedTempObject(currentFrame.getObjectFor(object), this.tempObjects2[i]);
+			if(i < currentFrame.getObjects().length) this.updateTempObject(currentFrame.getObjects()[i], this.nonTransformedTempObjects);
+			SpriterObject nextObject = nextFrame.getObjectFor(object);
+			
+			this.tweenObject(this.nonTransformedTempObjects[i], nextObject, i, currentFrame.getTime(), nextFrame.getTime());
+		}
+		//System.out.println(this.currenObjectsToDraw);
+		/*for (int i = 0; i < this.currenObjectsToDraw; i++) {
 			SpriterKeyFrame nextFrame = null;
 			int cnt = 0;
 			for(int j = (currentFrame.getId()+(int)Math.signum(frameSpeed) + nextFrames.length)%nextFrames.length; nextFrame == null && cnt < nextFrames.length;
@@ -199,35 +232,35 @@ public abstract class SpriterAbstractPlayer {
 					}
 				}
 			}
-			if(this.nonTransformedTempObjects[i].getName().equals("legUpperRight")) System.out.println("current frame: "+this.frame+", found frame at "+nextFrame.getStartTime()+"\nfor "+this.nonTransformedTempObjects[i]);
-			this.tweenObject(this.nonTransformedTempObjects[i], nextFrame, i, currentFrame.getStartTime());
-		}
+			if(this.nonTransformedTempObjects[i].getName().equals("legUpperRight")) System.out.println("current frame: "+this.frame+", found frame at "+nextFrame.getTime()+"\nfor "+this.nonTransformedTempObjects[i]);
+			this.tweenObject(this.nonTransformedTempObjects[i], nextFrame, i, currentFrame.getTime());
+		}*/
 	}
 	
-	private void tweenObject(SpriterObject obj1, SpriterKeyFrame nextFrame, int i, long startTime){
+	private void tweenObject(SpriterObject currentObject, SpriterObject nextObject, int i, long startTime, long endTime){
 		DrawInstruction dI = this.instructions[i];
-		SpriterObject obj2 = null;
-		obj1.copyValuesTo(this.tempObjects[i]);
+		currentObject.copyValuesTo(this.tempObjects[i]);
 		SpriterAbstractObject parent = null;
-		if(!obj1.isTransientObject()) {
-			obj2 = (SpriterObject) this.findTimelineObject(obj1, nextFrame.getObjects());
-			this.tempObjects[i].setTimeline((obj2 != null) ? obj1.getTimeline() : -1);
-			parent = (obj1.hasParent()) ? this.tempBones[obj1.getParentId()] : this.tempParent;
+		if(!currentObject.isTransientObject()) {
+			this.tempObjects[i].setTimeline((nextObject != null) ? currentObject.getTimeline() : -1);
+			parent = (currentObject.hasParent()) ? this.tempBones[currentObject.getParentId()] : this.tempParent;
 
-			if(obj2 != null){
-				if(parent != this.tempParent || (obj2.hasParent() && parent == this.tempParent)){
-					if(!obj1.getParent().equals(obj2.getParent())){
-						obj2 = (SpriterObject) this.findTimelineObject(obj1, this.tempObjects2);
-						SpriterCalculator.setRelative(parent, obj2);
+			if(nextObject != null){
+				if(parent != this.tempParent || (nextObject.hasParent() && parent == this.tempParent)){
+					if(!currentObject.getParent().equals(nextObject.getParent())){
+						nextObject = (SpriterObject) this.findTimelineObject(currentObject, this.tempObjects2);
+						SpriterCalculator.setRelative(parent, nextObject);
+						nextObject.setAngle(nextObject.getAngle()*this.flipX*this.flipY);
 					}
-				} else if(obj2.hasParent()){
-					obj2 = (SpriterObject) this.findTimelineObject(obj1, this.tempObjects2);
-					SpriterCalculator.setRelative(parent, obj2);
+				} else if(nextObject.hasParent()){
+					nextObject = (SpriterObject) this.findTimelineObject(currentObject, this.tempObjects2);
+					SpriterCalculator.setRelative(parent, nextObject);
+					nextObject.setAngle(nextObject.getAngle()*this.flipX*this.flipY);
 				}					
-				this.interpolateSpriterObject(this.tempObjects[i], obj1, obj2, startTime, nextFrame.getStartTime());
+				this.interpolateSpriterObject(this.tempObjects[i], currentObject, nextObject, startTime, endTime);
 			}
 			
-			this.moddedObjects[obj1.getId()].modSpriterObject(this.tempObjects[i]);
+			this.moddedObjects[currentObject.getId()].modSpriterObject(this.tempObjects[i]);
 			
 			if(this.transitionFixed) this.tempObjects[i].copyValuesTo(this.lastFrame.getObjects()[i]);
 			else this.tempObjects[i].copyValuesTo(this.lastTempFrame.getObjects()[i]);
@@ -238,11 +271,11 @@ public abstract class SpriterAbstractPlayer {
 			this.tempObjects[i].setY(this.tempObjects[i].getY()+this.pivotY);
 		}
 		this.translateRelative(this.tempObjects[i], parent);
-		if(this.moddedObjects[obj1.getId()].getRef() != null)	this.tempObjects[i].setRef(this.moddedObjects[obj1.getId()].getRef());
-		if(this.moddedObjects[obj1.getId()].getLoader() != null) this.tempObjects[i].setLoader(this.moddedObjects[obj1.getId()].getLoader());
+		if(this.moddedObjects[currentObject.getId()].getRef() != null)	this.tempObjects[i].setRef(this.moddedObjects[currentObject.getId()].getRef());
+		if(this.moddedObjects[currentObject.getId()].getLoader() != null) this.tempObjects[i].setLoader(this.moddedObjects[currentObject.getId()].getLoader());
 		this.tempObjects[i].copyValuesTo(dI);
 		
-		this.setInstructionRef(dI, this.tempObjects[i], obj2);
+		this.setInstructionRef(dI, this.tempObjects[i], nextObject);
 	}
 	
 	protected void setInstructionRef(DrawInstruction dI, SpriterObject obj1, SpriterObject obj2){
@@ -274,11 +307,11 @@ public abstract class SpriterAbstractPlayer {
 		this.updateTempObjects(currentFrame.getBones(), this.nonTransformedTempBones);
 		
 		for (int i = 0; i < this.nonTransformedTempBones.length; i++) {
-			this.tweenBone(this.nonTransformedTempBones[i], nextFrame, i, currentFrame.getStartTime());
+			this.tweenBone(this.nonTransformedTempBones[i], nextFrame.getBoneFor(this.nonTransformedTempBones[i]), i, currentFrame.getTime(), nextFrame.getTime());
 		}
 	}
 	
-	protected void transformBones(SpriterKeyFrame currentFrame, SpriterKeyFrame[] nextFrames, float xOffset, float yOffset){	
+	protected void transformBones(SpriterAnimation animation, float xOffset, float yOffset){	
 		if(this.rootParent.getParent() != null) this.translateRoot();
 		else{
 			this.tempParent.setX(xOffset); this.tempParent.setY(yOffset);
@@ -287,61 +320,47 @@ public abstract class SpriterAbstractPlayer {
 			this.tempParent.setScaleY(this.flipY);
 		}
 		this.setScale(this.scale);
-		this.updateTempObjects(currentFrame.getBones(), this.nonTransformedTempBones);	
+		this.frame = (this.frameSpeed+this.frame+animation.length)%animation.length;
+		
 		for (int i = 0; i < this.nonTransformedTempBones.length; i++) {
+			SpriterBone bone = this.nonTransformedTempBones[i];
 			SpriterKeyFrame nextFrame = null;
-			int cnt = 0;
-			for(int j = (currentFrame.getId()+(int)Math.signum(frameSpeed) + nextFrames.length)%nextFrames.length; nextFrame == null && cnt < nextFrames.length;
-					j = (j+(int)Math.signum(frameSpeed) + nextFrames.length)%nextFrames.length, cnt++){
-				/*if(this.nonTransformedTempBones[i].getName().equals("leftUpperLeg"))
-					System.out.println("searching at: "+j);*/
-				for(SpriterBone bone: nextFrames[j].getBones()){
-					if(this.nonTransformedTempBones[i].equals(bone)){
-						nextFrame = nextFrames[j];
-						bone.copyValuesTo(this.tempBones2[bone.getId()]);
-						if(!this.tempBones2[bone.getId()].hasParent()){
-							this.tempBones2[bone.getId()].setX(this.tempBones2[bone.getId()].getX()+this.pivotX);
-							this.tempBones2[bone.getId()].setY(this.tempBones2[bone.getId()].getY()+this.pivotY);
-						}
-						this.translateRelative(this.tempBones2[bone.getId()], (this.tempBones2[bone.getId()].hasParent()) ?
-								this.tempBones2[this.tempBones2[bone.getId()].getParentId()]: this.tempParent);
-					}
-				}
-			}
-			this.tweenBone(this.nonTransformedTempBones[i], nextFrame, i, currentFrame.getStartTime());
-			//if(this.nonTransformedTempBones[i].getName().equals("leftUpperLeg")) System.out.println("frame: "+this.frame+", found next frame at: "+nextFrame.getStartTime()+", bone: "+this.nonTransformedTempBones[i]);
-			/*else{
-				System.err.println("Did not find next frame for bone \""+this.nonTransformedTempBones[i].getName()+"\"");
-				//throw new RuntimeException("Did not find next frame for bone \""+this.nonTransformedTempBones[i].getName()+"\"");
-			}*/
-			//System.out.println("Found frame at "+nextFrame.getStartTime()+", for "+this.nonTransformedTempBones[i]);
+			SpriterKeyFrame currentFrame = animation.getPreviousFrameForBone(bone, this.frame);
+			nextFrame = animation.getNextFrameFor(bone, currentFrame, (int)Math.signum(this.frameSpeed));
+			this.updateTransformedTempObject(currentFrame.getBoneFor(bone), this.tempBones2[i]);
+			if(i < currentFrame.getBones().length) this.updateTempObject(currentFrame.getBones()[i], this.nonTransformedTempBones);
+			SpriterBone bone2 = nextFrame.getBoneFor(bone);
+			
+			this.tweenBone(this.nonTransformedTempBones[i], bone2, i, currentFrame.getTime(), nextFrame.getTime());
 		}
 	}
 	
-	private void tweenBone(SpriterBone bone1, SpriterKeyFrame nextFrame, int i, long firstTime){
-		bone1.copyValuesTo(this.tempBones[i]);
-		SpriterBone bone2 = (SpriterBone) this.findTimelineObject(bone1, nextFrame.getBones());
-		this.tempBones[i].setTimeline((bone2 != null) ? bone1.getTimeline() : -1);
+	private void tweenBone(SpriterBone currentBone, SpriterBone nextBone, int i, long startTime, long endTime){
+		currentBone.copyValuesTo(this.tempBones[i]);
+		//SpriterBone bone2 = (SpriterBone) this.findTimelineObject(bone, targetFrame.getBones());
+		this.tempBones[i].setTimeline((nextBone != null) ? currentBone.getTimeline() : -1);
 		SpriterAbstractObject parent = (this.tempBones[i].hasParent()) ?  this.tempBones[this.tempBones[i].getParentId()]: this.tempParent;
-		if(bone2 != null){
+		if(nextBone != null){
 			if(parent != this.tempParent){
-				if(!bone1.getParent().equals(bone2.getParent())){
-					bone2 = (SpriterBone) this.findTimelineObject(bone1, this.tempBones2);
-					SpriterCalculator.setRelative(parent, bone2);
+				if(!currentBone.getParent().equals(nextBone.getParent())){
+					nextBone = (SpriterBone) this.findTimelineObject(currentBone, this.tempBones2);
+					SpriterCalculator.setRelative(parent, nextBone);
+					nextBone.setAngle(nextBone.getAngle()*this.flipX*this.flipY);
 				}
-			} else if(bone2.hasParent()){
-				bone2 = (SpriterBone) this.findTimelineObject(bone1, this.tempBones2);
-				SpriterCalculator.setRelative(parent, bone2);
+			} else if(nextBone.hasParent()){
+				nextBone = (SpriterBone) this.findTimelineObject(currentBone, this.tempBones2);
+				SpriterCalculator.setRelative(parent, nextBone);
+				nextBone.setAngle(nextBone.getAngle()*this.flipX*this.flipY);
 			}
-			this.interpolateAbstractObject(this.tempBones[i], bone1, bone2, firstTime, nextFrame.getStartTime());
-		} /*else
-			System.err.println("Could not find second bone to tween");*/
+			this.interpolateAbstractObject(this.tempBones[i], currentBone, nextBone, startTime, endTime);
+		} else
+			System.err.println("Could not find second bone to tween");
 		
-		this.moddedBones[bone1.getId()].modSpriterBone(this.tempBones[i]);
+		this.moddedBones[currentBone.getId()].modSpriterBone(this.tempBones[i]);
 		
 		if(this.transitionFixed) this.tempBones[i].copyValuesTo(this.lastFrame.getBones()[i]);
 		else this.tempBones[i].copyValuesTo(this.lastTempFrame.getBones()[i]);
-		if(!this.tempBones[i].hasParent() || !this.moddedBones[bone1.getId()].isActive()){
+		if(!this.tempBones[i].hasParent() || !this.moddedBones[currentBone.getId()].isActive()){
 			this.tempBones[i].setX(this.tempBones[i].getX()+this.pivotX);
 			this.tempBones[i].setY(this.tempBones[i].getY()+this.pivotY);
 		}
@@ -349,38 +368,35 @@ public abstract class SpriterAbstractPlayer {
 	}
 	
 	private void updateTransformedTempObjects(SpriterAbstractObject[] source, SpriterAbstractObject[] target){
-		for(int i = 0; i< source.length; i++){
-			source[i].copyValuesTo(target[i]);
-			if(!target[i].hasParent()){
-				target[i].setX(target[i].getX()+this.pivotX);
-				target[i].setY(target[i].getY()+this.pivotY);
-			}
-			this.translateRelative(target[i], (target[i].hasParent()) ?  this.tempBones2[target[i].getParentId()]: this.tempParent);
+		for(int i = 0; i< source.length; i++)
+			this.updateTransformedTempObject(source[i], target[i]);
+	}
+	
+	private void updateTransformedTempObject(SpriterAbstractObject source, SpriterAbstractObject target){
+		source.copyValuesTo(target);
+		if(!target.hasParent()){
+			target.setX(target.getX()+this.pivotX);
+			target.setY(target.getY()+this.pivotY);
 		}
+		this.translateRelative(target, (target.hasParent()) ?  this.tempBones2[target.getParentId()]: this.tempParent);
 	}
 	
 	private void updateTempObjects(SpriterAbstractObject[] source, SpriterAbstractObject[] target){
 		for (int i = 0; i < source.length; i++) {
-			SpriterAbstractObject object = source[i];
-			boolean found = false;
-			for(int j = 0; j < target.length && !found; j++){
-				if(object.getId() == target[j].getId()){
-					object.copyValuesTo(target[j]);
-					found = true;
-				}
+			this.updateTempObject(source[i], target);
+		}
+	}
+	
+	private void updateTempObject(SpriterAbstractObject source, SpriterAbstractObject[] target){
+		boolean found = false;
+		for(int j = 0; j < target.length && !found; j++){
+			if(source.getId() == target[j].getId()){
+				source.copyValuesTo(target[j]);
+				found = true;
 			}
 		}
 	}
 	
-	/*float angleLinear(float angleA,float angleB,int spin, float startTime, float endTime)
-	{   
-		switch(spin){
-		case 1: if((angleB-angleA)<0) angleB+=360; break;
-		case -1: if((angleB-angleA)>0) angleB-=360; break;   
-		default: return angleA;
-		}
-		return this.interpolate(angleA, angleB, startTime, endTime, this.frame);
-	}*/
 	private void translateRoot(){
 		this.rootParent.copyValuesTo(tempParent);
 		this.tempParent.setAngle(this.tempParent.getAngle()*this.flipX*this.flipY + this.rootParent.getParent().getAngle());
@@ -391,7 +407,7 @@ public abstract class SpriterAbstractPlayer {
 	
 	private SpriterAbstractObject findTimelineObject(SpriterAbstractObject object, SpriterAbstractObject[] objects){
 		for(int i = 0; i < objects.length; i++)
-			if(objects[i].getTimeline() == object.getTimeline()) return objects[i];
+			if(objects[i].getTimeline().equals(object.getTimeline())) return objects[i];
 		return null;
 	}
 	
@@ -401,7 +417,6 @@ public abstract class SpriterAbstractPlayer {
 		target.setY(this.interpolate(obj1.getY(), obj2.getY(), startTime, endTime, this.frame));
 		target.setScaleX(this.interpolate(obj1.getScaleX(), obj2.getScaleX(), startTime, endTime, this.frame));
 		target.setScaleY(this.interpolate(obj1.getScaleY(), obj2.getScaleY(), startTime, endTime, this.frame));
-		//target.setAngle(this.angleLinear(obj1.getAngle(), obj2.getAngle(), obj2.getSpin(), startTime, endTime));
 		target.setAngle(this.interpolateAngle(obj1.getAngle(), obj2.getAngle(), startTime, endTime, this.frame));
 	}
 	

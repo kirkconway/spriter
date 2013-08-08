@@ -18,9 +18,9 @@
 package com.brashmonkey.spriter.player;
 
 import com.brashmonkey.spriter.SpriterCalculator;
+import com.brashmonkey.spriter.animation.SpriterKeyFrame;
 import com.brashmonkey.spriter.draw.DrawInstruction;
 import com.brashmonkey.spriter.objects.SpriterBone;
-import com.brashmonkey.spriter.objects.SpriterKeyFrame;
 import com.brashmonkey.spriter.objects.SpriterObject;
 
 /**
@@ -45,7 +45,7 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	 * @param second player to interpolate with the first one.
 	 */
 	public SpriterPlayerInterpolator(SpriterAbstractPlayer first, SpriterAbstractPlayer second){
-		super(first.loader, first.keyframes);
+		super(first.loader, first.animations);
 		this.weight = 0.5f;
 		setPlayers(first, second);
 		this.frame = new SpriterKeyFrame[1];

@@ -1,4 +1,4 @@
-package com.brahsmonkey.spriter.xml;
+package com.brashmonkey.spriter.xml;
 
 /** Indicates an error during serialization due to misconfiguration or during deserialization due to invalid input data.
  * @author Nathan Sweet */

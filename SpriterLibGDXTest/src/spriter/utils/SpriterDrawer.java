@@ -1,5 +1,6 @@
 package spriter.utils;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -89,7 +90,7 @@ public class SpriterDrawer extends AbstractDrawer<Sprite> {
 			shapeRenderer.line(bone.getX(), bone.getY(), bone.getX()+(float)Math.cos(Math.toRadians(bone.getAngle()))*200*bone.getScaleX(), bone.getY()+(float)Math.sin(Math.toRadians(bone.getAngle()))*200*bone.getScaleX());
 		}
 		shapeRenderer.setColor(1f, 0f, 0f, 1f);
-		shapeRenderer.rect(player.getBoundingBox().left, player.getBoundingBox().bottom, player.getBoundingBox().width, player.getBoundingBox().height);
+		/*shapeRenderer.rect(player.getBoundingBox().left, player.getBoundingBox().bottom, player.getBoundingBox().width, player.getBoundingBox().height);
 		
 		for(int j = 0; j< player.getObjectsToDraw(); j++){
 			SpriterObject object = player.getRuntimeObjects()[j];
@@ -108,20 +109,20 @@ public class SpriterDrawer extends AbstractDrawer<Sprite> {
 			vertices[i++] = points[0].y;
 			
 			shapeRenderer.polyline(vertices);
-		}
+		}*/
 		shapeRenderer.end();
 	}
 
 	private void setShapeColor(int i, ShapeRenderer shapeRenderer){
 		switch(i%8){
-			case 0: shapeRenderer.setColor(1f, 0f, 0f, 0.5f); break;
-			case 1: shapeRenderer.setColor(0f, 1f, 0f, 0.5f); break;
-			case 2: shapeRenderer.setColor(0f, 0f, 1f, 0.5f); break;
-			case 3: shapeRenderer.setColor(0f, 1f, 1f, 0.5f); break;
-			case 4: shapeRenderer.setColor(1f, 0f, 1f, 0.5f); break;
-			case 5: shapeRenderer.setColor(1f, 1f, 0f, 0.5f); break;
-			case 6: shapeRenderer.setColor(0f, 0f, 0f, 0.5f); break;
-			case 7: shapeRenderer.setColor(1f, 1f, 1f, 0.5f); break;
+			case 0: shapeRenderer.setColor(Color.BLUE); break;
+			case 1: shapeRenderer.setColor(Color.GREEN); break;
+			case 2: shapeRenderer.setColor(Color.YELLOW); break;
+			case 3: shapeRenderer.setColor(Color.CYAN); break;
+			case 4: shapeRenderer.setColor(Color.PINK); break;
+			case 5: shapeRenderer.setColor(Color.ORANGE); break;
+			case 6: shapeRenderer.setColor(Color.RED); break;
+			case 7: shapeRenderer.setColor(Color.WHITE); break;
 		}
 	}
 

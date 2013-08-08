@@ -19,9 +19,9 @@ package com.brashmonkey.spriter;
 
 import java.io.File;
 
-import com.brahsmonkey.spriter.xml.SCMLReader;
 import com.brashmonkey.spriter.file.FileLoader;
 import com.brashmonkey.spriter.file.Reference;
+import com.brashmonkey.spriter.xml.SCMLReader;
 import com.discobeard.spriter.dom.SpriterData;
 
 /**

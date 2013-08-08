@@ -21,10 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.brashmonkey.spriter.animation.SpriterAnimation;
+import com.brashmonkey.spriter.animation.SpriterKeyFrame;
 import com.brashmonkey.spriter.file.Reference;
-import com.brashmonkey.spriter.mergers.SpriterKeyFrameBuilder;
+import com.brashmonkey.spriter.mergers.SpriterAnimationBuilder;
 import com.brashmonkey.spriter.objects.SpriterBone;
-import com.brashmonkey.spriter.objects.SpriterKeyFrame;
 import com.brashmonkey.spriter.objects.SpriterObject;
 import com.brashmonkey.spriter.player.SpriterPlayer;
 import com.discobeard.spriter.dom.Animation;
@@ -48,17 +49,16 @@ public class SpriterKeyFrameProvider {
 	 * @param spriterData SpriterData to generate from.
 	 * @return generated keyframe list.
 	 */
-	public static List<SpriterKeyFrame[]> generateKeyFramePool(SpriterData data, Entity entity){
-		List<SpriterKeyFrame[]> keyframeList = new ArrayList<SpriterKeyFrame[]>();
+	public static List<SpriterAnimation> generateKeyFramePool(SpriterData data, Entity entity){
+		List<SpriterAnimation> spriterAnimations = new ArrayList<SpriterAnimation>();
 		List<Animation> animations = entity.getAnimation();
+		SpriterAnimationBuilder frameBuilder = new SpriterAnimationBuilder();
 		for(Animation anim: animations){
-			SpriterKeyFrame[] keyframes = new SpriterKeyFrameBuilder().buildKeyFrameArray(anim);
+			SpriterAnimation spriterAnimation = frameBuilder.buildAnimation(anim);
 			boolean found = false;
-			for(SpriterKeyFrame key: keyframes){
-				if(!found) found = key.getStartTime() == anim.getLength();
+			for(SpriterKeyFrame key: spriterAnimation.frames){
+				if(!found) found = key.getTime() == anim.getLength();
 				Arrays.sort(key.getObjects());
-				/*for(int i = 0; i < key.getBones().length; i++)
-					key.getBones()[i].setName(anim.getTimeline().get(key.getBones()[i].getTimeline()).getName());*/
 				for(SpriterBone bone: key.getBones()){
 					for(SpriterBone bone2: key.getBones()){
 						if(bone2.getParentId() != null)
@@ -74,31 +74,27 @@ public class SpriterKeyFrameProvider {
 					}
 				}
 			}
-			SpriterKeyFrame[] keys;
 			if(!found){
-				keys = new SpriterKeyFrame[keyframes.length+1];
-				for(int i = 0; i < keyframes.length; i++) 
-					keys[i] = keyframes[i];
-					keys[keys.length-1] = new SpriterKeyFrame();
-					keys[keys.length-1].setId(keyframes.length);
-					keys[keys.length-1].setBones(new SpriterBone[keys[0].getBones().length]);
-					keys[keys.length-1].setObjects(new SpriterObject[keys[0].getObjects().length]);
-					for(int j = 0; j< keys[keys.length-1].getBones().length; j++){
-						SpriterBone bone = new SpriterBone();
-						keys[0].getBones()[j].copyValuesTo(bone);
-						keys[keys.length-1].getBones()[j] = bone;
-					}
-					for(int j = 0; j< keys[keys.length-1].getObjects().length; j++){
-						SpriterObject object = new SpriterObject();
-						keys[0].getObjects()[j].copyValuesTo(object);
-						keys[keys.length-1].getObjects()[j] = object;
-					}
-					keys[keys.length-1].setStartTime(anim.getLength());
-					keys[keys.length-1].setEndTime(anim.getLength());
+				SpriterKeyFrame firstFrame = spriterAnimation.frames.get(0);
+				SpriterKeyFrame lastFrame =  new SpriterKeyFrame();
+				lastFrame.setId(spriterAnimation.frames());
+				lastFrame.setBones(new SpriterBone[firstFrame.getBones().length]);
+				lastFrame.setObjects(new SpriterObject[firstFrame.getObjects().length]);
+				for(int j = 0; j< lastFrame.getBones().length; j++){
+					SpriterBone bone = new SpriterBone();
+					firstFrame.getBones()[j].copyValuesTo(bone);
+					lastFrame.getBones()[j] = bone;
+				}
+				for(int j = 0; j< lastFrame.getObjects().length; j++){
+					SpriterObject object = new SpriterObject();
+					firstFrame.getObjects()[j].copyValuesTo(object);
+					lastFrame.getObjects()[j] = object;
+				}
+				lastFrame.setTime(anim.getLength());
+				spriterAnimation.frames.add(lastFrame);
 			}
-			else keys = keyframes;
-			keyframeList.add(keys);
+			spriterAnimations.add(spriterAnimation);
 		}
-		return keyframeList;
+		return spriterAnimations;
 	}
 }

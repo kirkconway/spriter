@@ -27,6 +27,7 @@ public abstract class SpriterAbstractObject {
 	protected int id, parentId, timeline, spin;
 	protected SpriterAbstractObject parent;
 	protected String name;
+	public boolean tween = true;
 
 	public SpriterAbstractObject(){
 		this.x = 0;

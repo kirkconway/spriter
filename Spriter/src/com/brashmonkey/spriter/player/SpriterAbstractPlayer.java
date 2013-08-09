@@ -196,7 +196,9 @@ public abstract class SpriterAbstractPlayer {
 		this.updateTempObjects(currentFrame.getObjects(), this.nonTransformedTempObjects);
 		
 		for (int i = 0; i < this.currenObjectsToDraw; i++)
-			this.tweenObject(this.nonTransformedTempObjects[i], nextFrame.getObjectFor(this.nonTransformedTempObjects[i]), i, currentFrame.getTime(), nextFrame.getTime());
+			if(this.tempObjects[i].tween) this.tweenObject(this.nonTransformedTempObjects[i], nextFrame.getObjectFor(this.nonTransformedTempObjects[i]), i, currentFrame.getTime(), nextFrame.getTime());
+			else this.tweenObject(this.animations.get(0).frames.get(0).getObjectFor(this.nonTransformedTempObjects[i]), nextFrame.getObjectFor(this.nonTransformedTempObjects[i]), i, currentFrame.getTime(), nextFrame.getTime());
+			
 	}
 
 	/*protected void transformObjects(SpriterAnimation animation, float xOffset, float yOffset) {
@@ -261,13 +263,13 @@ public abstract class SpriterAbstractPlayer {
 			this.tempParent.setScaleY(this.flipY);
 		}
 		this.setScale(this.scale);
-		this.currentBonesToAnimate = currentFrame.getBones().length;
 		
 		this.updateTransformedTempObjects(nextFrame.getBones(), this.tempBones2);
 		this.updateTempObjects(currentFrame.getBones(), this.nonTransformedTempBones);
 		
 		for (int i = 0; i < this.nonTransformedTempBones.length; i++) {
-			this.tweenBone(this.nonTransformedTempBones[i], nextFrame.getBoneFor(this.nonTransformedTempBones[i]), i, currentFrame.getTime(), nextFrame.getTime());
+			if(this.tempObjects[i].tween) this.tweenBone(this.nonTransformedTempBones[i], nextFrame.getBoneFor(this.nonTransformedTempBones[i]), i, currentFrame.getTime(), nextFrame.getTime());
+			else this.tweenBone(this.nonTransformedTempBones[i], this.animations.get(0).frames.get(0).getBoneFor(this.nonTransformedTempBones[i]), i, currentFrame.getTime(), nextFrame.getTime());
 		}
 	}
 	
@@ -306,16 +308,16 @@ public abstract class SpriterAbstractPlayer {
 			if(nextObject != null){
 				if(parent != this.tempParent){
 					if(!currentObject.getParent().equals(nextObject.getParent())){
-						nextObject = (SpriterObject) this.findTimelineObject(currentObject, this.tempObjects2);
-						SpriterCalculator.setRelative(parent, nextObject);
+						nextObject = (SpriterObject) this.getTimelineObject(currentObject, this.tempObjects2);
+						SpriterCalculator.reTranslateRelative(parent, nextObject);
 						nextObject.setAngle(nextObject.getAngle()*this.flipX*this.flipY);
 					}
 				} else if(nextObject.hasParent()){
-					nextObject = (SpriterObject) this.findTimelineObject(currentObject, this.tempObjects2);
-					SpriterCalculator.setRelative(parent, nextObject);
+					nextObject = (SpriterObject) this.getTimelineObject(currentObject, this.tempObjects2);
+					SpriterCalculator.reTranslateRelative(parent, nextObject);
 					nextObject.setAngle(nextObject.getAngle()*this.flipX*this.flipY);
 				}					
-				this.interpolateSpriterObject(this.tempObjects[i], currentObject, nextObject, startTime, endTime);
+				if(this.tempObjects[i].tween) this.interpolateSpriterObject(this.tempObjects[i], currentObject, nextObject, startTime, endTime);
 			}
 			
 			this.moddedObjects[currentObject.getId()].modSpriterObject(this.tempObjects[i]);
@@ -343,18 +345,18 @@ public abstract class SpriterAbstractPlayer {
 		if(nextBone != null){
 			if(parent != this.tempParent){
 				if(!currentBone.getParent().equals(nextBone.getParent())){
-					nextBone = (SpriterBone) this.findTimelineObject(currentBone, this.tempBones2);
-					SpriterCalculator.setRelative(parent, nextBone);
+					nextBone = (SpriterBone) this.getTimelineObject(currentBone, this.tempBones2);
+					SpriterCalculator.reTranslateRelative(parent, nextBone);
 					nextBone.setAngle(nextBone.getAngle()*this.flipX*this.flipY);
 				}
 			} else if(nextBone.hasParent()){
-				nextBone = (SpriterBone) this.findTimelineObject(currentBone, this.tempBones2);
-				SpriterCalculator.setRelative(parent, nextBone);
+				nextBone = (SpriterBone) this.getTimelineObject(currentBone, this.tempBones2);
+				SpriterCalculator.reTranslateRelative(parent, nextBone);
 				nextBone.setAngle(nextBone.getAngle()*this.flipX*this.flipY);
 			}
-			this.interpolateAbstractObject(this.tempBones[i], currentBone, nextBone, startTime, endTime);
+			if(this.tempBones[i].tween) this.interpolateAbstractObject(this.tempBones[i], currentBone, nextBone, startTime, endTime);
 		} /*else
-			System.err.println("Could not find second bone to tween");*/
+			System.err.println("Could not get second bone to tween");*/
 		
 		this.moddedBones[currentBone.getId()].modSpriterBone(this.tempBones[i]);
 		
@@ -405,7 +407,7 @@ public abstract class SpriterAbstractPlayer {
 		SpriterCalculator.translateRelative(this.rootParent.getParent(), this.tempParent);
 	}
 	
-	private SpriterAbstractObject findTimelineObject(SpriterAbstractObject object, SpriterAbstractObject[] objects){
+	protected SpriterAbstractObject getTimelineObject(SpriterAbstractObject object, SpriterAbstractObject[] objects){
 		for(int i = 0; i < objects.length; i++)
 			if(objects[i].getTimeline().equals(object.getTimeline())) return objects[i];
 		return null;
@@ -507,83 +509,40 @@ public abstract class SpriterAbstractPlayer {
 	}
 	
 	/**
-	 * Searches for the right index for a given bone. Use {@link #getRuntimeObjects()} to acces an object at runtime.
-	 * @param bone bone to search at.
-	 * @param objectIndex index of the object in the object children list of the given bone. 0 means first object.
-	 * @return right index for the object you want access to. -1 if not found.
+	 * Searches for the right index for a given object.
+	 * @param object object to search at.
+	 * @return right index for the mod object you want access to. -1 if not found.
 	 */
-	public int findObjectIndexForBone(SpriterBone bone, int objectIndex){
-		for(int i = 0; i < this.tempObjects.length && objectIndex >= 0 && objectIndex < bone.getChildObjects().size(); i++)
-			if(this.tempObjects[i].equals(bone.getChildObjects().get(objectIndex)))
+	public int getModObjectIndexForObject(SpriterObject object){
+		for(int i = 0; i < this.tempObjects.length; i++)
+			if(this.tempObjects[i].equals(object))
 				return i;
 		return -1;
 	}
 	
 	/**
-	 * Searches for the right object for a given bone.
-	 * @param bone bone to search at.
-	 * @param objectIndex index of the object in the object children list of the given bone. 0 means first object.
-	 * @return right object you want access to. Null if not found.
-	 */
-	public SpriterObject findObjectForBone(SpriterBone bone, int objectIndex){
-		try{
-			return this.tempObjects[this.findObjectIndexForBone(bone, objectIndex)];
-		} catch(ArrayIndexOutOfBoundsException e){
-			return null;
-		}
-	}
-	
-	/**
-	 * Searches for the right mod object for a given bone.
-	 * @param bone bone to search at.
-	 * @param objectIndex index of the object in the object children list of the given bone. 0 means first object.
+	 * Searches for the right mod object for the given object.
+	 * @param object object to search at.
 	 * @return right mod object you want access to. Null if not found.
 	 */
-	public SpriterModObject findModObjectForBone(SpriterBone bone, int objectIndex){
+	public SpriterModObject getModObjectForObject(SpriterObject object){
 		try{
-			return this.moddedObjects[this.findObjectIndexForBone(bone, objectIndex)];
+			return this.moddedObjects[this.getModObjectIndexForObject(object)];
 		} catch(ArrayIndexOutOfBoundsException e){
 			return null;
 		}
 	}
 	
 	/**
-	 * Searches for the right index for a given bone and index.
-	 * @param bone bone to search at.
-	 * @param boneIndex index of the bone in the object children list of the given bone. 0 means first object.
-	 * @return right index for the child bone you want access to. -1 if not found.
+	 * Searches for the right mod object for the given name.
+	 * @param name name to search for.
+	 * @return right mod object you want access to. Null if not found.
 	 */
-	public int findChildBoneIndexForBone(SpriterBone bone, int boneIndex){
-		for(int i = 0; i < this.tempObjects.length && boneIndex >= 0 && boneIndex < bone.getChildBones().size(); i++)
-			if(this.tempBones[i].equals(bone.getChildBones().get(boneIndex)))
-				return i;
-		return -1;
-	}
-	
-	/**
-	 * Searches for the right child bone for a given bone and index.
-	 * @param bone bone to search at.
-	 * @param boneIndex index of the bone in the object children list of the given bone. 0 means first object.
-	 * @return right bone you want access to. Null if not found.
-	 */
-	public SpriterBone findChildBoneForBone(SpriterBone bone, int boneIndex){
+	public SpriterModObject getModObjectByName(String name){
 		try{
-			return this.tempBones[this.findChildBoneIndexForBone(bone, boneIndex)];
-		} catch(ArrayIndexOutOfBoundsException e){
-			return null;
-		}
-	}
-	
-	/**
-	 * Searches for the right child bone for a given bone and index.
-	 * @param bone bone to search at.
-	 * @param boneIndex index of the bone in the object children list of the given bone. 0 means first object.
-	 * @return right mod bone you want access to. Null if not found.
-	 */
-	public SpriterModObject findChildModBoneForBone(SpriterBone bone, int boneIndex){
-		try{
-			return this.moddedBones[this.findChildBoneIndexForBone(bone, boneIndex)];
-		} catch(ArrayIndexOutOfBoundsException e){
+			return getModObjectForObject(this.getObjectByName(name));
+		} catch (Exception e){
+			System.err.println("Could not find object \""+name+"\"");
 			return null;
 		}
 	}
@@ -593,7 +552,7 @@ public abstract class SpriterAbstractPlayer {
 	 * @param bone bone to search at.
 	 * @return right index for the mod bone you want access to. -1 if not found.
 	 */
-	public int findModBoneIndexForBone(SpriterBone bone){
+	public int getModBoneIndexForBone(SpriterBone bone){
 		for(int i = 0; i < this.tempObjects.length; i++)
 			if(this.tempBones[i].equals(bone))
 				return i;
@@ -601,14 +560,28 @@ public abstract class SpriterAbstractPlayer {
 	}
 	
 	/**
-	 * Searches for the right mod bone for a given bone.
+	 * Searches for the right mod bone for the given bone.
 	 * @param bone bone to search at.
 	 * @return right mod bone you want access to. Null if not found.
 	 */
-	public SpriterModObject findModBoneForBone(SpriterBone bone){
+	public SpriterModObject getModBoneForBone(SpriterBone bone){
 		try{
-			return this.moddedBones[this.findModBoneIndexForBone(bone)];
+			return this.moddedBones[this.getModBoneIndexForBone(bone)];
 		} catch(ArrayIndexOutOfBoundsException e){
+			return null;
+		}
+	}
+	
+	/**
+	 * Searches for the right mod bone for the given name.
+	 * @param name name to search for.
+	 * @return right mod bone you want access to. Null if not found.
+	 */
+	public SpriterModObject getModBoneByName(String name){
+		try{
+			return getModBoneForBone(this.getBoneByName(name));
+		} catch (Exception e){
+			System.err.println("Could not find bone \""+name+"\"");
 			return null;
 		}
 	}
@@ -756,6 +729,17 @@ public abstract class SpriterAbstractPlayer {
 	}
 	
 	/**
+	 * Searches for the object index with the given name and returns the right one
+	 * @param name name of the object.
+	 * @return index of the object if the given name was found, otherwise it returns -1
+	 */
+	public int getObjectIndexByName(String name){
+		for(int i = 0; i < this.tempObjects.length; i++)
+			if(name.equals(this.tempObjects[i].getName())) return i;
+		return -1;
+	}
+	
+	/**
 	 * Searches for the bone index with the given name and returns the right one
 	 * @param name name of the bone.
 	 * @return index of the bone if the given name was found, otherwise it returns null
@@ -763,6 +747,17 @@ public abstract class SpriterAbstractPlayer {
 	public SpriterBone getBoneByName(String name){
 		int i = this.getBoneIndexByName(name);
 		if(i != -1) return this.tempBones[i];
+		else return null;
+	}
+	
+	/**
+	 * Searches for the object index with the given name and returns the right one
+	 * @param name name of the object.
+	 * @return index of the object if the given name was found, otherwise it returns null
+	 */
+	public SpriterObject getObjectByName(String name){
+		int i = this.getObjectIndexByName(name);
+		if(i != -1) return this.tempObjects[i];
 		else return null;
 	}
 
@@ -865,7 +860,7 @@ public abstract class SpriterAbstractPlayer {
 		return this.players.contains(player);
 	}
 	
-	public void updateBone(SpriterBone bone){
+	protected void updateBone(SpriterBone bone){
 		if(bone.hasParent()){
 			//if(this.moddedBones[bone.getId()].isActive()) bone.setAngle(this.lastFrame.getBones()[bone.getId()].getAngle()+this.tempBones[bone.getParentId()].getAngle());
 			SpriterCalculator.translateRelative(this.tempBones[bone.getParentId()], this.lastFrame.getBones()[bone.getId()].getX(),
@@ -873,6 +868,10 @@ public abstract class SpriterAbstractPlayer {
 		}
 	}
 	
+	/**
+	 * Transforms the given bone with relative information to its parent
+	 * @param bone
+	 */
 	public void updateRecursively(SpriterBone bone){
 		this.updateBone(bone);
 		for(SpriterBone child: bone.getChildBones())

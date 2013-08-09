@@ -21,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.brashmonkey.spriter.SpriterPoint;
-import com.brashmonkey.spriter.SpriterCalculator;
 import com.brashmonkey.spriter.SpriterRectangle;
 
 /**
@@ -63,17 +62,6 @@ public class SpriterBone extends SpriterAbstractObject{
 		if(!(bone instanceof SpriterBone)) return;
 		((SpriterBone)bone).childBones = this.childBones;
 		((SpriterBone)bone).childObjects = this.childObjects;
-	}
-	
-	public void update(){
-		if(this.parent != null)
-			SpriterCalculator.translateRelative(parent, this);
-	}
-	
-	public void updateRecursively(){
-		this.update();
-		for(SpriterBone child: this.childBones)
-			child.updateRecursively();
 	}
 	
 	public void calcBoundingBox(SpriterRectangle base){

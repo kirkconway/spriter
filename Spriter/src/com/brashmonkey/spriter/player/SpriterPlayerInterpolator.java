@@ -37,7 +37,6 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	private SpriterAbstractPlayer first, second;
 	private float weight;
 	private boolean interpolateSpeed = false;
-	private SpriterKeyFrame[] frame;
 
 	/**
 	 * Returns an instance of this class, which will manage the interpolation between two #SpriterAbstractPlayer instances.
@@ -48,7 +47,6 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 		super(first.loader, first.animations);
 		this.weight = 0.5f;
 		setPlayers(first, second);
-		this.frame = new SpriterKeyFrame[1];
 		this.generateData();
 		this.update(0, 0);
 	}
@@ -99,7 +97,7 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	
 	@Override
 	protected void step(float xOffset, float yOffset){
-		int fristLastSpeed = first.frameSpeed, secondLastSpeed = second.frameSpeed;
+		int firstLastSpeed = first.frameSpeed, secondLastSpeed = second.frameSpeed;
 		int speed;
 		if(this.interpolateSpeed)
 			speed = (int)this.interpolate(first.frameSpeed, second.frameSpeed, 0, 1, this.weight);
@@ -118,6 +116,7 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 			this.first.update(xOffset,yOffset);
 			this.instructions = this.first.instructions;
 			this.currenObjectsToDraw = first.currenObjectsToDraw;
+			this.currentBonesToAnimate = first.currentBonesToAnimate;
 		}
 		else if(this.weight == 1){
 			this.tempBones = this.second.tempBones;
@@ -125,20 +124,22 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 			this.second.update(xOffset,yOffset);
 			this.instructions = this.second.instructions;
 			this.currenObjectsToDraw = second.currenObjectsToDraw;
+			this.currentBonesToAnimate = second.currentBonesToAnimate;
 		}
 		else{
-			this.currenObjectsToDraw = first.currenObjectsToDraw;
-			this.first.update(0,0);
-			this.second.update(0,0);
+			this.currenObjectsToDraw = Math.min(first.currenObjectsToDraw, second.currenObjectsToDraw);
+			this.currentBonesToAnimate =  Math.min(first.currentBonesToAnimate, second.currentBonesToAnimate);
+			this.first.update(xOffset, yOffset);
+			this.second.update(xOffset, yOffset);
 		
 			SpriterKeyFrame key1 = (first.transitionFixed) ? first.lastFrame: first.lastTempFrame;
-			this.frame[0] = (second.transitionFixed) ? second.lastFrame: second.lastTempFrame;
-			this.transformBones(key1, this.frame[0], xOffset, yOffset);
-			this.transformObjects(first.lastFrame, this.frame[0], xOffset, yOffset);
+			SpriterKeyFrame key2 = (second.transitionFixed) ? second.lastFrame: second.lastTempFrame;
+			this.transformBones(key1, key2, xOffset, yOffset);
+			this.transformObjects(key1, key2, xOffset, yOffset);
 		}
 		this.tempBones = tempBones;
 		this.tempObjects = tempObjects;
-		this.first.frameSpeed = fristLastSpeed;
+		this.first.frameSpeed = firstLastSpeed;
 		this.second.frameSpeed = secondLastSpeed;
 	}
 	

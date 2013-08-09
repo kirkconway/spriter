@@ -79,6 +79,7 @@ public class Spriter {
 								+ fileName);
 			}
 		}
+		this.loader.finishLoading();
 	}
 	
 	/**

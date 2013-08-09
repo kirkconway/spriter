@@ -98,11 +98,11 @@ public class SpriterCalculator {
 		target.setY(ynew);
 	}
 	
-	public static void setRelative(SpriterAbstractObject parent, SpriterAbstractObject child){
-		setRelative(parent, child.getX(), child.getY(), child);
+	public static void reTranslateRelative(SpriterAbstractObject parent, SpriterAbstractObject child){
+		reTranslateRelative(parent, child.getX(), child.getY(), child);
 	}
 	
-	public static void setRelative(SpriterAbstractObject parent, float x, float y, SpriterAbstractObject target){
+	public static void reTranslateRelative(SpriterAbstractObject parent, float x, float y, SpriterAbstractObject target){
 		target.setAngle(target.getAngle()-parent.getAngle());
 		target.setScaleX(target.getScaleX()/parent.getScaleX());
 		target.setScaleY(target.getScaleY()/parent.getScaleY());

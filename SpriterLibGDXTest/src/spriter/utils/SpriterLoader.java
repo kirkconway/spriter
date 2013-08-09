@@ -107,4 +107,16 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 		else this.disposeNonPackedTextures();
 	}
 
+	@Override
+	public void finishLoading() { //This method basically calls the method to create an atlas for all loaded textures
+		if(this.pack)
+			Gdx.app.postRunnable(new Runnable(){//Has to be called in the rendering thread since OpenGL textures have to be created
+				@Override
+				public void run() {
+					generatePackedSprites();
+				}
+				
+			});
+	}
+
 }

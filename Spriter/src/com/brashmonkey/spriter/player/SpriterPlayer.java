@@ -144,10 +144,10 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 				else this.transitionTempFixed = true;
 				firstKeyFrame.setTime(0);
 			}
-			this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		}
 		//Interpolate
 		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
+		this.currentBonesToAnimate = firstKeyFrame.getBones().length;
 		if(this.updateBones) this.transformBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
 		if(this.updateObjects) this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
 	}

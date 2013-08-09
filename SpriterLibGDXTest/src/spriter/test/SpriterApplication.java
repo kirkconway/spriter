@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.brashmonkey.spriter.Spriter;
 import com.brashmonkey.spriter.player.SpriterPlayer;
 
@@ -41,6 +42,7 @@ public class SpriterApplication implements ApplicationListener{
 		//you will have the ability to pack all textures into one atlas, to increase performance
 		this.drawer = new SpriterDrawer(this.batch); //A drawer needs a batch to draw
 		//You can change the batch at runtime
+		this.drawer.renderer = this.shape;
 		
 		this.loadSCML(Gdx.files.classpath("assets/monster/basic.scml")); //Loads the scml file
 		Gdx.input.setInputProcessor(inputHandler);
@@ -55,6 +57,7 @@ public class SpriterApplication implements ApplicationListener{
 	public void render() {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		this.player.update(cam.viewportWidth/2, cam.viewportHeight/2);//Call this method to perform the tweening for the current animation.
+		this.player.calcBoundingBox(null);
 		
 		this.batch.begin();
 			this.drawer.draw(this.player); //The drawer is responsible for drawing the player
@@ -64,8 +67,12 @@ public class SpriterApplication implements ApplicationListener{
 			
 		this.batch.end();
 		
-		if(Gdx.input.isKeyPressed(Keys.SPACE)) 
-			this.drawer.debugDraw(shape, player);//Here the drawer draws all bounding boxes and bones from the current animation
+		if(Gdx.input.isKeyPressed(Keys.SPACE)) {
+			//this.drawer.drawBoxes = false; //test it, the drawer will then just draw the bones and no boxes
+			this.shape.begin(ShapeType.Line);
+			this.drawer.debugDraw(player);//Here the drawer draws all bounding boxes and bones from the current animation
+			this.shape.end();
+		}
 	}
 
 	@Override
@@ -105,7 +112,7 @@ public class SpriterApplication implements ApplicationListener{
 	public void loadSCML(FileHandle file){
 		this.spriter = Spriter.getSpriter(file.file().getAbsolutePath(), loader);
 		this.player = new SpriterPlayer(this.spriter,0, loader);//Creates a new SpriterPlayer object which is responsible for tweening all animations in the loaded entity.
-		this.player.setFrameSpeed(10);//Changes the frame speed
+		this.player.setFrameSpeed(15);//Changes the frame speed
 		Gdx.app.postRunnable(new Runnable(){
 			public void run(){
 				loader.generatePackedSprites();//Create the atlas as mentioned before. Has to be called on the rendering thread after all OpenGL textures are loaded

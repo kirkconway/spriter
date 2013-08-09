@@ -18,8 +18,10 @@
 package com.brashmonkey.spriter.draw;
 
 
+import com.brashmonkey.spriter.SpriterPoint;
 import com.brashmonkey.spriter.file.FileLoader;
 import com.brashmonkey.spriter.file.Reference;
+import com.brashmonkey.spriter.objects.SpriterBone;
 import com.brashmonkey.spriter.player.SpriterAbstractPlayer;
 
 /**
@@ -32,6 +34,10 @@ public abstract class AbstractDrawer<L> {
 	
 	public FileLoader<L> loader;
 	
+	public static float BONE_LENGTH = 200, BONE_WIDTH = 10;
+	
+	public boolean drawBones = true, drawBoxes = true;
+	
 	public AbstractDrawer(FileLoader<L> loader){
 		this.loader=loader;
 	}
@@ -41,6 +47,54 @@ public abstract class AbstractDrawer<L> {
 	 * @param instruction Instruction to draw with.
 	 */
 	abstract public void draw(DrawInstruction instruction);
+	
+	/**
+	* Draws the playing animation in <code>player</code> with all bones (if {@link #drawBones} is true) and bounding boxes (if {@link #drawBoxes} is true) but without the corresponding sprites.
+	* @param player {@link [com.brashmonkey.spriter.player.]SpriterAbstractPlayer AbstractPlayer} to draw
+	*/
+	public void debugDraw(SpriterAbstractPlayer player){
+		if(drawBoxes)this.drawBoxes(player);
+		if(drawBones)this.drawBones(player);
+	}
+	
+	protected void drawBones(SpriterAbstractPlayer player){
+		this.setDrawColor(1, 1, 1, 1);
+		for(int i = 0; i < player.getBonesToAnimate(); i++){
+			SpriterBone bone = player.getRuntimeBones()[i];
+			float xx = bone.getX()+(float)Math.cos(Math.toRadians(bone.getAngle()))*5;
+			float yy = bone.getY()+(float)Math.sin(Math.toRadians(bone.getAngle()))*5;
+			float x2 = (float)Math.cos(Math.toRadians(bone.getAngle()+90))*(BONE_WIDTH/2)*bone.getScaleY();
+			float y2 = (float)Math.sin(Math.toRadians(bone.getAngle()+90))*(BONE_WIDTH/2)*bone.getScaleY();
+			
+			float targetX = bone.getX()+(float)Math.cos(Math.toRadians(bone.getAngle()))*BONE_LENGTH*bone.getScaleX(),
+					targetY = bone.getY()+(float)Math.sin(Math.toRadians(bone.getAngle()))*BONE_LENGTH*bone.getScaleX();
+			float upperPointX = xx+x2, upperPointY = yy+y2;
+			this.drawLine(bone.getX(), bone.getY(), upperPointX, upperPointY);
+			this.drawLine(upperPointX, upperPointY, targetX, targetY);
+
+			float lowerPointX = xx-x2, lowerPointY = yy-y2;
+			this.drawLine(bone.getX(), bone.getY(), lowerPointX, lowerPointY);
+			this.drawLine(lowerPointX, lowerPointY, targetX, targetY);
+			this.drawLine(bone.getX(), bone.getY(), targetX, targetY);
+		}
+	}
+	
+	protected void drawBoxes(SpriterAbstractPlayer player){
+		this.setDrawColor(1f, 0f, 0f, 1f);
+		this.drawRectangle(player.getBoundingBox().left, player.getBoundingBox().bottom, player.getBoundingBox().width, player.getBoundingBox().height);
+		
+		for(int j = 0; j< player.getObjectsToDraw(); j++){
+			SpriterPoint[] points = player.getRuntimeObjects()[j].getBoundingBox();
+			this.drawLine(points[0].x, points[0].y, points[1].x, points[1].y);
+			this.drawLine(points[1].x, points[1].y, points[3].x, points[3].y);
+			this.drawLine(points[3].x, points[3].y, points[2].x, points[2].y);
+			this.drawLine(points[2].x, points[2].y, points[0].x, points[0].y);
+		}
+	}
+	
+	abstract protected void setDrawColor(float r, float g, float b, float a);
+	abstract protected void drawLine(float x1, float y1, float x2, float y2);
+	abstract protected void drawRectangle(float x, float y, float width, float height);
 	
 	/**
 	 * Draws the given player with its sprites.

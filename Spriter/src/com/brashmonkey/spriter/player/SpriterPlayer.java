@@ -111,7 +111,7 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 		List<SpriterKeyFrame> frameList = this.animation.frames;
 		if(this.transitionFixed && this.transitionTempFixed){
 			//anim = this.animation;
-			/*if(this.frameSpeed >= 0){
+			if(this.frameSpeed >= 0){
 				firstKeyFrame = frameList.get(this.currentKey);
 				secondKeyFrame = frameList.get((this.currentKey+1)%frameList.size());
 			}
@@ -129,16 +129,8 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 				this.currentKey = ((this.currentKey-1)+frameList.size())%frameList.size();
 				this.frame = frameList.get(this.currentKey).getTime();
 			}
-			this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
-			if(this.updateBones) this.transformBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
-			if(this.updateObjects) this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);*/
-			
-			if(this.updateBones) this.transformBones(this.animation,  xOffset, yOffset);
-			if(this.updateObjects) this.transformObjects(this.animation,  xOffset, yOffset);
 		}
 		else{
-			//this.transitionAnimation.frames.remove(0);
-			//this.transitionAnimation.frames.remove(1);
 			firstKeyFrame = frameList.get(0);
 			secondKeyFrame = this.lastRealFrame;
 			float temp =(float)(this.fixCounter)/(float)this.fixMaxSteps;
@@ -153,13 +145,11 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 				firstKeyFrame.setTime(0);
 			}
 			this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
-			if(this.updateBones) this.transformBones(firstKeyFrame, secondKeyFrame,  xOffset, yOffset);
-			if(this.updateObjects) this.transformObjects(firstKeyFrame, secondKeyFrame,  xOffset, yOffset);
 		}
-		//this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		//Interpolate
-		//if(this.updateBones) this.transformBones(anim, xOffset, yOffset);
-		//if(this.updateObjects) this.transformObjects(this.animation, xOffset, yOffset);
+		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
+		if(this.updateBones) this.transformBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
+		if(this.updateObjects) this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
 	}
 	
 	/**
@@ -190,7 +180,7 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 			this.lastRealFrame.setTime(this.frame+1);
 			this.animation = this.animations.get(animationIndex);
 			this.animation.frames.get(0).setTime(this.frame+1+this.fixMaxSteps);
-			//this.currentKey = 0;
+			this.currentKey = 0;
 			this.fixCounter = 0;
 			this.animationIndex = animationIndex;
 		}

@@ -1,17 +1,12 @@
 package spriter.utils;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.brashmonkey.spriter.SpriterPoint;
 import com.brashmonkey.spriter.draw.AbstractDrawer;
 import com.brashmonkey.spriter.draw.DrawInstruction;
 import com.brashmonkey.spriter.file.FileLoader;
-import com.brashmonkey.spriter.objects.SpriterBone;
-import com.brashmonkey.spriter.objects.SpriterObject;
-import com.brashmonkey.spriter.player.SpriterAbstractPlayer;
 
 /**
 * A drawer class which draws Spriter animations in a proper way inside LibGDX.
@@ -21,9 +16,10 @@ import com.brashmonkey.spriter.player.SpriterAbstractPlayer;
 public class SpriterDrawer extends AbstractDrawer<Sprite> {
 
 	public SpriteBatch batch;
+	public ShapeRenderer renderer;
 	public boolean drawNormals = false;
 	public ShaderProgram shaderProgram;
-	private float[] vertices = new float[10];
+	//private float[] vertices = new float[10];
 
 	public SpriterDrawer(SpriteBatch batch){
 		this(null, batch);
@@ -71,49 +67,10 @@ public class SpriterDrawer extends AbstractDrawer<Sprite> {
 
 	/**
 	* Draws the playing animation in <code>player</code> with all bones and bounding boxes but without the corresponding sprites.
-	* @param shapeRenderer {@link [com.badlogic.gdx.graphics.glutils.]ShapeRenderer ShapeRenderer} to draw with. This object is not disposed by this drawer.
 	* @param player {@link [com.brashmonkey.spriter.player.]SpriterAbstractPlayer AbstractPlayer} to draw
 	*/
-	public void debugDraw(ShapeRenderer shapeRenderer, SpriterAbstractPlayer player){
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		for(int i = 0; i < player.getRuntimeBones().length; i++){
-		this.setShapeColor(i, shapeRenderer);
-		SpriterBone bone = player.getRuntimeBones()[i];
-		shapeRenderer.circle(bone.getX(), bone.getY(), 5);
-		}
-		
-		shapeRenderer.end();
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-		for(int i = 0; i < player.getRuntimeBones().length; i++){
-			this.setShapeColor(i, shapeRenderer);
-			SpriterBone bone = player.getRuntimeBones()[i];
-			shapeRenderer.line(bone.getX(), bone.getY(), bone.getX()+(float)Math.cos(Math.toRadians(bone.getAngle()))*200*bone.getScaleX(), bone.getY()+(float)Math.sin(Math.toRadians(bone.getAngle()))*200*bone.getScaleX());
-		}
-		shapeRenderer.setColor(1f, 0f, 0f, 1f);
-		/*shapeRenderer.rect(player.getBoundingBox().left, player.getBoundingBox().bottom, player.getBoundingBox().width, player.getBoundingBox().height);
-		
-		for(int j = 0; j< player.getObjectsToDraw(); j++){
-			SpriterObject object = player.getRuntimeObjects()[j];
-			int i = 0;
-			SpriterPoint[] points = object.getBoundingBox();
-			
-			vertices[i++] = points[0].x;
-			vertices[i++] = points[0].y;
-			vertices[i++] = points[1].x;
-			vertices[i++] = points[1].y;
-			vertices[i++] = points[3].x;
-			vertices[i++] = points[3].y;
-			vertices[i++] = points[2].x;
-			vertices[i++] = points[2].y;
-			vertices[i++] = points[0].x;
-			vertices[i++] = points[0].y;
-			
-			shapeRenderer.polyline(vertices);
-		}*/
-		shapeRenderer.end();
-	}
 
-	private void setShapeColor(int i, ShapeRenderer shapeRenderer){
+	/*private void setShapeColor(int i, ShapeRenderer shapeRenderer){
 		switch(i%8){
 			case 0: shapeRenderer.setColor(Color.BLUE); break;
 			case 1: shapeRenderer.setColor(Color.GREEN); break;
@@ -124,6 +81,21 @@ public class SpriterDrawer extends AbstractDrawer<Sprite> {
 			case 6: shapeRenderer.setColor(Color.RED); break;
 			case 7: shapeRenderer.setColor(Color.WHITE); break;
 		}
+	}*/
+
+	@Override
+	protected void drawLine(float x1, float y1, float x2, float y2) {
+		this.renderer.line(x1, y1, x2, y2);
+	}
+
+	@Override
+	protected void drawRectangle(float x, float y, float width, float height) {
+		this.renderer.rect(x, y, width, height);
+	}
+
+	@Override
+	protected void setDrawColor(float r, float g, float b, float a) {
+		this.renderer.setColor(r, g, b, a);
 	}
 
 }

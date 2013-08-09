@@ -18,6 +18,7 @@
 package com.brashmonkey.spriter.player;
 
 import com.brashmonkey.spriter.SpriterCalculator;
+import com.brashmonkey.spriter.SpriterRectangle;
 import com.brashmonkey.spriter.animation.SpriterKeyFrame;
 import com.brashmonkey.spriter.draw.DrawInstruction;
 import com.brashmonkey.spriter.objects.SpriterBone;
@@ -98,29 +99,20 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	@Override
 	protected void step(float xOffset, float yOffset){
 		int firstLastSpeed = first.frameSpeed, secondLastSpeed = second.frameSpeed;
-		int speed;
-		if(this.interpolateSpeed)
-			speed = (int)this.interpolate(first.frameSpeed, second.frameSpeed, 0, 1, this.weight);
-		else
-			speed = this.frameSpeed;
+		int speed = this.frameSpeed;
+		if(this.interpolateSpeed)	speed = (int)this.interpolate(first.frameSpeed, second.frameSpeed, 0, 1, this.weight);
 		this.first.frameSpeed = speed;
 		this.second.frameSpeed = speed;
 		
 		this.moddedBones = (this.weight <= 0.5f) ? this.first.moddedBones: this.second.moddedBones;
 		this.moddedObjects = (this.weight <= 0.5f) ? this.first.moddedObjects: this.second.moddedObjects;
-		SpriterBone[] tempBones = this.tempBones;
-		SpriterObject[] tempObjects = this.tempObjects;
 		if(this.weight == 0){
-			this.tempBones = this.first.tempBones;
-			this.tempObjects = this.first.tempObjects;
 			this.first.update(xOffset,yOffset);
 			this.instructions = this.first.instructions;
 			this.currenObjectsToDraw = first.currenObjectsToDraw;
 			this.currentBonesToAnimate = first.currentBonesToAnimate;
 		}
 		else if(this.weight == 1){
-			this.tempBones = this.second.tempBones;
-			this.tempObjects = this.second.tempObjects;
 			this.second.update(xOffset,yOffset);
 			this.instructions = this.second.instructions;
 			this.currenObjectsToDraw = second.currenObjectsToDraw;
@@ -137,8 +129,6 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 			this.transformBones(key1, key2, xOffset, yOffset);
 			this.transformObjects(key1, key2, xOffset, yOffset);
 		}
-		this.tempBones = tempBones;
-		this.tempObjects = tempObjects;
 		this.first.frameSpeed = firstLastSpeed;
 		this.second.frameSpeed = secondLastSpeed;
 	}
@@ -181,5 +171,33 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	 */
 	public void setInterpolateSpeed(boolean inter){
 		this.interpolateSpeed = inter;
+	}
+	
+	@Override
+	public SpriterBone[] getRuntimeBones(){
+		if(this.weight == 0) return this.first.getRuntimeBones();
+		else if(this.weight == 1) return this.second.getRuntimeBones();
+		else return this.tempBones;
+	}
+	
+	@Override
+	public SpriterObject[] getRuntimeObjects(){
+		if(this.weight == 0) return this.first.getRuntimeObjects();
+		else if(this.weight == 1) return this.second.getRuntimeObjects();
+		else return this.tempObjects;
+	}
+	
+	@Override
+	public SpriterRectangle getBoundingBox(){
+		if(this.weight == 0) return this.first.getBoundingBox();
+		else if(this.weight == 1) return this.second.getBoundingBox();
+		else return this.rect;
+	}
+	
+	@Override
+	public void calcBoundingBox(SpriterBone parent){
+		if(this.weight == 0) this.first.calcBoundingBox(parent);
+		else if(this.weight == 1) this.second.calcBoundingBox(parent);
+		else super.calcBoundingBox(parent);
 	}
 }

@@ -121,13 +121,24 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 			}
 			//Update
 			this.frame += this.frameSpeed;
-			if (this.frame > secondKeyFrame.getTime() && this.frameSpeed >= 0){
-				this.currentKey = (this.currentKey+1)%frameList.size();
-				this.frame = frameList.get(this.currentKey).getTime();
+			if(this.frame >= this.animation.length){
+				this.frame = 0;
+				this.currentKey = 0;
+				firstKeyFrame = frameList.get(this.currentKey);
+				secondKeyFrame = frameList.get((this.currentKey+1)%frameList.size());
 			}
-			else if(this.frame < firstKeyFrame.getTime()){
-				this.currentKey = ((this.currentKey-1)+frameList.size())%frameList.size();
-				this.frame = frameList.get(this.currentKey).getTime();
+			if(this.currentKey == frameList.size()-1)
+				frameList.get(0).setTime(this.animation.length);
+			else{
+				frameList.get(0).setTime(0);
+				if (this.frame > secondKeyFrame.getTime() && this.frameSpeed >= 0){
+					this.currentKey = (this.currentKey+1)%frameList.size();
+					this.frame = frameList.get(this.currentKey).getTime();
+				}
+				else if(this.frame < firstKeyFrame.getTime()){
+					this.currentKey = ((this.currentKey-1)+frameList.size())%frameList.size();
+					this.frame = frameList.get(this.currentKey).getTime();
+				}
 			}
 		}
 		else{

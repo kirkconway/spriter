@@ -780,14 +780,14 @@ public abstract class SpriterAbstractPlayer {
 	/**
 	 * @return the current bones which where interpolated for the current animation. Bones are not flipped.
 	 */
-	public final SpriterBone[] getRuntimeBones(){
+	public SpriterBone[] getRuntimeBones(){
 		return this.tempBones;
 	}
 	
 	/**
 	 * @return the current objects which where interpolated for the current animation. Objects are flipped.
 	 */
-	public final SpriterObject[] getRuntimeObjects(){
+	public SpriterObject[] getRuntimeObjects(){
 		return this.tempObjects;
 	}
 

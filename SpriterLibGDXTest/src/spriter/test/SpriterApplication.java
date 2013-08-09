@@ -143,16 +143,17 @@ public class SpriterApplication implements ApplicationListener{
 		this.player.setFrameSpeed(15);//Changes the frame speed
 		this.player.mapIKObject(ikObj, this.player.getBoneByName("leftHand"));
 		this.player.mapIKObject(ikObj2, this.player.getBoneByName("rightHand"));
-		this.player.deactivateEffectors(true);
-		//this.player.setResovling(false);
+		//this.player.deactivateEffectors(true);
+		this.player.setResovling(false);
 		
 		this.player2 = new SpriterPlayerIK(this.spriter,0,loader);
 		this.player2.setFrameSpeed(10);//Changes the frame speed
 		this.player2.mapIKObject(ikObj, this.player2.getBoneByName("leftHand"));
 		this.player2.mapIKObject(ikObj2, this.player2.getBoneByName("rightHand"));
-		this.player2.deactivateEffectors(true);
-		//this.player2.setResovling(false);
+		//this.player2.deactivateEffectors(true);
+		this.player2.setResovling(false);
 		this.inter = new SpriterPlayerInterpolator(this.player, this.player2);
+		this.inter.setWeight(0);
 	}
 	
 	/**

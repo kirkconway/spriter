@@ -65,24 +65,6 @@ public class SpriterDrawer extends AbstractDrawer<Sprite> {
 			sprite.draw(batch);
 	}
 
-	/**
-	* Draws the playing animation in <code>player</code> with all bones and bounding boxes but without the corresponding sprites.
-	* @param player {@link [com.brashmonkey.spriter.player.]SpriterAbstractPlayer AbstractPlayer} to draw
-	*/
-
-	/*private void setShapeColor(int i, ShapeRenderer shapeRenderer){
-		switch(i%8){
-			case 0: shapeRenderer.setColor(Color.BLUE); break;
-			case 1: shapeRenderer.setColor(Color.GREEN); break;
-			case 2: shapeRenderer.setColor(Color.YELLOW); break;
-			case 3: shapeRenderer.setColor(Color.CYAN); break;
-			case 4: shapeRenderer.setColor(Color.PINK); break;
-			case 5: shapeRenderer.setColor(Color.ORANGE); break;
-			case 6: shapeRenderer.setColor(Color.RED); break;
-			case 7: shapeRenderer.setColor(Color.WHITE); break;
-		}
-	}*/
-
 	@Override
 	protected void drawLine(float x1, float y1, float x2, float y2) {
 		this.renderer.line(x1, y1, x2, y2);

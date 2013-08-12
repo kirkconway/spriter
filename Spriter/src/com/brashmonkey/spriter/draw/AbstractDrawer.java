@@ -58,9 +58,10 @@ public abstract class AbstractDrawer<L> {
 	}
 	
 	protected void drawBones(SpriterAbstractPlayer player){
-		this.setDrawColor(1, 1, 1, 1);
 		for(int i = 0; i < player.getBonesToAnimate(); i++){
 			SpriterBone bone = player.getRuntimeBones()[i];
+			if(bone.active) this.setDrawColor(1, 0, 0, 1);
+			else this.setDrawColor(0, 1, 1, 1);
 			float xx = bone.getX()+(float)Math.cos(Math.toRadians(bone.getAngle()))*5;
 			float yy = bone.getY()+(float)Math.sin(Math.toRadians(bone.getAngle()))*5;
 			float x2 = (float)Math.cos(Math.toRadians(bone.getAngle()+90))*(BONE_WIDTH/2)*bone.getScaleY();
@@ -80,7 +81,7 @@ public abstract class AbstractDrawer<L> {
 	}
 	
 	protected void drawBoxes(SpriterAbstractPlayer player){
-		this.setDrawColor(1f, 0f, 0f, 1f);
+		this.setDrawColor(.25f, 1f, .25f, 1f);
 		this.drawRectangle(player.getBoundingBox().left, player.getBoundingBox().bottom, player.getBoundingBox().width, player.getBoundingBox().height);
 		
 		for(int j = 0; j< player.getObjectsToDraw(); j++){

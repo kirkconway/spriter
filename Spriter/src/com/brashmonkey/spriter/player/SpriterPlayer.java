@@ -56,11 +56,10 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	private int transitionSpeed = 30;
 	private int animationIndex = 0;
 	private int currentKey = 0;
-	SpriterKeyFrame lastRealFrame, firstKeyFrame, secondKeyFrame;
+	SpriterKeyFrame lastRealFrame, firstKeyFrame, secondKeyFrame, animLastFrame;
 	boolean transitionTempFixed = true;
 	private int fixCounter = 0;
 	private int fixMaxSteps = 100;
-	protected boolean updateObjects = true, updateBones = true;
 	
 	
 	/**
@@ -107,18 +106,10 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 	@Override
 	protected void step(float xOffset, float yOffset){
 		//Fetch information
-		//SpriterAnimation anim = this.animation;
 		List<SpriterKeyFrame> frameList = this.animation.frames;
 		if(this.transitionFixed && this.transitionTempFixed){
-			//anim = this.animation;
-			if(this.frameSpeed >= 0){
-				firstKeyFrame = frameList.get(this.currentKey);
-				secondKeyFrame = frameList.get((this.currentKey+1)%frameList.size());
-			}
-			else{
-				secondKeyFrame = frameList.get(this.currentKey);
-				firstKeyFrame = frameList.get((this.currentKey+1)%frameList.size());
-			}
+			firstKeyFrame = frameList.get(this.currentKey);
+			secondKeyFrame = frameList.get((this.currentKey+1)%frameList.size());
 			//Update
 			this.frame += this.frameSpeed;
 			if(this.frame >= this.animation.length){
@@ -127,18 +118,16 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 				firstKeyFrame = frameList.get(this.currentKey);
 				secondKeyFrame = frameList.get((this.currentKey+1)%frameList.size());
 			}
-			if(this.currentKey == frameList.size()-1)
-				frameList.get(0).setTime(this.animation.length);
-			else{
-				frameList.get(0).setTime(0);
-				if (this.frame > secondKeyFrame.getTime() && this.frameSpeed >= 0){
-					this.currentKey = (this.currentKey+1)%frameList.size();
-					this.frame = frameList.get(this.currentKey).getTime();
+			if(this.frame > secondKeyFrame.getTime() && this.frameSpeed >= 0)
+				this.currentKey = (this.currentKey+1)%frameList.size();
+			else if(this.frame < firstKeyFrame.getTime()){
+				if(this.frame < 0){
+					this.frame = this.animation.length;
+					this.currentKey = frameList.size()-1;
+					firstKeyFrame = frameList.get(frameList.size()-1);
+					secondKeyFrame = frameList.get(0);
 				}
-				else if(this.frame < firstKeyFrame.getTime()){
-					this.currentKey = ((this.currentKey-1)+frameList.size())%frameList.size();
-					this.frame = frameList.get(this.currentKey).getTime();
-				}
+				else this.currentKey = ((this.currentKey-1)+frameList.size())%frameList.size();
 			}
 		}
 		else{
@@ -159,8 +148,8 @@ public class SpriterPlayer extends SpriterAbstractPlayer{
 		//Interpolate
 		this.currenObjectsToDraw = firstKeyFrame.getObjects().length;
 		this.currentBonesToAnimate = firstKeyFrame.getBones().length;
-		if(this.updateBones) this.transformBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
-		if(this.updateObjects) this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
+		this.transformBones(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
+		this.transformObjects(firstKeyFrame, secondKeyFrame, xOffset, yOffset);
 	}
 	
 	/**

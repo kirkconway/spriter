@@ -18,10 +18,8 @@
 package com.brashmonkey.spriter.player;
 
 import com.brashmonkey.spriter.SpriterCalculator;
-import com.brashmonkey.spriter.SpriterRectangle;
 import com.brashmonkey.spriter.animation.SpriterKeyFrame;
 import com.brashmonkey.spriter.draw.DrawInstruction;
-import com.brashmonkey.spriter.objects.SpriterBone;
 import com.brashmonkey.spriter.objects.SpriterObject;
 
 /**
@@ -37,7 +35,7 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	
 	private SpriterAbstractPlayer first, second;
 	private float weight;
-	private boolean interpolateSpeed = false;
+	public boolean updatePlayers = true;
 
 	/**
 	 * Returns an instance of this class, which will manage the interpolation between two #SpriterAbstractPlayer instances.
@@ -99,36 +97,24 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	@Override
 	protected void step(float xOffset, float yOffset){
 		int firstLastSpeed = first.frameSpeed, secondLastSpeed = second.frameSpeed;
-		int speed = this.frameSpeed;
-		if(this.interpolateSpeed)	speed = (int)this.interpolate(first.frameSpeed, second.frameSpeed, 0, 1, this.weight);
-		this.first.frameSpeed = speed;
-		this.second.frameSpeed = speed;
+		//int speed = this.frameSpeed;
+		//if(this.interpolateSpeed)	speed = (int)this.interpolate(first.frameSpeed, second.frameSpeed, 0, 1, this.weight);
+		//this.first.frameSpeed = speed;
+		//this.second.frameSpeed = speed;
 		
 		this.moddedBones = (this.weight <= 0.5f) ? this.first.moddedBones: this.second.moddedBones;
 		this.moddedObjects = (this.weight <= 0.5f) ? this.first.moddedObjects: this.second.moddedObjects;
-		if(this.weight == 0){
-			this.first.update(xOffset,yOffset);
-			this.instructions = this.first.instructions;
-			this.currenObjectsToDraw = first.currenObjectsToDraw;
-			this.currentBonesToAnimate = first.currentBonesToAnimate;
-		}
-		else if(this.weight == 1){
-			this.second.update(xOffset,yOffset);
-			this.instructions = this.second.instructions;
-			this.currenObjectsToDraw = second.currenObjectsToDraw;
-			this.currentBonesToAnimate = second.currentBonesToAnimate;
-		}
-		else{
-			this.currenObjectsToDraw = Math.min(first.currenObjectsToDraw, second.currenObjectsToDraw);
-			this.currentBonesToAnimate =  Math.min(first.currentBonesToAnimate, second.currentBonesToAnimate);
+		this.currenObjectsToDraw = Math.max(first.currenObjectsToDraw, second.currenObjectsToDraw);
+		this.currentBonesToAnimate =  Math.max(first.currentBonesToAnimate, second.currentBonesToAnimate);
+		if(this.updatePlayers){
 			this.first.update(xOffset, yOffset);
 			this.second.update(xOffset, yOffset);
-		
-			SpriterKeyFrame key1 = (first.transitionFixed) ? first.lastFrame: first.lastTempFrame;
-			SpriterKeyFrame key2 = (second.transitionFixed) ? second.lastFrame: second.lastTempFrame;
-			this.transformBones(key1, key2, xOffset, yOffset);
-			this.transformObjects(key1, key2, xOffset, yOffset);
 		}
+	
+		SpriterKeyFrame key1 = (first.transitionFixed) ? first.lastFrame: first.lastTempFrame;
+		SpriterKeyFrame key2 = (second.transitionFixed) ? second.lastFrame: second.lastTempFrame;
+		this.transformBones(key1, key2, xOffset, yOffset);
+		this.transformObjects(first.lastFrame, second.lastFrame, xOffset, yOffset);
 		this.first.frameSpeed = firstLastSpeed;
 		this.second.frameSpeed = secondLastSpeed;
 	}
@@ -161,43 +147,15 @@ public class SpriterPlayerInterpolator extends SpriterAbstractPlayer{
 	/**
 	 * @return true if this player also interpolates the speed of both players. false if not.
 	 */
-	public boolean interpolatesSpeed(){
+	/*public boolean interpolatesSpeed(){
 		return this.interpolateSpeed;
-	}
+	}*/
 	
 	/**
 	 * @param inter indicates whether this player has to interpolate the speed of bother players or not.
 	 * If it set to false, this player will set for both players the speed which this player has. See {@link #setFrameSpeed(int)}
 	 */
-	public void setInterpolateSpeed(boolean inter){
+	/*public void setInterpolateSpeed(boolean inter){
 		this.interpolateSpeed = inter;
-	}
-	
-	@Override
-	public SpriterBone[] getRuntimeBones(){
-		if(this.weight == 0) return this.first.getRuntimeBones();
-		else if(this.weight == 1) return this.second.getRuntimeBones();
-		else return this.tempBones;
-	}
-	
-	@Override
-	public SpriterObject[] getRuntimeObjects(){
-		if(this.weight == 0) return this.first.getRuntimeObjects();
-		else if(this.weight == 1) return this.second.getRuntimeObjects();
-		else return this.tempObjects;
-	}
-	
-	@Override
-	public SpriterRectangle getBoundingBox(){
-		if(this.weight == 0) return this.first.getBoundingBox();
-		else if(this.weight == 1) return this.second.getBoundingBox();
-		else return this.rect;
-	}
-	
-	@Override
-	public void calcBoundingBox(SpriterBone parent){
-		if(this.weight == 0) this.first.calcBoundingBox(parent);
-		else if(this.weight == 1) this.second.calcBoundingBox(parent);
-		else super.calcBoundingBox(parent);
-	}
+	}*/
 }

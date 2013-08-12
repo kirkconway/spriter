@@ -59,7 +59,7 @@ public class SCMLReader {
 		return null;
 	}
 	
-	private static SpriterData load(InputStream stream){
+	public static SpriterData load(InputStream stream){
 		XmlReader reader = new XmlReader();
 		data = new SpriterData();
 		try {

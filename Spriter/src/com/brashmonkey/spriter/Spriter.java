@@ -18,6 +18,8 @@
 package com.brashmonkey.spriter;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import com.brashmonkey.spriter.file.FileLoader;
 import com.brashmonkey.spriter.file.Reference;
@@ -36,8 +38,6 @@ public class Spriter {
 	 * Creates a spriter object.
 	 * 
 	 * @param path Path to the scml file
-	 * @param drawer
-	 *            a drawer extended from the AbstractDrawer
 	 * @param loader
 	 *            a loader extended from the AbstractLoader
 	 * @return a Spriter Object
@@ -47,9 +47,20 @@ public class Spriter {
 		return new Spriter(path, loader);
 	}
 	
+	public static Spriter getSpriter(File scmlFile, FileLoader<?> loader) throws FileNotFoundException {
+		return new Spriter(scmlFile, loader);
+	}
+	
 	public final FileLoader<?> loader;
 	public final File scmlFile;
 	public final SpriterData spriterData;
+	
+	public Spriter(File scmlfile, FileLoader<?> loader) throws FileNotFoundException {
+		this.scmlFile = scmlfile;
+		this.spriterData = SCMLReader.load(new FileInputStream(scmlFile));
+		this.loader = loader;
+		loadResources();
+	}
 
 	public Spriter(String scmlPath, FileLoader<?> loader) {
 		this.scmlFile = new File(scmlPath);

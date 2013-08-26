@@ -12,3 +12,9 @@ The library is meant to be generic, so to use it you have to implement some clas
 *   A specific drawer (AbstractDrawer) class which is repsonsible for drawing the animation data and also to debug draw an animation.
 
 If you do not know how to implement them, have a look at the LibGDX demo.
+
+After implementing those classes, the remaining should be quite easy.
+Create a Spriter instance:
+```
+Spriter spriter = Spriter.getSpriter("Path to your scml file", instanceOfYourLoader);//You can also pass a java.io.File instance as first argument.
+```

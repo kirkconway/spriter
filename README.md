@@ -94,3 +94,12 @@ SpriterBone bone = player.getBoneByName("boneName");
 SpriterBone bone = palyer.getRuntimeBones()[player.getBoneIndexByName("boneName")];
 //This works for SpriterObject analogous
 ```
+After accessing a specific bone or object instance you can apply translation, scaling or roation to it.
+What you need to keep in mind is that applying those operations have to happen __after__ updating the player
+and __before__ drawing it. Otherwise you will not see any changes.
+```
+bone.setAngle(yourAngle);
+bone.setX(x); bone.setY(y);
+bone.setScaleX(scaleX); bone.setScaleY(scaleY);
+```
+The method sould be self explanatory and this works for objects analogous.

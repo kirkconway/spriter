@@ -70,7 +70,27 @@ player.setFrameSpeed(15);
 //This will set the frame speed to 15. This means that in every update step the frame will jump 15 frames further
 
 player.setFrame(100);
-//This will set the current frame to 100 regardless what current frame we have now.
-//This can be handy if you want to stop the animation at a specific frame (you have to set the speed to 0 before)
+/*This will set the current frame to 100 regardless what current frame we have now.
+*/This can be handy if you want to stop the animation at a specific frame (you have to set the speed to 0 before)
 ```
 Yes, this is everything what you need for a basic usage of this library.
+
+Manipulating bones and objects at runtime
+-----------------------------------------
+This is also a cool topic. For example if you want your character to look always to the mouse or an enemy.
+The library gives you access to all updated bones and objects. You have just to call:
+```
+player.getRuntimeBones();
+//or
+player.getRuntimeObjects();
+```
+those two methods will give you an array of all bones or objects which have been updated.
+Accessing a specific instance in this way could be a little bit complicated, since you do not always know where in the
+array the desired bone or object is.
+So there are also methods which can give you a specific bone (index) or object (index) just by searching for its name:
+```
+SpriterBone bone = player.getBoneByName("boneName");
+//or
+SpriterBone bone = palyer.getRuntimeBones()[player.getBoneIndexByName("boneName")];
+//This works for SpriterObject analogous
+```

@@ -147,9 +147,9 @@ You could of course create a second interpolator, which interpolates `inter` and
 
 Inverse kinematics
 ------------------
-If you want to apply inverse kinematics on a player you just need an instance of ([SpriterIKResolver](https://github.com/Trixt0r/spriter/blob/master/Spriter/src/com/brashmonkey/spriter/ik/SpriterIKResolver.java) 'SpriterIKResolver') class,
+If you want to apply inverse kinematics on a player you just need an instance of ([SpriterIKResolver](https://github.com/Trixt0r/spriter/blob/master/Spriter/src/com/brashmonkey/spriter/ik/SpriterIKResolver.java "SpriterIKResolver")) class,
 which is an abstract class, means you need a specific algorithm to solve the constraints.
-Anyway, there is a ([SpriterCCDResolver](https://github.com/Trixt0r/spriter/blob/master/Spriter/src/com/brashmonkey/spriter/ik/SpriterCCDResolver.java)"SpriterCCDResolver") class, which does the job for you.
+Anyway, there is a ([SpriterCCDResolver](https://github.com/Trixt0r/spriter/blob/master/Spriter/src/com/brashmonkey/spriter/ik/SpriterCCDResolver.java "SpriterCCDResolver")) class, which does the job for you.
 To apply inverse kinematics create a SpriterIKObject instance and map it to a bone or a sprite with:
 
 ```

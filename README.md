@@ -104,6 +104,21 @@ bone.setScaleX(scaleX); bone.setScaleY(scaleY);
 ```
 The method sould be self explanatory and this works for objects analogous.
 
+Bounding boxes
+--------------
+Calculating bounding boxes is also possible with the library and it is also necessary to do so, for performance reasons.
+
+Anyway, to calculate a bounding box for a player is quite easy:
+```
+player.calcBoundingBox(null);
+//by setting the argument to null a bbox for all objects is calculated
+//you can change the argument to an arbitary SpriterBone instance
+//this enables the ability to cull sprites out, to increase performance
+SpriterRectangle rectangle = player.getBoundingBox();
+```
+
+That is all what you need to know about bouding boxes.
+
 Interpolate two running animations
 ----------------------------------
 Another cool thing about this library is that you can create an instance of SpriterPlayerInterpolator which will enable
@@ -119,9 +134,15 @@ SpriterPlayerInterpolator inter = new SpriterPlayerInterpolator(player1, player2
 ```
 After creating an instance of SpriterPlayerInterpolator you can use it as a normal SpriterPlayer instance
 (except changing animations and changing playback speed will have no effect).
+
 A SpriterPlayerInterpolator instance will update player1 and player2 on its own. You can change this, by setting
 `inter.updatePlayers = false;` if you want to draw the other players on different places
 (of course you have to update the players then on your own).
+
 You can change the interpolation weight of a SpriterPlayerInterpolator instance with `inter.setWeight(.75f);`.
 The value has to be between 0 and 1, where 0 means that the interpolator is playing the current animation of player1 back
 and 1 means it plays the current animation of player2 back. All other cases will end up in a mix between the two current animations.
+
+You could of course create a second interpolator, which interpolates `inter` and `player2`. Just play around with it.
+
+

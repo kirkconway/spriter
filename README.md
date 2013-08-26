@@ -33,6 +33,7 @@ In you update method you should call:
 player.update(x,y);
 ```
 Where `x` and `y` are the coordinates you want to draw the animation later on.
+The method will loop the animation on its own.
 
 In you rendering (or drawing) method you just call:
 ```
@@ -42,16 +43,34 @@ Which should draw the animation at `(x,y)` if your specific drawer is implemente
 
 That's it! Now read further if you want to know what other abilities the library has.
 
-Manipulate players at runtime
+Manipulate a SpriterPlayer at runtime
 -----------------------------
 Of course you have also the ability to change the animation and speed of your player.
 Change animation:
 ```
-//This method changes the animation immediately to the given animation index
 player.setAnimationIndex(anAnimationIndex);
-//This method does the same, but with a smooth transition from the current animation index the given one
-player.setAnimationIndex(anAnimationIndex, 1, 10); //This will take 10 update steps to switch into anAnimationIndex
-//This method does the same as the previous one, but this time you pass a name of the animation instead of an index
-player.setAnimation("animationName", 1, 20); //This will take 20 update steps to switch into "animationName"
+//This method changes the animation immediately to the given animation index
+
+player.setAnimationIndex(anAnimationIndex, 1, 10);
+/*This method does the same, but with a smooth transition from the current animation index the given one
+*/This will take 10 update steps to switch into anAnimationIndex
+
+player.setAnimation("animationName", 1, 20); 
+/*This method does the same as the previous one, but this time you pass a name of the animation instead of an index
+*The method will search only in the previous set entity. So if you have set the entity index to 0 in the constructor
+*and you search for an animation which is in the entity with the index 1 it could happen that you get an error.
+*/This will take 20 update steps to switch into "animationName"
 ```
 Note: All methods will throw a RuntimeException if the given animation index or name does not exist.
+Keep in mind that a smooth transition between two animations is only usefull if both animations have the same structure.
+
+Change speed and current frame:
+```
+player.setFrameSpeed(15);
+//This will set the frame speed to 15. This means that in every update step the frame will jump 15 frames further
+
+player.setFrame(100);
+//This will set the current frame to 100 regardless what current frame we have now.
+//This can be handy if you want to stop the animation at a specific frame (you have to set the speed to 0 before)
+```
+Yes, this is everything what you need for a basic usage of this library.

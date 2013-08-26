@@ -1,5 +1,6 @@
 Spriter
 =======
+(WIP)
 
 A Generic Java library for Spriter animation files.
 

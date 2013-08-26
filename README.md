@@ -145,4 +145,29 @@ and 1 means it plays the current animation of player2 back. All other cases will
 
 You could of course create a second interpolator, which interpolates `inter` and `player2`. Just play around with it.
 
+Inverse kinematics
+------------------
+If you want to apply inverse kinematics on a player you just need an instance of SpriterIKResolver class,
+which is an abstract class, means you need a specific algorithm to solve the constraints.
+Anyway, there is a SpriterCCDResolver class, which does the job for you.
+To apply inverse kinematics create a SpriterIKObject instance and map it to a bone or a sprite with:
 
+```
+yourResolver.mapIKObject(ikObject, boneOrSprite);
+```
+and in your update logic method just call:
+```
+yourResolver.resolve(yourPlayer);
+```
+after `yourPlayer.update(x,y);` to resolve the whole stuff.
+Before calling `resolve(yourPlayer)`, you need to deactivate all effectors, otherwise the resolver will have no 
+effect on the animation:
+```
+yourResolver.deactivateEffectors(yourPlayer, true);
+```
+If you do not want the resolver to apply IK for some reason, just call:
+```
+yourResolver.activateEffectors(yourPlayer);//Activates all effectors which where mapped before
+//or
+yourResolver.activateAlll(yourPlayer);//To activate all bones, no matter if they were mapped or not
+```

@@ -103,3 +103,25 @@ bone.setX(x); bone.setY(y);
 bone.setScaleX(scaleX); bone.setScaleY(scaleY);
 ```
 The method sould be self explanatory and this works for objects analogous.
+
+Interpolate two running animations
+----------------------------------
+Another cool thing about this library is that you can create an instance of SpriterPlayerInterpolator which will enable
+the ability to interpolate two, already tweened, animations (this works only in a proper way if both animatons have the
+same structure).
+What you need is two SpriterAbstractPlayer instances (usually two SpriterPlayer instances) which tween the keyframes of
+two different animations and pass those instances to the constructor of SpriterPlayerInterpolator:
+```
+SpriterPlayer player1 = new SpriterPlayer(spriter, 0, myLoader);
+SpriterPlayer player2 = new SpriterPlayer(spriter, 0, myLoader);
+player2.setAnimation("otherAnimationThanPlayer1", 1,1): //Make sure the players have two different animations
+SpriterPlayerInterpolator inter = new SpriterPlayerInterpolator(player1, player2);
+```
+After creating an instance of SpriterPlayerInterpolator you can use it as a normal SpriterPlayer instance
+(except changing animations and changing playback speed will have no effect).
+A SpriterPlayerInterpolator instance will update player1 and player2 on its own. You can change this, by setting
+`inter.updatePlayers = false;` if you want to draw the other players on different places
+(of course you have to update the players then on your own).
+You can change the interpolation weight of a SpriterPlayerInterpolator instance with `inter.setWeight(.75f);`.
+The value has to be between 0 and 1, where 0 means that the interpolator is playing the current animation of player1 back
+and 1 means it plays the current animation of player2 back. All other cases will end up in a mix between the two current animations.

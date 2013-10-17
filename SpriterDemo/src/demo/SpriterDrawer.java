@@ -2,7 +2,6 @@ package demo;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.brashmonkey.spriter.draw.AbstractDrawer;
 import com.brashmonkey.spriter.draw.DrawInstruction;
@@ -18,8 +17,6 @@ public class SpriterDrawer extends AbstractDrawer<Sprite> {
 	public SpriteBatch batch;
 	public ShapeRenderer renderer;
 	public boolean drawNormals = false;
-	public ShaderProgram shaderProgram;
-	//private float[] vertices = new float[10];
 
 	public SpriterDrawer(SpriteBatch batch){
 		this(null, batch);
@@ -55,14 +52,7 @@ public class SpriterDrawer extends AbstractDrawer<Sprite> {
 		
 		sprite.setColor(1f, 1f, 1f, alpha);
 		sprite.setScale(scaleX, scaleY);
-		/*if(this.drawNormals){
-			sprite.setNormal();
-			//this.shaderProgram.setAttributef("transform", angle, Math.signum(scaleX), Math.signum(scaleY), 0);
-			sprite.normalSprite.draw(batch);
-			batch.flush();
-		}
-		else*/
-			sprite.draw(batch);
+		sprite.draw(batch);
 	}
 
 	@Override

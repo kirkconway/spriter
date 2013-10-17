@@ -31,51 +31,7 @@
         <file id="3" name="mon_legs/foot_0.png" width="139" height="159" pivot_x="0" pivot_y="1"/>
         <file id="4" name="mon_legs/thigh_0.png" width="81" height="156" pivot_x="0" pivot_y="1"/>
     </folder>
-    <folder id="5" name="fatman/arm_lower_right">
-        <file id="0" name="fatman/arm_lower_right/0.png" width="49" height="42" pivot_x="0" pivot_y="1"/>
-    </folder>
-    <folder id="6" name="fatman/arm_upper_right">
-        <file id="0" name="fatman/arm_upper_right/0.png" width="50" height="79" pivot_x="0" pivot_y="1"/>
-    </folder>
-    <folder id="7" name="fatman/hand_right">
-        <file id="0" name="fatman/hand_right/0.png" width="49" height="41" pivot_x="0" pivot_y="1"/>
-        <file id="1" name="fatman/hand_right/2.png" width="49" height="41" pivot_x="0" pivot_y="1"/>
-    </folder>
-    <folder id="8" name="fatman/body">
-        <file id="0" name="fatman/body/5.png" width="123" height="111" pivot_x="0" pivot_y="1"/>
-    </folder>
-    <folder id="9" name="fatman/head">
-        <file id="0" name="fatman/head/4.png" width="123" height="129" pivot_x="0" pivot_y="1"/>
-    </folder>
-    <folder id="10" name="fatman/leg_upper_right">
-        <file id="0" name="fatman/leg_upper_right/0.png" width="23" height="32" pivot_x="0" pivot_y="1"/>
-    </folder>
-    <folder id="11" name="fatman/leg_lower_right">
-        <file id="0" name="fatman/leg_lower_right/1.png" width="30" height="18" pivot_x="0" pivot_y="1"/>
-    </folder>
     <entity id="0" name="monster">
-        <character_map id="0" name=""/>
-        <character_map id="1" name="fatman">
-            <map folder="1" file="5" target_folder="7" target_file="0"/>
-            <map folder="1" file="7" target_folder="7" target_file="0"/>
-            <map folder="1" file="9" target_folder="7" target_file="0"/>
-            <map folder="1" file="3" target_folder="6" target_file="0"/>
-            <map folder="1" file="4" target_folder="5" target_file="0"/>
-            <map folder="1" file="0" target_folder="6" target_file="0"/>
-            <map folder="1" file="1" target_folder="7" target_file="1"/>
-            <map folder="1" file="6" target_folder="7" target_file="1"/>
-            <map folder="1" file="8" target_folder="7" target_file="1"/>
-            <map folder="1" file="2" target_folder="5" target_file="0"/>
-            <map folder="2" file="0" target_folder="8" target_file="0"/>
-            <map folder="3" file="0" target_folder="9" target_file="0"/>
-            <map folder="3" file="1" target_folder="9" target_file="0"/>
-            <map folder="3" file="2" target_folder="9" target_file="0"/>
-            <map folder="3" file="3" target_folder="9" target_file="0"/>
-            <map folder="4" file="4" target_folder="10" target_file="0"/>
-            <map folder="4" file="1" target_folder="10" target_file="0"/>
-            <map folder="4" file="0" target_folder="11" target_file="0"/>
-            <map folder="4" file="3" target_folder="11" target_file="0"/>
-        </character_map>
         <animation id="0" name="idle" length="1000" looping="false">
             <mainline>
                 <key id="0">

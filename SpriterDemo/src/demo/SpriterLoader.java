@@ -28,7 +28,9 @@ import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.brashmonkey.spriter.file.FileLoader;
 import com.brashmonkey.spriter.file.Reference;
 
@@ -41,41 +43,74 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 	
 	private PixmapPacker packer;
 	private boolean pack;
+	private int atlasWidth, atlasHeight;
+	
+	public SpriterLoader(){
+		this(true);
+	}
+	
+	/**
+	 * Creates a loader object to load all necessary sprites for playing Spriter animations.
+	 * @param pack Indicates whether the loaded sprites have to be packed into an atlas (with a 1024x1024 dimension)
+	 * or not (resolves performance issues if true).
+	 */
+	public SpriterLoader(boolean pack){
+		this(1024, 1024);
+		this.pack = pack;
+	}
 	
 	/**
 	 * Creates a loader object to load all necessary sprites for playing Spriter animations.
 	 * @param pack Indicates whether the loaded sprites have to be packed into an atlas or not (resolves performance issues if true).
 	 */
-	public SpriterLoader(boolean pack){
-		this.pack = pack;
+	/**
+	 * Creates a loader object to load all necessary sprites for playing Spriter animations.
+	 * @param atlasWidth The desired width of the atlas which is going to be generated.
+	 * @param atlasHeight The desired height of the atlas which is going to be generated.
+	 */
+	public SpriterLoader(int atlasWidth, int atlasHeight){
+		this.pack = true;
+		if(!Gdx.graphics.isGL20Available() && (!MathUtils.isPowerOfTwo(atlasWidth) || !MathUtils.isPowerOfTwo(atlasHeight)))
+			throw new GdxRuntimeException("Wrong dimensions for the texture atlas ("+atlasWidth+"x"+atlasHeight+")!\n"
+					+ " Use OpenGL ES 2.0 or change the dimensions to power of two (e.g. "+MathUtils.nextPowerOfTwo(atlasWidth)+"x"+MathUtils.nextPowerOfTwo(atlasHeight)+")");
+		this.atlasWidth = atlasWidth;
+		this.atlasHeight = atlasHeight;
 	}
 
 	@Override
 	public void load(final Reference ref, String path) {
-		FileHandle f = Gdx.files.internal(path);
-		if(!f.exists()) return;
-		if(packer == null && this.pack)
-			packer = new PixmapPacker(2048, 2048, Pixmap.Format.RGBA8888, 2, true);
-		final Pixmap pix = new Pixmap(f);
+		FileHandle f;
+		switch(Gdx.app.getType()){
+		case iOS: f = Gdx.files.absolute(path); break;
+		default: f = Gdx.files.internal(path); break;
+		}
+		
+		if(!f.exists()) throw new GdxRuntimeException("Could not find file handle "+ path + "! Please check your paths.");
+		if(this.packer == null && this.pack)
+			this.packer = new PixmapPacker(this.atlasWidth, this.atlasHeight, Pixmap.Format.RGBA8888, 2, true);
+		final Pixmap pix;
+		Texture tex;
+		TextureRegion texRegion;
+		if(!Gdx.graphics.isGL20Available()){
+			Pixmap temp = new Pixmap(f);
+			pix = new Pixmap(MathUtils.nextPowerOfTwo(temp.getWidth()), MathUtils.nextPowerOfTwo(temp.getHeight()), temp.getFormat());
+			pix.drawPixmap(temp, 0, 0);
+			tex = new Texture(pix);
+			texRegion = new TextureRegion(tex, temp.getWidth(), temp.getHeight());
+			temp.dispose();
+		}
+		else{
+			pix = new Pixmap(f);
+			tex = new Texture(pix);
+			texRegion = new TextureRegion(tex, pix.getWidth(), pix.getHeight());
+		}
+		
+		tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-		if(packer != null)
-			packer.pack(ref.fileName, pix);
+		if(this.packer != null)	packer.pack(ref.fileName, pix);
 		
-		files.put(ref, null);//Put first the reference into the map, in the next frame, the null value will be replaced with the actual texture.
-		
-		Gdx.app.postRunnable(new Runnable(){ //Post the creation of a OpenGL Texture to the LibGDX rendering thread.
-			//This is necessary if you are loading the scml file asynchrouously with more than one thread.
-			@Override
-			public void run() {
-				files.put(ref, createSprite(new Texture(pix)));
-				pix.dispose();
-			}
-		});
-	}
-	
-	private Sprite createSprite(Texture diffuse){
-		diffuse.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		return new Sprite(diffuse);
+		this.files.put(ref, new Sprite(texRegion));
+		pix.dispose();
 	}
 	
 	/**
@@ -83,13 +118,14 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 	 */
 	public void generatePackedSprites(){
 		if(this.packer == null) return;
-		TextureAtlas diffuseAtlas = this.packer.generateTextureAtlas(TextureFilter.Linear, TextureFilter.Linear, false);
+		TextureAtlas tex = this.packer.generateTextureAtlas(TextureFilter.Linear, TextureFilter.Linear, false);
 		Set<Reference> keys = this.files.keySet();
 		this.disposeNonPackedTextures();
 		for(Reference ref: keys){
-			TextureRegion texReg = diffuseAtlas.findRegion(ref.fileName);
-			Sprite sprite = new Sprite(diffuseAtlas.findRegion(ref.fileName));
-			sprite.setSize(texReg.getRegionWidth(), texReg.getRegionHeight());
+			TextureRegion texReg = tex.findRegion(ref.fileName);
+			texReg.setRegionWidth((int) ref.dimensions.width);
+			texReg.setRegionHeight((int) ref.dimensions.height);
+			Sprite sprite = new Sprite(texReg);			
 			files.put(ref, sprite);
 		}
 	}
@@ -109,14 +145,7 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 
 	@Override
 	public void finishLoading() { //This method basically calls the method to create an atlas for all loaded textures
-		if(this.pack)
-			Gdx.app.postRunnable(new Runnable(){//Has to be called in the rendering thread since OpenGL textures have to be created
-				@Override
-				public void run() {
-					generatePackedSprites();
-				}
-				
-			});
+		if(this.pack) generatePackedSprites();
 	}
 
 }

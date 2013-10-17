@@ -33,10 +33,10 @@ public abstract class FileLoader<I> {
 	abstract public void load(Reference ref, String path);
 	
 	/**
-	 * Is called if all resources have been passed to this loader. 
+	 * Gets called if all resources have been passed to this loader. 
 	 */
 	public void finishLoading(){
-		//To be implemented by your specific backend loader.
+		//TODO be implemented by your specific backend loader.
 	}
 	
 	public I get(Reference ref){

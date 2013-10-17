@@ -17,7 +17,7 @@ public class StageComposer {
 	public static PlayerInterpolationControl middleController;
 	
 	public static void compose(Stage stage, FileLoader<?> loader, AbstractDrawer<?> drawer, Skin skin) throws IOException{
-		Spriter spriter = Spriter.getSpriter(Gdx.files.internal("monster/basic.scml").file(), loader);
+		Spriter spriter = Spriter.getSpriter(Gdx.files.absolute("monster/basic.scml").file(), loader);
 		Table table = new Table(skin);
 		//table.debug();
 		table.setFillParent(true);

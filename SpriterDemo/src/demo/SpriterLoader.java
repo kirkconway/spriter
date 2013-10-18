@@ -17,6 +17,7 @@
 
 package demo;
 
+import java.util.HashMap;
 import java.util.Set;
 
 import com.badlogic.gdx.Gdx;
@@ -42,6 +43,8 @@ import com.brashmonkey.spriter.file.Reference;
 public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 	
 	private PixmapPacker packer;
+	private HashMap<Reference, Pixmap> pixmaps;	
+	private HashMap<Pixmap, Boolean> pixmapsToDispose;
 	private boolean pack;
 	private int atlasWidth, atlasHeight;
 	
@@ -61,10 +64,6 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 	
 	/**
 	 * Creates a loader object to load all necessary sprites for playing Spriter animations.
-	 * @param pack Indicates whether the loaded sprites have to be packed into an atlas or not (resolves performance issues if true).
-	 */
-	/**
-	 * Creates a loader object to load all necessary sprites for playing Spriter animations.
 	 * @param atlasWidth The desired width of the atlas which is going to be generated.
 	 * @param atlasHeight The desired height of the atlas which is going to be generated.
 	 */
@@ -75,6 +74,8 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 					+ " Use OpenGL ES 2.0 or change the dimensions to power of two (e.g. "+MathUtils.nextPowerOfTwo(atlasWidth)+"x"+MathUtils.nextPowerOfTwo(atlasHeight)+")");
 		this.atlasWidth = atlasWidth;
 		this.atlasHeight = atlasHeight;
+		this.pixmaps = new HashMap<Reference, Pixmap>();
+		this.pixmapsToDispose = new HashMap<Pixmap, Boolean>();
 	}
 
 	@Override
@@ -88,35 +89,15 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 		if(!f.exists()) throw new GdxRuntimeException("Could not find file handle "+ path + "! Please check your paths.");
 		if(this.packer == null && this.pack)
 			this.packer = new PixmapPacker(this.atlasWidth, this.atlasHeight, Pixmap.Format.RGBA8888, 2, true);
-		final Pixmap pix;
-		Texture tex;
-		TextureRegion texRegion;
-		if(!Gdx.graphics.isGL20Available()){
-			Pixmap temp = new Pixmap(f);
-			pix = new Pixmap(MathUtils.nextPowerOfTwo(temp.getWidth()), MathUtils.nextPowerOfTwo(temp.getHeight()), temp.getFormat());
-			pix.drawPixmap(temp, 0, 0);
-			tex = new Texture(pix);
-			texRegion = new TextureRegion(tex, temp.getWidth(), temp.getHeight());
-			temp.dispose();
-		}
-		else{
-			pix = new Pixmap(f);
-			tex = new Texture(pix);
-			texRegion = new TextureRegion(tex, pix.getWidth(), pix.getHeight());
-		}
-		
-		tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-		if(this.packer != null)	packer.pack(ref.fileName, pix);
-		
-		this.files.put(ref, new Sprite(texRegion));
-		pix.dispose();
+		final Pixmap pix = new Pixmap(f);
+		this.files.put(ref, null);
+		this.pixmaps.put(ref, pix);
 	}
 	
 	/**
 	 * Packs all loaded sprites into an atlas. Has to called after loading all sprites.
 	 */
-	public void generatePackedSprites(){
+	protected void generatePackedSprites(){
 		if(this.packer == null) return;
 		TextureAtlas tex = this.packer.generateTextureAtlas(TextureFilter.Linear, TextureFilter.Linear, false);
 		Set<Reference> keys = this.files.keySet();
@@ -125,8 +106,7 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 			TextureRegion texReg = tex.findRegion(ref.fileName);
 			texReg.setRegionWidth((int) ref.dimensions.width);
 			texReg.setRegionHeight((int) ref.dimensions.height);
-			Sprite sprite = new Sprite(texReg);			
-			files.put(ref, sprite);
+			files.put(ref, new Sprite(texReg));
 		}
 	}
 	
@@ -144,8 +124,53 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 	}
 
 	@Override
-	public void finishLoading() { //This method basically calls the method to create an atlas for all loaded textures
+	/**
+	 * This method is now responsible for creating the pixmaps and textures.
+	 */
+	public void finishLoading() {
+		final Reference[] refs = super.getRefs();
+		for(int i = 0; i < refs.length; i++){
+			final Pixmap image;
+			Pixmap pix = this.pixmaps.get(refs[i]);
+			if(!Gdx.graphics.isGL20Available()){
+				Pixmap temp = pix;
+				image = new Pixmap(MathUtils.nextPowerOfTwo(temp.getWidth()), MathUtils.nextPowerOfTwo(temp.getHeight()), temp.getFormat());
+				image.drawPixmap(temp, 0, 0);
+				this.pixmapsToDispose.put(temp, true);
+			}
+			else image = pix;
+			final int index = i;
+			this.pixmapsToDispose.put(image, false);
+			this.createSprite(refs[index], image);
+			
+			if(this.packer != null)	packer.pack(refs[i].fileName, image);
+		}
 		if(this.pack) generatePackedSprites();
+		this.disposePixmaps();
+	}
+	
+	protected void createSprite(Reference ref, Pixmap image){
+		Texture tex = new Texture(image);
+		tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		TextureRegion texRegion = new TextureRegion(tex, (int)ref.dimensions.width, (int)ref.dimensions.height);
+		files.put(ref, new Sprite(texRegion));
+		pixmapsToDispose.put(image, true);
+	}
+	
+	protected void disposePixmaps(){
+		Pixmap[] maps = new Pixmap[this.pixmapsToDispose.size()];
+		this.pixmapsToDispose.keySet().toArray(maps);
+		for(Pixmap pix: maps){
+			try{
+				while(pixmapsToDispose.get(pix)){
+					pix.dispose();
+					pixmapsToDispose.put(pix, false);
+				}
+			} catch(GdxRuntimeException e){
+				System.err.println("Pixmap was already disposed!");
+			}
+		}
+		pixmapsToDispose.clear();
 	}
 
 }

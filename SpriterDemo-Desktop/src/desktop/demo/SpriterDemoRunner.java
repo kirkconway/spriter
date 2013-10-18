@@ -14,8 +14,8 @@ public class SpriterDemoRunner {
 		cfg.width = 1280;
 		cfg.height = 720;
 		cfg.resizable = false;
-		
-		new LwjglApplication(new SpriterDemo(), cfg);
+		SpriterDemo demo = new SpriterDemo(true);
+		new LwjglApplication(demo, cfg);
 	}
 
 }

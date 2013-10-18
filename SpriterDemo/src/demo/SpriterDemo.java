@@ -22,6 +22,11 @@ public class SpriterDemo implements ApplicationListener{
 	private SpriterLoader loader;
 	private SpriterDrawer drawer;
 	SpriterPlayerController leftController, rightController;
+	private boolean loadAsynchronus;
+	
+	public SpriterDemo(boolean loadAsynchronus){
+		this.loadAsynchronus = loadAsynchronus;
+	}
 
 	@Override
 	public void create() {
@@ -30,17 +35,31 @@ public class SpriterDemo implements ApplicationListener{
 		this.uiStage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
 				false, this.batch);
 		Gdx.input.setInputProcessor(this.uiStage);
-		this.loader = new SpriterLoader(true);
+		this.loader = new SpriterLoaderMultithreaded(true);
 		this.drawer = new SpriterDrawer(this.batch);
 		this.drawer.renderer = this.shapeRenderer;
 		this.skin = new Skin(Gdx.files.internal("data/buttons.json"));
-		try {
-			StageComposer.compose(uiStage, loader, drawer, skin);
-		} catch (IOException e) {
-			FileHandle f = Gdx.files.absolute("fail.txt");
-			f.writeString(e.getMessage()+"\n", true);
-			e.printStackTrace();
-		}
+		if(this.loadAsynchronus){
+			new Thread(getAssetLoaderRunnable()).start();
+		} else
+			Gdx.app.postRunnable(getAssetLoaderRunnable());
+		
+	}
+	
+	private Runnable getAssetLoaderRunnable(){
+		return new Runnable(){
+			@Override
+			public void run() {
+				try {
+					StageComposer.compose(uiStage, loader, drawer, skin);
+				} catch (IOException e) {
+					FileHandle f = Gdx.files.absolute("fail.txt");
+					f.writeString(e.getMessage()+"\n", true);
+					e.printStackTrace();
+				}
+			}
+			
+		};
 	}
 
 	@Override

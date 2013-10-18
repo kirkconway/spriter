@@ -8,27 +8,27 @@
 	<classpathentry exported="true" kind="lib" path="libs/libgdx/gdx-backend-lwjgl.jar" sourcepath="libs/libgdx/gdx-backend-lwjgl-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/libgdx/gdx-natives.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/libgdx/gdx.jar" sourcepath="libs/libgdx/gdx-sources.jar"/>
-	<classpathentry kind="lib" path="libs/slick/jinput.jar">
+	<classpathentry exported="true" kind="lib" path="libs/slick/jinput.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SpriterTests/libs/slick/natives"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/slick/lwjgl_util.jar">
+	<classpathentry exported="true" kind="lib" path="libs/slick/lwjgl_util.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SpriterTests/libs/slick/natives"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/slick/lwjgl.jar">
+	<classpathentry exported="true" kind="lib" path="libs/slick/lwjgl.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SpriterTests/libs/slick/natives"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/slick/slick.jar">
+	<classpathentry exported="true" kind="lib" path="libs/slick/slick.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SpriterTests/libs/slick/natives"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/slick/slick-util.jar">
+	<classpathentry exported="true" kind="lib" path="libs/slick/slick-util.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SpriterTests/libs/slick/natives"/>
 		</attributes>

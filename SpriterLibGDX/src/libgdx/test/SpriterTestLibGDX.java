@@ -1,4 +1,4 @@
-package spriter.test;
+package libgdx.test;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -12,16 +12,16 @@ import com.brashmonkey.spriter.player.SpriterAbstractPlayer;
 import com.brashmonkey.spriter.player.SpriterPlayer;
 import com.brashmonkey.spriter.xml.FileHandleSCMLReader;
 
-public class SpriterTest implements ApplicationListener{
+public class SpriterTestLibGDX implements ApplicationListener{
 	
 	public static void main(String... args){
 		LwjglApplicationConfiguration cfg =  new LwjglApplicationConfiguration();
-		cfg.title = "Spriter - demo";
+		cfg.title = "Spriter test for LibGDX";
 		cfg.useGL20 = false;
 		cfg.width = 1280;
 		cfg.height = 720;
 		cfg.resizable = false;
-		new LwjglApplication(new SpriterTest(), cfg);
+		new LwjglApplication(new SpriterTestLibGDX(), cfg);
 	}
 
 	private SpriteBatch batch;

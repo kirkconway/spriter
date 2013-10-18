@@ -1,4 +1,4 @@
-package spriter.test;
+package libgdx.test;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

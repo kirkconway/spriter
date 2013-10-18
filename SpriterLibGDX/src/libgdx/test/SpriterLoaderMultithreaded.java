@@ -15,7 +15,7 @@
  * limitations under the License.
 ***************************************************************************/
 
-package spriter.test;
+package libgdx.test;
 
 
 import com.badlogic.gdx.Gdx;

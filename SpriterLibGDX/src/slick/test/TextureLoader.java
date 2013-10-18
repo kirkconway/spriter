@@ -6,7 +6,7 @@ import org.newdawn.slick.SlickException;
 import com.brashmonkey.spriter.file.FileLoader;
 import com.brashmonkey.spriter.file.Reference;
 
-public class ImageLoader extends FileLoader<Image>{
+public class TextureLoader extends FileLoader<Image>{
 
 	@Override
 	public void load(Reference ref, String path) {

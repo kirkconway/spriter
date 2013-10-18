@@ -12,17 +12,17 @@ import com.brashmonkey.spriter.file.FileLoader;
 * @author Trixt0r
 */
 
-public class SpriterDrawer extends AbstractDrawer<Sprite> {
+public class SpriteDrawer extends AbstractDrawer<Sprite> {
 
 	public SpriteBatch batch;
 	public ShapeRenderer renderer;
 	public boolean drawNormals = false;
 
-	public SpriterDrawer(SpriteBatch batch){
+	public SpriteDrawer(SpriteBatch batch){
 		this(null, batch);
 	}
 
-	public SpriterDrawer(FileLoader<Sprite> loader, SpriteBatch batch) {
+	public SpriteDrawer(FileLoader<Sprite> loader, SpriteBatch batch) {
 		super(loader);
 		this.batch = batch;
 	}

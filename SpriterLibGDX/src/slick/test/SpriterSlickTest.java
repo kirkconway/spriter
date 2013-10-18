@@ -14,7 +14,7 @@ public class SpriterSlickTest extends BasicGame{
     float x = 640;
     float y = 360;
     float scale = 1;
-    private ImageDrawer drawer;
+    private TextureDrawer drawer;
     private Spriter spriter;
     private SpriterPlayer spriterPlayer; 
     
@@ -27,9 +27,9 @@ public class SpriterSlickTest extends BasicGame{
     public void init(GameContainer gc)
 			throws SlickException {
     	
-    	ImageLoader loader = new ImageLoader();
+    	TextureLoader loader = new TextureLoader();
     	Graphics g = gc.getGraphics();
-    	this.drawer = new ImageDrawer(loader, 720, g);
+    	this.drawer = new TextureDrawer(loader, 720, g);
 		//spriter = Spriter.getSpriter("monster/basic.scml",new ImageDrawer(loader,800,g),loader);
 		//spriter.playAnimation(2,true);
 		

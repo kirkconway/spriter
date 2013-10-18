@@ -26,8 +26,8 @@ public class SpriterTestLibGDX implements ApplicationListener{
 
 	private SpriteBatch batch;
 	private OrthographicCamera cam;
-	private SpriterLoader loader;
-	private SpriterDrawer drawer;
+	private SpriteLoader loader;
+	private SpriteDrawer drawer;
 	private SpriterAbstractPlayer player;
 	private Spriter spriter;
 	
@@ -36,8 +36,8 @@ public class SpriterTestLibGDX implements ApplicationListener{
 		this.batch = new SpriteBatch();
 		this.cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
-		this.loader = new SpriterLoader(2048, 2048);
-		this.drawer = new SpriterDrawer(this.loader, this.batch);
+		this.loader = new SpriteLoader(2048, 2048);
+		this.drawer = new SpriteDrawer(this.loader, this.batch);
 		
 		this.spriter = FileHandleSCMLReader.getSpriter(Gdx.files.internal("monster/basic.scml"), this.loader);
 		this.player = new SpriterPlayer(this.spriter.getSpriterData(), 0, this.loader);

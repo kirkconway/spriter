@@ -40,7 +40,7 @@ import com.brashmonkey.spriter.file.Reference;
  * @author Trixt0r
  */
 
-public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
+public class SpriteLoader extends FileLoader<Sprite> implements Disposable{
 	
 	private PixmapPacker packer;
 	private HashMap<Reference, Pixmap> pixmaps;	
@@ -48,7 +48,7 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 	private boolean pack;
 	private int atlasWidth, atlasHeight;
 	
-	public SpriterLoader(){
+	public SpriteLoader(){
 		this(true);
 	}
 	
@@ -57,7 +57,7 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 	 * @param pack Indicates whether the loaded sprites have to be packed into an atlas (with a 1024x1024 dimension)
 	 * or not (resolves performance issues if true).
 	 */
-	public SpriterLoader(boolean pack){
+	public SpriteLoader(boolean pack){
 		this(1024, 1024);
 		this.pack = pack;
 	}
@@ -67,7 +67,7 @@ public class SpriterLoader extends FileLoader<Sprite> implements Disposable{
 	 * @param atlasWidth The desired width of the atlas which is going to be generated.
 	 * @param atlasHeight The desired height of the atlas which is going to be generated.
 	 */
-	public SpriterLoader(int atlasWidth, int atlasHeight){
+	public SpriteLoader(int atlasWidth, int atlasHeight){
 		this.pack = true;
 		if(!Gdx.graphics.isGL20Available() && (!MathUtils.isPowerOfTwo(atlasWidth) || !MathUtils.isPowerOfTwo(atlasHeight)))
 			throw new GdxRuntimeException("Wrong dimensions for the texture atlas ("+atlasWidth+"x"+atlasHeight+")!\n"

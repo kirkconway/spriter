@@ -28,13 +28,13 @@ import com.brashmonkey.spriter.file.Reference;
  * @author Trixt0r
  */
 
-public class SpriterLoaderMultithreaded extends SpriterLoader implements Disposable{
+public class SpriteLoaderMultithreaded extends SpriteLoader implements Disposable{
 	
-	public SpriterLoaderMultithreaded(boolean pack){
+	public SpriteLoaderMultithreaded(boolean pack){
 		super(pack);
 	}
 	
-	public SpriterLoaderMultithreaded(int atlasWidth, int atlasHeight){
+	public SpriteLoaderMultithreaded(int atlasWidth, int atlasHeight){
 		super(atlasWidth, atlasHeight);
 	}
 	
@@ -43,7 +43,7 @@ public class SpriterLoaderMultithreaded extends SpriterLoader implements Disposa
 		Gdx.app.postRunnable(new Runnable(){
 			@Override
 			public void run() {
-				SpriterLoaderMultithreaded.super.createSprite(ref, image);
+				SpriteLoaderMultithreaded.super.createSprite(ref, image);
 			}
 		});
 	}
@@ -53,7 +53,7 @@ public class SpriterLoaderMultithreaded extends SpriterLoader implements Disposa
 		Gdx.app.postRunnable(new Runnable(){
 			@Override
 			public void run() {
-				SpriterLoaderMultithreaded.super.generatePackedSprites();
+				SpriteLoaderMultithreaded.super.generatePackedSprites();
 			}
 		});
 	}

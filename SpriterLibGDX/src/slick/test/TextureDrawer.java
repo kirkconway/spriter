@@ -7,12 +7,12 @@ import com.brashmonkey.spriter.draw.AbstractDrawer;
 import com.brashmonkey.spriter.draw.DrawInstruction;
 import com.brashmonkey.spriter.file.FileLoader;
 
-public class ImageDrawer extends AbstractDrawer<Image> {
+public class TextureDrawer extends AbstractDrawer<Image> {
 
 	private float screenheight;
 	private Graphics g;
 
-	public ImageDrawer(FileLoader<Image> loader, float screenheight, Graphics g) {
+	public TextureDrawer(FileLoader<Image> loader, float screenheight, Graphics g) {
 		super(loader);
 		this.screenheight = screenheight;
 		this.g = g;

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="Spriter/src"/>
+	<classpathentry kind="src" path="SpriterDemo/src"/>
+	<classpathentry kind="lib" path="SpriterDemo/libs/gdx-backend-lwjgl-natives.jar"/>
+	<classpathentry kind="lib" path="SpriterDemo/libs/gdx-backend-lwjgl-sources.jar"/>
+	<classpathentry kind="lib" path="SpriterDemo/libs/gdx-backend-lwjgl.jar"/>
+	<classpathentry kind="lib" path="SpriterDemo/libs/gdx-natives.jar"/>
+	<classpathentry kind="lib" path="SpriterDemo/libs/gdx-sources.jar"/>
+	<classpathentry kind="lib" path="SpriterDemo/libs/gdx.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="SpriterDemo/bin"/>
+</classpath>

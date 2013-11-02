@@ -33,7 +33,7 @@ import com.discobeard.spriter.dom.*;
  */
 public class SCMLReader {
 	
-	static SpriterData data;
+	protected static SpriterData data;
 	
 	/**
 	 * Loads a whole spriter file.
@@ -72,7 +72,7 @@ public class SCMLReader {
 		return data;
 	}
 	
-	static void loadFolders(ArrayList<XmlReader.Element> folders){
+	protected static void loadFolders(ArrayList<XmlReader.Element> folders){
 		for(int i = 0; i < folders.size(); i++){
 			XmlReader.Element repo = folders.get(i);
 			Folder folder = new Folder();
@@ -97,7 +97,7 @@ public class SCMLReader {
 		}
 	}
 
-	static void loadEntities(ArrayList<XmlReader.Element> entities){
+	protected static void loadEntities(ArrayList<XmlReader.Element> entities){
 		for(int i = 0; i < entities.size(); i++){
 			XmlReader.Element e = entities.get(i);
 			Entity entity = new Entity();

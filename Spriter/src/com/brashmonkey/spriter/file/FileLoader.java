@@ -35,9 +35,7 @@ public abstract class FileLoader<I> {
 	/**
 	 * Gets called if all resources have been passed to this loader. 
 	 */
-	public void finishLoading(){
-		//TODO be implemented by your specific backend loader.
-	}
+	public abstract void finishLoading();
 	
 	public I get(Reference ref){
 		return files.get(ref);
@@ -75,8 +73,10 @@ public abstract class FileLoader<I> {
 		Reference[] refs = this.getRefs();
 		ArrayList<Reference> files = new ArrayList<Reference>();
 		for(Reference ref: refs)
-			if(ref.folderName.equals(folderName)) files.add(ref);
-		return files.toArray(refs);
+			if(ref.folderName.toLowerCase().equals(folderName)) files.add(ref);
+		Reference[] r = new Reference[files.size()];
+		files.toArray(r);
+		return r;
 	}
 	
 	/**
@@ -87,7 +87,7 @@ public abstract class FileLoader<I> {
 	public Reference findReferenceByFileName(String fileName){
 		Reference[] refs = this.getRefs();
 		for(Reference ref: refs)
-			if(ref.fileName.equals(fileName)) return ref;
+			if(ref.fileName.toLowerCase().equals(fileName)) return ref;
 		return null;
 	}
 	
@@ -103,7 +103,7 @@ public abstract class FileLoader<I> {
 		for(Reference ref: refs){
 			String file = ref.fileName.replaceAll(folderName+"/", "");
 			if(withoutExtension) file = file.replaceAll(".png", "");
-			if(file.equals(fileName)) return ref;
+			if(file.toLowerCase().equals(fileName)) return ref;
 		}
 		return null;
 	}

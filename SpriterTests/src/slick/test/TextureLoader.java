@@ -16,4 +16,10 @@ public class TextureLoader extends FileLoader<Image>{
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public void finishLoading() {
+		// TODO Auto-generated method stub
+		
+	}
 }

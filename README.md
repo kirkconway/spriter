@@ -4,6 +4,7 @@ Spriter
 
 A Generic Java library for Spriter animation files.
 
+[Checkout the features video.](http://www.youtube.com/watch?v=i_OxqopvMH0)
 
 
 Basic usage

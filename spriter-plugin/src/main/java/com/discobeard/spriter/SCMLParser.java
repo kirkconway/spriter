@@ -38,7 +38,6 @@ public class SCMLParser {
 		jc = JAXBContext.newInstance("com.discobeard.spriter.dom");
 		Unmarshaller u = jc.createUnmarshaller();
 
-		@SuppressWarnings("unchecked")
 		JAXBElement<SpriterData> root = (JAXBElement<SpriterData>) u.unmarshal(new FileInputStream(SCMLFile));
 		SpriterData spriterData = root.getValue();
 		return spriterData;

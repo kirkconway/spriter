@@ -24,11 +24,4 @@
 	        </plugin>
 		</plugins>
 	</build>
-	<dependencies>
-		<dependency>
-			<groupId>com.discobeard.spriter</groupId>
-			<artifactId>spriter-scml-dom</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>	
-	</dependencies>
 </project>

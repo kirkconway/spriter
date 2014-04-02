@@ -32,7 +32,7 @@ public class SpriterTest {
 	}
 	
 	public void draw(){
-		spriterPlayer.update(100, 100);
+		spriterPlayer.update(300, 300);
 		spriterPlayer.draw();
 	}
 }

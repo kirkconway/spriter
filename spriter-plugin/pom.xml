@@ -15,13 +15,22 @@
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-compiler-plugin</artifactId>
 		        <configuration>
-		            <source>1.7</source>
-		            <target>1.7</target>
+		            <source>1.8</source>
+		            <target>1.8</target>
 		            <showDeprecation>true</showDeprecation>
 		            <showWarnings>true</showWarnings>
 		            <fork>true</fork>
 		        </configuration>
 	        </plugin>
-		</plugins>
+        </plugins>
 	</build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

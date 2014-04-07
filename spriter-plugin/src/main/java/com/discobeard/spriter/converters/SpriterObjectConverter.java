@@ -4,7 +4,6 @@ import com.discobeard.spriter.dom.AnimationObject;
 import com.discobeard.spriter.objects.SpriterObject;
 
 public class SpriterObjectConverter implements Converter<AnimationObject, SpriterObject>{
-
 	public SpriterObject convert(AnimationObject from) {
 		
 		SpriterObject object = new SpriterObject();

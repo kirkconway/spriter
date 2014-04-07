@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.newdawn.slick.opengl.Texture;
 
-import com.discobeard.spriter.Spriter;
+import com.discobeard.spriter.SpriterAnimation;
 import com.discobeard.spriter.SpriterKeyFrameProvider;
 import com.discobeard.spriter.SpriterPlayer;
 import com.discobeard.spriter.file.AbstractLoader;
@@ -16,18 +16,18 @@ public class SpriterTest {
 	private AbstractLoader<Texture> loader;
 	private TextureDrawer drawer;
 
-	SpriterPlayer spriterPlayer; 
-	Spriter spriter;
+	private SpriterPlayer spriterPlayer;
+	private SpriterAnimation spriterAnimation;
 	
 	public SpriterTest(){
 		loader = new TextureLoader();
 		drawer = new TextureDrawer(loader);
 		
-		spriter = Spriter.getSpriter("monster/basic.scml", loader);
-		List<SpriterKeyFrame[]> keyframes = SpriterKeyFrameProvider.generateKeyFramePool(spriter.getSpriterData());
-		spriterPlayer = new SpriterPlayer(spriter.getSpriterData(), drawer, keyframes);
+		spriterAnimation = SpriterAnimation.createAnimation("Goblin_enemy/Goblin_edited.scml", loader);
+		List<SpriterKeyFrame[]> keyframes = SpriterKeyFrameProvider.generateKeyFramePool(spriterAnimation.getSpriterData());
+		spriterPlayer = new SpriterPlayer(spriterAnimation.getSpriterData(), drawer, keyframes);
 		spriterPlayer.setFrameSpeed(10);
-		spriterPlayer.setAnimatioIndex(spriterPlayer.getAnimationIndexByName("idle"), 0, 0);
+		spriterPlayer.setAnimatioIndex(spriterPlayer.getAnimationIndexByName("walk"), 0, 0);
 		
 	}
 	

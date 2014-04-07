@@ -38,12 +38,15 @@
             <xs:attribute name="name" type="xs:string"/>
             <xs:attribute name="width" type="xs:long"/>
 			<xs:attribute name="height" type="xs:long"/>
+            <xs:attribute name="pivot_x" type="xs:decimal"/>
+            <xs:attribute name="pivot_y" type="xs:decimal"/>
     </xs:complexType>
 	
 	<xs:complexType name="Entity">
-		<xs:sequence>
-			<xs:element name="animation" type="Animation" minOccurs="0" maxOccurs="unbounded" />
-		</xs:sequence>
+        <xs:sequence>
+            <xs:element name="obj_info" type="ObjectInfo" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="animation" type="Animation" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
 		<xs:attribute name="id" type="xs:int"/>
 		<xs:attribute name="name" type="xs:string" />
     </xs:complexType>
@@ -72,6 +75,17 @@
 		<xs:attribute name="length" type="xs:long" />
 		<xs:attribute name="looping" type="xs:boolean" />
 	</xs:complexType>
+
+    <xs:complexType name="ObjectInfo">
+        <xs:sequence>
+            <xs:element name="mainline" type="MainLine" minOccurs="1" maxOccurs="1" />
+            <xs:element name="timeline" type="TimeLine" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:int"/>
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="length" type="xs:long" />
+        <xs:attribute name="looping" type="xs:boolean" />
+    </xs:complexType>
 	
 	<xs:complexType name="Key">
 		<xs:sequence>

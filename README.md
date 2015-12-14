@@ -1,8 +1,6 @@
 spriter
 =======
 
-A Generic Java importer for Spriter animation files.
+This project hasnt been updated in years check out https://github.com/Trixt0r/spriter for a more up to date library
 
-Travis Build Status
 
-[![Build Status](https://api.travis-ci.org/Discobeard/spriter.svg)](https://travis-ci.org/Discobeard/spriter)
